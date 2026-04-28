@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { AnimatePresence, motion, type HTMLMotionProps } from "motion/react";
 
 import { cn } from "@/lib/utils";
 
@@ -32,13 +31,37 @@ type StepperContextValue = {
   goNext: () => void;
 };
 
+type StepperItemContextValue = {
+  value: string;
+  index: number;
+  disabled: boolean;
+  isActive: boolean;
+  stepState: StepperStepState;
+  orientation: StepperOrientation;
+  setValue: (value: string) => void;
+  triggerId: string;
+  contentId: string;
+};
+
 const StepperContext = React.createContext<StepperContextValue | null>(null);
+const StepperItemContext =
+  React.createContext<StepperItemContextValue | null>(null);
 
 function useStepperContext(component: string) {
   const context = React.useContext(StepperContext);
 
   if (!context) {
     throw new Error(`${component} must be used within Stepper`);
+  }
+
+  return context;
+}
+
+function useStepperItemContext(component: string) {
+  const context = React.useContext(StepperItemContext);
+
+  if (!context) {
+    throw new Error(`${component} must be used within StepperItem`);
   }
 
   return context;
@@ -229,11 +252,12 @@ function StepperList({ className, ...props }: StepperListProps) {
 }
 
 type StepperItemProps = Omit<
-  React.ComponentPropsWithoutRef<"button">,
+  React.ComponentPropsWithoutRef<"li">,
   "value"
 > & {
   value: string;
   completed?: boolean;
+  disabled?: boolean;
   error?: boolean;
 };
 
@@ -244,7 +268,6 @@ function StepperItem({
   error = false,
   className,
   children,
-  onClick,
   ...props
 }: StepperItemProps) {
   const {
@@ -266,6 +289,31 @@ function StepperItem({
         : completed
           ? "completed"
           : "inactive";
+  const hasCustomChildren = hasStepperPrimitiveChild(children);
+  const itemContext = React.useMemo<StepperItemContextValue>(
+    () => ({
+      value,
+      index,
+      disabled,
+      isActive,
+      stepState,
+      orientation,
+      setValue,
+      triggerId: getTriggerId(value),
+      contentId: getContentId(value),
+    }),
+    [
+      value,
+      index,
+      disabled,
+      isActive,
+      stepState,
+      orientation,
+      setValue,
+      getTriggerId,
+      getContentId,
+    ]
+  );
 
   return (
     <li
@@ -275,76 +323,175 @@ function StepperItem({
       className={cn(
         "group/stepper-item relative flex min-w-0",
         "data-[orientation=horizontal]:min-w-24 data-[orientation=horizontal]:flex-1 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:items-center",
-        "data-[orientation=vertical]:items-start data-[orientation=vertical]:gap-3"
+        "data-[orientation=vertical]:items-start data-[orientation=vertical]:gap-3",
+        className
       )}
+      {...props}
     >
-      <button
-        id={getTriggerId(value)}
-        type="button"
-        aria-current={isActive ? "step" : undefined}
-        aria-controls={isActive ? getContentId(value) : undefined}
-        disabled={disabled}
-        data-slot="stepper-trigger"
-        data-state={stepState}
-        className={cn(
-          "group inline-flex min-h-10 min-w-0 items-center gap-2 rounded-md text-left text-sm font-medium outline-none",
-          "text-muted-foreground transition-[color,background-color,box-shadow,transform] active:scale-[0.96]",
-          "focus-visible:ring-ring/50 focus-visible:ring-[3px]",
-          "disabled:pointer-events-none disabled:opacity-50",
-          "data-[state=active]:text-foreground",
-          "data-[state=completed]:text-foreground",
-          "data-[state=error]:text-destructive",
-          orientation === "horizontal" && "w-full flex-col items-center text-center",
-          orientation === "vertical" && "justify-start",
-          className
+      <StepperItemContext.Provider value={itemContext}>
+        {hasCustomChildren ? (
+          children
+        ) : (
+          <>
+            <StepperTrigger>
+              <StepperIndicator />
+              <StepperLabel>{children}</StepperLabel>
+            </StepperTrigger>
+            <StepperSeparator />
+          </>
         )}
-        onClick={(event) => {
-          onClick?.(event);
-
-          if (!event.defaultPrevented) {
-            setValue(value);
-          }
-        }}
-        {...props}
-      >
-        <span
-          aria-hidden="true"
-          data-slot="stepper-indicator"
-          className={cn(
-            "flex size-9 shrink-0 items-center justify-center rounded-full border border-border bg-background text-xs font-semibold text-muted-foreground shadow-sm",
-            "group-data-[state=active]:border-primary group-data-[state=active]:bg-primary group-data-[state=active]:text-primary-foreground",
-            "group-data-[state=completed]:border-primary group-data-[state=completed]:bg-primary group-data-[state=completed]:text-primary-foreground",
-            "group-data-[state=error]:border-destructive group-data-[state=error]:bg-destructive group-data-[state=error]:text-destructive-foreground"
-          )}
-        >
-          {stepState === "error" ? "!" : index >= 0 ? index + 1 : null}
-        </span>
-        <span
-          data-slot="stepper-label"
-          className={cn(
-            "min-w-0 leading-none",
-            orientation === "horizontal" && "max-w-24 truncate"
-          )}
-        >
-          {children}
-        </span>
-      </button>
-      <span
-        aria-hidden="true"
-        data-slot="stepper-separator"
-        className={cn(
-          "bg-muted-foreground/25",
-          orientation === "horizontal" &&
-            "absolute left-[calc(50%+1.25rem)] right-[calc(-50%+1.25rem)] top-[1.125rem] h-px group-data-[state=completed]/stepper-item:bg-primary",
-          orientation === "vertical" &&
-            "absolute left-[1.125rem] top-11 h-[calc(100%-1.5rem)] w-px group-data-[state=completed]/stepper-item:bg-primary"
-        )}
-      />
+      </StepperItemContext.Provider>
     </li>
   );
 }
 
-type StepperContentProps = Omit<HTMLMotionProps<"div">, "value"> & {
+function hasStepperPrimitiveChild(children: React.ReactNode): boolean {
+  return React.Children.toArray(children).some((child) => {
+    if (!React.isValidElement(child)) {
+      return false;
+    }
+
+    return (
+      child.type === StepperTrigger ||
+      child.type === StepperIndicator ||
+      child.type === StepperLabel ||
+      child.type === StepperSeparator
+    );
+  });
+}
+
+type StepperTriggerProps = React.ComponentPropsWithoutRef<"button">;
+
+function StepperTrigger({
+  className,
+  children,
+  disabled,
+  onClick,
+  ...props
+}: StepperTriggerProps) {
+  const {
+    value,
+    disabled: itemDisabled,
+    isActive,
+    stepState,
+    orientation,
+    setValue,
+    triggerId,
+    contentId,
+  } = useStepperItemContext("StepperTrigger");
+  const isDisabled = itemDisabled || disabled;
+
+  return (
+    <button
+      id={triggerId}
+      type="button"
+      aria-current={isActive ? "step" : undefined}
+      aria-controls={isActive ? contentId : undefined}
+      disabled={isDisabled}
+      data-slot="stepper-trigger"
+      data-state={stepState}
+      className={cn(
+        "group inline-flex min-h-10 min-w-0 items-center gap-2 rounded-md text-left text-sm font-medium outline-none",
+        "text-muted-foreground transition-[color,background-color,box-shadow,transform] active:scale-[0.96]",
+        "focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+        "disabled:pointer-events-none disabled:opacity-50",
+        "data-[state=active]:text-foreground",
+        "data-[state=completed]:text-foreground",
+        "data-[state=error]:text-destructive",
+        orientation === "horizontal" && "w-full flex-col items-center text-center",
+        orientation === "vertical" && "justify-start",
+        className
+      )}
+      onClick={(event) => {
+        onClick?.(event);
+
+        if (!event.defaultPrevented && !isDisabled) {
+          setValue(value);
+        }
+      }}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+}
+
+type StepperIndicatorProps = React.ComponentPropsWithoutRef<"span">;
+
+function StepperIndicator({
+  className,
+  children,
+  ...props
+}: StepperIndicatorProps) {
+  const { index, stepState } = useStepperItemContext("StepperIndicator");
+  const content =
+    children !== undefined
+      ? children
+      : stepState === "error"
+        ? "!"
+        : index >= 0
+          ? index + 1
+          : null;
+
+  return (
+    <span
+      aria-hidden="true"
+      data-slot="stepper-indicator"
+      className={cn(
+        "flex size-9 shrink-0 items-center justify-center rounded-full border border-border bg-background text-xs font-semibold text-muted-foreground shadow-sm",
+        "group-data-[state=active]:border-primary group-data-[state=active]:bg-primary group-data-[state=active]:text-primary-foreground",
+        "group-data-[state=completed]:border-primary group-data-[state=completed]:bg-primary group-data-[state=completed]:text-primary-foreground",
+        "group-data-[state=error]:border-destructive group-data-[state=error]:bg-destructive group-data-[state=error]:text-destructive-foreground",
+        className
+      )}
+      {...props}
+    >
+      {content}
+    </span>
+  );
+}
+
+type StepperLabelProps = React.ComponentPropsWithoutRef<"span">;
+
+function StepperLabel({ className, ...props }: StepperLabelProps) {
+  const { orientation } = useStepperItemContext("StepperLabel");
+
+  return (
+    <span
+      data-slot="stepper-label"
+      className={cn(
+        "min-w-0 leading-none",
+        orientation === "horizontal" && "max-w-24 truncate",
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+type StepperSeparatorProps = React.ComponentPropsWithoutRef<"span">;
+
+function StepperSeparator({ className, ...props }: StepperSeparatorProps) {
+  const { orientation } = useStepperItemContext("StepperSeparator");
+
+  return (
+    <span
+      aria-hidden="true"
+      data-slot="stepper-separator"
+      className={cn(
+        "bg-muted-foreground/25",
+        orientation === "horizontal" &&
+          "absolute left-[calc(50%+1.25rem)] right-[calc(-50%+1.25rem)] top-[1.125rem] h-px group-data-[state=completed]/stepper-item:bg-primary",
+        orientation === "vertical" &&
+          "absolute left-[1.125rem] top-11 h-[calc(100%-1.5rem)] w-px group-data-[state=completed]/stepper-item:bg-primary",
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+type StepperContentProps = React.ComponentPropsWithoutRef<"div"> & {
   value: string;
   forceMount?: boolean;
 };
@@ -363,19 +510,18 @@ function StepperContent({
   } = useStepperContext("StepperContent");
   const isActive = currentValue === value;
 
-  const content = (
-    <motion.div
-      key={value}
+  if (!forceMount && !isActive) {
+    return null;
+  }
+
+  return (
+    <div
       id={getContentId(value)}
       role="region"
       aria-labelledby={getTriggerId(value)}
       data-slot="stepper-content"
       data-state={isActive ? "active" : "inactive"}
-      hidden={!isActive}
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -4 }}
-      transition={{ type: "spring", duration: 0.3, bounce: 0 }}
+      hidden={forceMount ? !isActive : undefined}
       className={cn(
         "rounded-lg border border-border/70 bg-muted/25 p-4 text-sm text-foreground shadow-sm",
         className
@@ -383,17 +529,7 @@ function StepperContent({
       {...props}
     >
       {children}
-    </motion.div>
-  );
-
-  if (forceMount) {
-    return content;
-  }
-
-  return (
-    <AnimatePresence initial={false} mode="wait">
-      {isActive ? content : null}
-    </AnimatePresence>
+    </div>
   );
 }
 
@@ -767,11 +903,15 @@ export {
   StepperControlledExample,
   StepperContent,
   StepperExample,
+  StepperIndicator,
   StepperItem,
+  StepperLabel,
   StepperList,
   StepperNext,
   StepperPrevious,
+  StepperSeparator,
   StepperStatusExample,
+  StepperTrigger,
   StepperVerticalExample,
 };
 

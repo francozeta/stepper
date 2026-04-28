@@ -2,7 +2,7 @@
 
 A lightweight Stepper component for React, Next.js, TypeScript, and Tailwind CSS.
 
-The current implementation is intentionally small and shadcn/ui-friendly. It does not require Radix, `asChild`, or multiple visual variants. Motion is used only for subtle `StepperContent` transitions.
+The current implementation is intentionally small and shadcn/ui-friendly. It does not require Radix, Motion, `asChild`, or multiple visual variants.
 
 ## Features
 
@@ -14,7 +14,7 @@ The current implementation is intentionally small and shadcn/ui-friendly. It doe
 - Basic navigation with `StepperPrevious` and `StepperNext`
 - Real buttons, `aria-current="step"` on the active step, and real `disabled`
 - Tailwind tokens such as `border`, `muted-foreground`, `primary`, `destructive`, `background`, and `foreground`
-- Subtle content transitions with Motion
+- Primitive pieces for custom step markup: `StepperTrigger`, `StepperIndicator`, `StepperLabel`, and `StepperSeparator`
 - `forceMount` on `StepperContent` for mounted inactive content
 
 ## Usage
@@ -23,10 +23,14 @@ The current implementation is intentionally small and shadcn/ui-friendly. It doe
 import {
   Stepper,
   StepperContent,
+  StepperIndicator,
   StepperItem,
+  StepperLabel,
   StepperList,
   StepperNext,
   StepperPrevious,
+  StepperSeparator,
+  StepperTrigger,
 } from "@/components/ui/stepper";
 
 export function CheckoutStepper() {
@@ -73,6 +77,18 @@ const [step, setStep] = React.useState("details");
 </Stepper>;
 ```
 
+## Primitive Composition
+
+```tsx
+<StepperItem value="shipping">
+  <StepperTrigger>
+    <StepperIndicator />
+    <StepperLabel>Shipping</StepperLabel>
+  </StepperTrigger>
+  <StepperSeparator />
+</StepperItem>
+```
+
 ## API
 
 ### `Stepper`
@@ -100,8 +116,17 @@ const [step, setStep] = React.useState("details");
 | `value` | `string` | Step value this content belongs to. |
 | `forceMount` | `boolean` | Keeps inactive content mounted with `hidden` and `data-state="inactive"`. |
 
+### Primitive step parts
+
+| Component | Element | Description |
+| --- | --- | --- |
+| `StepperTrigger` | `button` | Real button that selects the step. |
+| `StepperIndicator` | `span` | Visual step number or error marker. |
+| `StepperLabel` | `span` | Label text with responsive truncation. |
+| `StepperSeparator` | `span` | Visual connector between steps. |
+
 ## Notes
 
 This V1 uses `collectSteps(children)` to infer step order from direct `StepperItem` usage. That keeps the component light and copy-paste friendly, but it is a controlled tradeoff: custom wrapper components around `StepperItem` may not be detected.
 
-For a more flexible V2, split `StepperItem` into primitives such as `StepperTrigger`, `StepperIndicator`, `StepperLabel`, `StepperDescription`, and `StepperSeparator`, then consider `asChild` with Radix Slot. Richer animation control or Presence should come after the component is more composable.
+The next V2 step would be adding `StepperDescription`, `asChild` with Radix Slot, and optional animated examples where users compose their own `motion.div` instead of making Motion part of the core Stepper.
