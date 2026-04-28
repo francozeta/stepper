@@ -13,8 +13,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Stepper",
-  description: "A lightweight Stepper component for React and Next.js.",
+  title: {
+    default: "Stepper",
+    template: "%s - Stepper",
+  },
+  description:
+    "A lightweight Stepper component for React, Next.js, Tailwind CSS, and shadcn/ui-style projects.",
 };
 
 export default function RootLayout({

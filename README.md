@@ -4,6 +4,11 @@ A lightweight Stepper component for React, Next.js, TypeScript, Tailwind CSS, an
 
 The Stepper core is intentionally small and shadcn/ui-friendly. It does not require Radix, Motion, `asChild`, or multiple visual variants.
 
+## Files
+
+- `components/ui/stepper.tsx` contains the reusable Stepper primitive.
+- `components/stepper-examples.tsx` contains the product-style demos used by the local preview.
+
 ## Features
 
 - Controlled state with `value` and `onValueChange`
@@ -97,7 +102,7 @@ const [step, setStep] = React.useState("details");
 
 ## Icon Composition
 
-`StepperIndicator` accepts custom children, so icons can be composed in the demo or application layer without becoming a hard requirement of the Stepper core.
+`StepperIndicator` accepts custom children, so icons can be composed in the demo or application layer without becoming a hard requirement of the Stepper core. The core file does not import `lucide-react`.
 
 ```tsx
 import { Check } from "lucide-react";

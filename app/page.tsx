@@ -13,7 +13,7 @@ import {
   StepperExample,
   StepperStatusExample,
   StepperVerticalExample,
-} from "@/components/ui/stepper";
+} from "@/components/stepper-examples";
 
 const examples = [
   {
