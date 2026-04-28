@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { DocsExample } from "@/components/docs-example";
 import { PageHeader } from "@/components/docs-content";
 import {
   StepperControlledExample,
@@ -7,15 +8,12 @@ import {
   StepperStatusExample,
   StepperVerticalExample,
 } from "@/components/stepper-examples";
-import { Badge } from "@/components/ui/badge";
 import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  checkoutExampleCode,
+  controlledExampleCode,
+  statusExampleCode,
+  verticalExampleCode,
+} from "@/lib/docs";
 
 export const metadata: Metadata = {
   title: "Examples",
@@ -27,6 +25,8 @@ const examples = [
     description:
       "Guide customers through cart review, shipping details, and payment.",
     badge: "Horizontal",
+    code: checkoutExampleCode,
+    filename: "checkout-flow.tsx",
     component: <StepperExample />,
   },
   {
@@ -34,6 +34,8 @@ const examples = [
     description:
       "Use a vertical layout when each step needs more context and scanning.",
     badge: "Vertical",
+    code: verticalExampleCode,
+    filename: "workspace-onboarding.tsx",
     component: <StepperVerticalExample />,
   },
   {
@@ -41,6 +43,8 @@ const examples = [
     description:
       "Show validation problems, completed progress, and steps that are not available yet.",
     badge: "States",
+    code: statusExampleCode,
+    filename: "stepper-with-states.tsx",
     component: <StepperStatusExample />,
   },
   {
@@ -48,6 +52,8 @@ const examples = [
     description:
       "Drive the active step from React state when the flow depends on app logic.",
     badge: "Controlled",
+    code: controlledExampleCode,
+    filename: "controlled-stepper.tsx",
     component: <StepperControlledExample />,
   },
 ];
@@ -63,20 +69,15 @@ export default function ExamplesPage() {
 
       <div className="flex flex-col gap-6">
         {examples.map((example) => (
-          <Card key={example.title} className="shadow-sm">
-            <CardHeader>
-              <CardTitle>{example.title}</CardTitle>
-              <CardDescription className="max-w-xl text-pretty leading-6">
-                {example.description}
-              </CardDescription>
-              <CardAction>
-                <Badge variant="secondary" className="w-fit">
-                  {example.badge}
-                </Badge>
-              </CardAction>
-            </CardHeader>
-            <CardContent>{example.component}</CardContent>
-          </Card>
+          <DocsExample
+            key={example.title}
+            title={example.title}
+            description={example.description}
+            badge={example.badge}
+            code={example.code}
+            filename={example.filename}
+            preview={example.component}
+          />
         ))}
       </div>
     </>

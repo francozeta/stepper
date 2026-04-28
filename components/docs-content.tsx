@@ -1,4 +1,8 @@
+import { codeToHtml } from "shiki";
+
+import { CopyButton } from "@/components/copy-button";
 import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
 type PageHeaderProps = {
@@ -6,9 +10,16 @@ type PageHeaderProps = {
   title: string;
   description: string;
   badge?: string;
+  action?: React.ReactNode;
 };
 
-function PageHeader({ eyebrow, title, description, badge }: PageHeaderProps) {
+function PageHeader({
+  eyebrow,
+  title,
+  description,
+  badge,
+  action,
+}: PageHeaderProps) {
   return (
     <header className="flex max-w-3xl flex-col gap-4">
       {eyebrow ? (
@@ -30,6 +41,7 @@ function PageHeader({ eyebrow, title, description, badge }: PageHeaderProps) {
         <p className="max-w-2xl text-pretty text-sm leading-6 text-muted-foreground sm:text-base">
           {description}
         </p>
+        {action ? <div className="flex flex-wrap gap-2">{action}</div> : null}
       </div>
     </header>
   );
@@ -63,22 +75,56 @@ function Section({
   );
 }
 
-function CodeBlock({
-  children,
-  className,
-}: {
-  children: string;
+type CodeBlockProps = {
+  code?: string;
+  children?: string;
+  filename?: string;
+  lang?: string;
   className?: string;
-}) {
+  showCopy?: boolean;
+};
+
+async function CodeBlock({
+  code,
+  children,
+  filename,
+  lang = "tsx",
+  className,
+  showCopy = true,
+}: CodeBlockProps) {
+  const source = (code ?? children ?? "").trim();
+  const html = await codeToHtml(source, {
+    lang,
+    theme: "github-dark-default",
+  });
+
   return (
-    <pre
+    <div
+      data-slot="docs-code-block"
       className={cn(
-        "overflow-x-auto rounded-lg border border-border bg-muted/30 p-4 text-sm leading-6 shadow-sm",
+        "overflow-hidden rounded-lg border border-border bg-[#0d1117] text-sm shadow-sm",
         className
       )}
     >
-      <code className="font-mono text-foreground">{children}</code>
-    </pre>
+      <div className="flex min-h-10 items-center justify-between gap-3 border-b border-white/10 bg-background px-3">
+        <span className="min-w-0 truncate font-mono text-xs text-muted-foreground">
+          {filename ?? lang}
+        </span>
+        {showCopy ? (
+          <CopyButton
+            value={source}
+            label="Copy"
+            toastMessage={filename ? `${filename} copied` : "Code copied"}
+          />
+        ) : null}
+      </div>
+      <ScrollArea className="max-h-[520px]">
+        <div
+          className="docs-code min-w-full"
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+      </ScrollArea>
+    </div>
   );
 }
 

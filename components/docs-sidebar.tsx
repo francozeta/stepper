@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { GitBranch, PackageCheck } from "lucide-react";
+import { PackageCheck } from "lucide-react";
+import { FaGithub } from "react-icons/fa";
 
 import { docsNav } from "@/lib/docs";
 import { cn } from "@/lib/utils";
@@ -15,7 +16,7 @@ function DocsSidebar() {
       <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col border-r border-border bg-background md:flex">
         <div className="flex min-h-0 flex-1 flex-col px-4 py-5">
           <SidebarBrand />
-          <nav className="mt-6 flex flex-1 flex-col gap-7 overflow-y-auto">
+          <nav className="docs-scrollbar mt-6 flex flex-1 flex-col gap-7 overflow-y-auto pr-1">
             {docsNav.map((group) => (
               <div key={group.title} className="flex flex-col gap-2">
                 <p className="px-2 text-xs font-medium text-muted-foreground">
@@ -59,10 +60,10 @@ function DocsSidebar() {
             aria-label="Open GitHub repository"
             className="inline-flex size-9 items-center justify-center rounded-md text-muted-foreground transition-[background-color,color] hover:bg-muted hover:text-foreground focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none"
           >
-            <GitBranch className="size-4" />
+            <FaGithub className="size-4" />
           </a>
         </div>
-        <nav className="-mx-4 flex gap-1 overflow-x-auto px-4 pb-3">
+        <nav className="docs-scrollbar-muted -mx-4 flex gap-1 overflow-x-auto px-4 pb-3">
           {docsNav.flatMap((group) =>
             group.items.map((item) => {
               const isActive = pathname === item.href;
@@ -134,7 +135,7 @@ function SidebarFooter() {
           aria-label="Open GitHub repository"
           className="inline-flex size-9 items-center justify-center rounded-md text-muted-foreground transition-[background-color,color] hover:bg-muted hover:text-foreground focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none"
         >
-          <GitBranch className="size-4" />
+          <FaGithub className="size-4" />
         </a>
       </div>
     </div>

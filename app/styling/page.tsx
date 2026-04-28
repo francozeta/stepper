@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { indicatorCode, stateSelectorsCode } from "@/lib/docs";
 
 export const metadata: Metadata = {
   title: "Styling",
@@ -50,13 +51,11 @@ export default function StylingPage() {
       </Section>
 
       <Section title="State selectors">
-        <CodeBlock>{`[data-slot="stepper-item"][data-state="active"]
-[data-slot="stepper-item"][data-state="completed"]
-[data-slot="stepper-item"][data-state="disabled"]
-[data-slot="stepper-item"][data-state="error"]
-
-[data-slot="stepper-content"][data-state="active"]
-[data-slot="stepper-content"][data-state="inactive"]`}</CodeBlock>
+        <CodeBlock
+          code={stateSelectorsCode}
+          filename="state-selectors.css"
+          lang="css"
+        />
       </Section>
 
       <Section
@@ -71,9 +70,11 @@ export default function StylingPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <CodeBlock className="border-0 bg-transparent p-0 shadow-none">{`<StepperIndicator>
-  <Check />
-</StepperIndicator>`}</CodeBlock>
+            <CodeBlock
+              code={indicatorCode}
+              filename="custom-indicator.tsx"
+              className="border-0 shadow-none"
+            />
           </CardContent>
         </Card>
       </Section>

@@ -1,18 +1,21 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
+import { DocsExample } from "@/components/docs-example";
 import { CodeBlock, InfoGrid, PageHeader, Section } from "@/components/docs-content";
 import { StepperExample } from "@/components/stepper-examples";
-import { Badge } from "@/components/ui/badge";
 import {
   Card,
-  CardAction,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { packageNotes, quickFacts, v2Roadmap } from "@/lib/docs";
+import {
+  checkoutExampleCode,
+  packageNotes,
+  quickFacts,
+  v2Roadmap,
+} from "@/lib/docs";
 
 export default function Home() {
   return (
@@ -30,27 +33,21 @@ export default function Home() {
         title="Preview"
         description="The first screen is now the component experience, with docs navigation wrapped around it."
       >
-        <Card className="shadow-sm">
-          <CardHeader>
-            <CardTitle>Checkout flow</CardTitle>
-            <CardDescription className="max-w-xl text-pretty leading-6">
-              A realistic horizontal Stepper with completed, active, and disabled states.
-            </CardDescription>
-            <CardAction>
-              <Badge variant="secondary">Horizontal</Badge>
-            </CardAction>
-          </CardHeader>
-          <CardContent>
-            <StepperExample />
-          </CardContent>
-        </Card>
+        <DocsExample
+          title="Checkout flow"
+          description="A realistic horizontal Stepper with completed, active, and disabled states."
+          badge="Horizontal"
+          code={checkoutExampleCode}
+          filename="checkout-flow.tsx"
+          preview={<StepperExample />}
+        />
       </Section>
 
       <Section
         title="Install shape"
         description="The reusable primitive lives in one shadcn-style file. Demo code stays outside the core."
       >
-        <CodeBlock>{`components/
+        <CodeBlock filename="project tree" lang="text">{`components/
   stepper-examples.tsx
   ui/
     stepper.tsx`}</CodeBlock>
