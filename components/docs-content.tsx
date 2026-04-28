@@ -101,7 +101,7 @@ async function CodeBlock({
   const source = (code ?? children ?? "").trim();
   const html = await codeToHtml(source, {
     lang,
-    theme: "vitesse-dark",
+    theme: "github-dark-default",
   });
 
   return (
@@ -130,7 +130,7 @@ async function CodeBlock({
 
       <div
         className={cn(
-          "docs-scrollbar max-h-[420px] overflow-auto",
+          "docs-code-scroll max-h-[420px] overflow-auto",
           filename ? "pt-8" : "pt-2"
         )}
       >
