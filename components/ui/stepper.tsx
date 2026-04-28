@@ -1,6 +1,21 @@
 "use client";
 
 import * as React from "react";
+import {
+  AlertCircle,
+  ArrowLeft,
+  ArrowRight,
+  Building2,
+  Check,
+  CreditCard,
+  FileCheck,
+  Lock,
+  ShoppingCart,
+  Truck,
+  UserRound,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -17,10 +32,17 @@ type StepRecord = {
   disabled: boolean;
 };
 
+type RegisteredStep = StepRecord & {
+  element: HTMLLIElement | null;
+  order: number;
+};
+
 type StepperContextValue = {
   value: string | undefined;
   orientation: StepperOrientation;
   steps: StepRecord[];
+  registerStep: (step: Omit<RegisteredStep, "order">) => void;
+  unregisterStep: (value: string) => void;
   setValue: (value: string) => void;
   getStepIndex: (value: string) => number;
   getTriggerId: (value: string) => string;
@@ -29,6 +51,12 @@ type StepperContextValue = {
   canGoNext: boolean;
   goPrevious: () => void;
   goNext: () => void;
+};
+
+type StepperStepMeta = {
+  currentValue: string | undefined;
+  fallbackValue: string | undefined;
+  selectedStep: StepRecord | undefined;
 };
 
 type StepperItemContextValue = {
@@ -100,6 +128,75 @@ function getPreviousEnabledStep(
     .find((step) => !step.disabled);
 }
 
+function getStepperStepMeta(
+  steps: StepRecord[],
+  selectedValue: string | undefined
+): StepperStepMeta {
+  const fallbackValue = steps.find((step) => !step.disabled)?.value;
+  const selectedStep = steps.find((step) => step.value === selectedValue);
+  const currentValue =
+    selectedStep && !selectedStep.disabled ? selectedStep.value : fallbackValue;
+
+  return {
+    currentValue,
+    fallbackValue,
+    selectedStep,
+  };
+}
+
+function toStepRecord(step: RegisteredStep): StepRecord {
+  return {
+    value: step.value,
+    disabled: step.disabled,
+  };
+}
+
+function sortRegisteredSteps(steps: RegisteredStep[]) {
+  return [...steps].sort((firstStep, secondStep) => {
+    const firstElement = firstStep.element;
+    const secondElement = secondStep.element;
+
+    if (
+      firstElement &&
+      secondElement &&
+      firstElement !== secondElement &&
+      typeof Node !== "undefined"
+    ) {
+      const position = firstElement.compareDocumentPosition(secondElement);
+
+      if (position & Node.DOCUMENT_POSITION_FOLLOWING) {
+        return -1;
+      }
+
+      if (position & Node.DOCUMENT_POSITION_PRECEDING) {
+        return 1;
+      }
+    }
+
+    return firstStep.order - secondStep.order;
+  });
+}
+
+function areRegisteredStepsEqual(
+  firstSteps: RegisteredStep[],
+  secondSteps: RegisteredStep[]
+) {
+  if (firstSteps.length !== secondSteps.length) {
+    return false;
+  }
+
+  return firstSteps.every((step, index) => {
+    const nextStep = secondSteps[index];
+
+    return (
+      step.value === nextStep.value &&
+      step.disabled === nextStep.disabled &&
+      step.element === nextStep.element &&
+      step.order === nextStep.order
+    );
+  });
+}
+
 function collectSteps(children: React.ReactNode) {
   const steps: StepRecord[] = [];
 
@@ -152,10 +249,23 @@ function Stepper({
   const id = React.useId();
   const isControlled = value !== undefined;
   const [uncontrolledValue, setUncontrolledValue] = React.useState(defaultValue);
-  const steps = React.useMemo(() => collectSteps(children), [children]);
+  const collectedSteps = React.useMemo(() => collectSteps(children), [children]);
+  const [registeredSteps, setRegisteredSteps] = React.useState<
+    RegisteredStep[]
+  >([]);
+  const stepOrderRef = React.useRef(0);
+  const steps = React.useMemo(
+    () =>
+      registeredSteps.length > 0
+        ? registeredSteps.map(toStepRecord)
+        : collectedSteps,
+    [collectedSteps, registeredSteps]
+  );
   const selectedValue = isControlled ? value : uncontrolledValue;
-  const fallbackValue = steps.find((step) => !step.disabled)?.value;
-  const currentValue = selectedValue ?? fallbackValue;
+  const { currentValue } = React.useMemo(
+    () => getStepperStepMeta(steps, selectedValue),
+    [selectedValue, steps]
+  );
   const previousStep = React.useMemo(
     () => getPreviousEnabledStep(steps, currentValue),
     [currentValue, steps]
@@ -165,11 +275,42 @@ function Stepper({
     [currentValue, steps]
   );
 
+  const registerStep = React.useCallback(
+    (step: Omit<RegisteredStep, "order">) => {
+      setRegisteredSteps((currentSteps) => {
+        const existingStep = currentSteps.find(
+          (currentStep) => currentStep.value === step.value
+        );
+        const nextStep: RegisteredStep = {
+          ...step,
+          order: existingStep?.order ?? stepOrderRef.current++,
+        };
+        const nextSteps = sortRegisteredSteps([
+          ...currentSteps.filter(
+            (currentStep) => currentStep.value !== step.value
+          ),
+          nextStep,
+        ]);
+
+        return areRegisteredStepsEqual(currentSteps, nextSteps)
+          ? currentSteps
+          : nextSteps;
+      });
+    },
+    []
+  );
+
+  const unregisterStep = React.useCallback((stepValue: string) => {
+    setRegisteredSteps((currentSteps) =>
+      currentSteps.filter((step) => step.value !== stepValue)
+    );
+  }, []);
+
   const setStepperValue = React.useCallback(
     (nextValue: string) => {
       const nextStepRecord = steps.find((step) => step.value === nextValue);
 
-      if (nextStepRecord?.disabled) {
+      if (!nextStepRecord || nextStepRecord.disabled) {
         return;
       }
 
@@ -187,6 +328,8 @@ function Stepper({
       value: currentValue,
       orientation,
       steps,
+      registerStep,
+      unregisterStep,
       setValue: setStepperValue,
       getStepIndex: (stepValue) =>
         steps.findIndex((step) => step.value === stepValue),
@@ -211,8 +354,10 @@ function Stepper({
       nextStep,
       orientation,
       previousStep,
+      registerStep,
       setStepperValue,
       steps,
+      unregisterStep,
     ]
   );
 
@@ -273,11 +418,14 @@ function StepperItem({
   const {
     value: currentValue,
     orientation,
+    registerStep,
+    unregisterStep,
     setValue,
     getStepIndex,
     getTriggerId,
     getContentId,
   } = useStepperContext("StepperItem");
+  const itemRef = React.useRef<HTMLLIElement>(null);
   const index = getStepIndex(value);
   const isActive = currentValue === value;
   const stepState: StepperStepState = disabled
@@ -290,6 +438,17 @@ function StepperItem({
           ? "completed"
           : "inactive";
   const hasCustomChildren = hasStepperPrimitiveChild(children);
+
+  React.useEffect(() => {
+    registerStep({
+      value,
+      disabled,
+      element: itemRef.current,
+    });
+
+    return () => unregisterStep(value);
+  }, [disabled, registerStep, unregisterStep, value]);
+
   const itemContext = React.useMemo<StepperItemContextValue>(
     () => ({
       value,
@@ -317,9 +476,13 @@ function StepperItem({
 
   return (
     <li
+      ref={itemRef}
       data-slot="stepper-item"
       data-orientation={orientation}
       data-state={stepState}
+      data-disabled={disabled ? "" : undefined}
+      data-error={error ? "" : undefined}
+      data-completed={completed ? "" : undefined}
       className={cn(
         "group/stepper-item relative flex min-w-0",
         "data-[orientation=horizontal]:min-w-24 data-[orientation=horizontal]:flex-1 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:items-center",
@@ -355,6 +518,7 @@ function hasStepperPrimitiveChild(children: React.ReactNode): boolean {
       child.type === StepperTrigger ||
       child.type === StepperIndicator ||
       child.type === StepperLabel ||
+      child.type === StepperDescription ||
       child.type === StepperSeparator
     );
   });
@@ -387,9 +551,11 @@ function StepperTrigger({
       type="button"
       aria-current={isActive ? "step" : undefined}
       aria-controls={isActive ? contentId : undefined}
+      aria-disabled={isDisabled ? true : undefined}
       disabled={isDisabled}
       data-slot="stepper-trigger"
       data-state={stepState}
+      data-disabled={isDisabled ? "" : undefined}
       className={cn(
         "group inline-flex min-h-10 min-w-0 items-center gap-2 rounded-md text-left text-sm font-medium outline-none",
         "text-muted-foreground transition-[color,background-color,box-shadow,transform] active:scale-[0.96]",
@@ -442,6 +608,7 @@ function StepperIndicator({
         "group-data-[state=active]:border-primary group-data-[state=active]:bg-primary group-data-[state=active]:text-primary-foreground",
         "group-data-[state=completed]:border-primary group-data-[state=completed]:bg-primary group-data-[state=completed]:text-primary-foreground",
         "group-data-[state=error]:border-destructive group-data-[state=error]:bg-destructive group-data-[state=error]:text-destructive-foreground",
+        "[&>svg]:size-4 [&>svg]:shrink-0",
         className
       )}
       {...props}
@@ -462,6 +629,21 @@ function StepperLabel({ className, ...props }: StepperLabelProps) {
       className={cn(
         "min-w-0 leading-none",
         orientation === "horizontal" && "max-w-24 truncate",
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+type StepperDescriptionProps = React.ComponentPropsWithoutRef<"span">;
+
+function StepperDescription({ className, ...props }: StepperDescriptionProps) {
+  return (
+    <span
+      data-slot="stepper-description"
+      className={cn(
+        "text-xs leading-snug font-normal text-muted-foreground",
         className
       )}
       {...props}
@@ -554,6 +736,7 @@ function StepperPrevious({
         "transition-[color,background-color,box-shadow,transform] hover:bg-muted hover:text-foreground active:scale-[0.96]",
         "focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none",
         "disabled:pointer-events-none disabled:opacity-50",
+        "[&>svg]:size-4 [&>svg]:shrink-0",
         className
       )}
       onClick={(event) => {
@@ -589,6 +772,7 @@ function StepperNext({
         "transition-[background-color,box-shadow,transform] hover:bg-primary/90 active:scale-[0.96]",
         "focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none",
         "disabled:pointer-events-none disabled:opacity-50",
+        "[&>svg]:size-4 [&>svg]:shrink-0",
         className
       )}
       onClick={(event) => {
@@ -609,6 +793,7 @@ type ExampleContentProps = {
   eyebrow: string;
   title: string;
   description: string;
+  icon?: LucideIcon;
   children?: React.ReactNode;
 };
 
@@ -616,21 +801,79 @@ function ExampleContent({
   eyebrow,
   title,
   description,
+  icon: Icon,
   children,
 }: ExampleContentProps) {
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1">
-        <p className="text-xs font-medium text-muted-foreground">{eyebrow}</p>
-        <h3 className="text-balance text-sm font-medium text-foreground">
-          {title}
-        </h3>
-        <p className="text-pretty text-sm leading-6 text-muted-foreground">
-          {description}
-        </p>
+      <div className="flex items-start gap-3">
+        {Icon ? (
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground">
+            <Icon className="size-4" />
+          </span>
+        ) : null}
+        <div className="flex min-w-0 flex-col gap-1">
+          <p className="text-xs font-medium text-muted-foreground">{eyebrow}</p>
+          <h3 className="text-balance text-sm font-medium text-foreground">
+            {title}
+          </h3>
+          <p className="text-pretty text-sm leading-6 text-muted-foreground">
+            {description}
+          </p>
+        </div>
       </div>
       {children}
     </div>
+  );
+}
+
+type DemoStepProps = {
+  value: string;
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  completed?: boolean;
+  disabled?: boolean;
+  error?: boolean;
+};
+
+function DemoStep({
+  value,
+  title,
+  description,
+  icon: Icon,
+  completed,
+  disabled,
+  error,
+}: DemoStepProps) {
+  return (
+    <StepperItem
+      value={value}
+      completed={completed}
+      disabled={disabled}
+      error={error}
+    >
+      <StepperTrigger>
+        <StepperIndicator>
+          {error ? (
+            <AlertCircle />
+          ) : disabled ? (
+            <Lock />
+          ) : completed ? (
+            <Check />
+          ) : (
+            <Icon />
+          )}
+        </StepperIndicator>
+        <span className="flex min-w-0 flex-col gap-1">
+          <StepperLabel>{title}</StepperLabel>
+          <StepperDescription className="hidden max-w-32 sm:block">
+            {description}
+          </StepperDescription>
+        </span>
+      </StepperTrigger>
+      <StepperSeparator />
+    </StepperItem>
   );
 }
 
@@ -663,8 +906,18 @@ function SummaryGrid({ items }: { items: SummaryItem[] }) {
 
 function StepperActions({
   note,
-  previousLabel = "Back",
-  nextLabel = "Continue",
+  previousLabel = (
+    <>
+      <ArrowLeft />
+      Back
+    </>
+  ),
+  nextLabel = (
+    <>
+      Continue
+      <ArrowRight />
+    </>
+  ),
 }: {
   note?: React.ReactNode;
   previousLabel?: React.ReactNode;
@@ -689,13 +942,26 @@ function StepperExample() {
   return (
     <Stepper defaultValue="shipping" orientation="horizontal">
       <StepperList>
-        <StepperItem value="cart" completed>
-          Cart review
-        </StepperItem>
-        <StepperItem value="shipping">Shipping</StepperItem>
-        <StepperItem value="payment" disabled>
-          Payment
-        </StepperItem>
+        <DemoStep
+          value="cart"
+          title="Cart"
+          description="Review items"
+          icon={ShoppingCart}
+          completed
+        />
+        <DemoStep
+          value="shipping"
+          title="Shipping"
+          description="Delivery details"
+          icon={Truck}
+        />
+        <DemoStep
+          value="payment"
+          title="Payment"
+          description="Locked"
+          icon={CreditCard}
+          disabled
+        />
       </StepperList>
 
       <StepperContent value="cart">
@@ -703,6 +969,7 @@ function StepperExample() {
           eyebrow="Cart"
           title="Review selected products"
           description="Confirm the items in the order before choosing how they should be delivered."
+          icon={ShoppingCart}
         >
           <SummaryGrid
             items={[
@@ -718,6 +985,7 @@ function StepperExample() {
           eyebrow="Shipping"
           title="Confirm delivery details"
           description="A horizontal stepper works well when users move through a short linear checkout."
+          icon={Truck}
         >
           <SummaryGrid
             items={[
@@ -733,6 +1001,7 @@ function StepperExample() {
           eyebrow="Payment"
           title="Choose a payment method"
           description="This step stays disabled until the required shipping details are complete."
+          icon={CreditCard}
         />
       </StepperContent>
 
@@ -745,13 +1014,26 @@ function StepperVerticalExample() {
   return (
     <Stepper defaultValue="workspace" orientation="vertical">
       <StepperList>
-        <StepperItem value="profile" completed>
-          Profile
-        </StepperItem>
-        <StepperItem value="workspace">Workspace</StepperItem>
-        <StepperItem value="invite" disabled>
-          Invite team
-        </StepperItem>
+        <DemoStep
+          value="profile"
+          title="Profile"
+          description="Identity"
+          icon={UserRound}
+          completed
+        />
+        <DemoStep
+          value="workspace"
+          title="Workspace"
+          description="Team defaults"
+          icon={Building2}
+        />
+        <DemoStep
+          value="invite"
+          title="Invite team"
+          description="Locked"
+          icon={Users}
+          disabled
+        />
       </StepperList>
 
       <StepperContent value="profile">
@@ -759,6 +1041,7 @@ function StepperVerticalExample() {
           eyebrow="Profile"
           title="Personal details are ready"
           description="The user has already added their name, role, and notification preferences."
+          icon={UserRound}
         />
       </StepperContent>
       <StepperContent value="workspace">
@@ -766,6 +1049,7 @@ function StepperVerticalExample() {
           eyebrow="Workspace"
           title="Set team defaults"
           description="Vertical orientation gives each step room to carry extra explanation without compressing the labels."
+          icon={Building2}
         >
           <SummaryGrid
             items={[
@@ -781,6 +1065,7 @@ function StepperVerticalExample() {
           eyebrow="Invites"
           title="Invite teammates"
           description="Invitations become available once the workspace defaults have been saved."
+          icon={Users}
         />
       </StepperContent>
 
@@ -793,15 +1078,27 @@ function StepperStatusExample() {
   return (
     <Stepper defaultValue="shipping" orientation="horizontal">
       <StepperList>
-        <StepperItem value="account" completed>
-          Account
-        </StepperItem>
-        <StepperItem value="shipping" error>
-          Shipping
-        </StepperItem>
-        <StepperItem value="payment" disabled>
-          Payment
-        </StepperItem>
+        <DemoStep
+          value="account"
+          title="Account"
+          description="Complete"
+          icon={UserRound}
+          completed
+        />
+        <DemoStep
+          value="shipping"
+          title="Shipping"
+          description="Needs ZIP"
+          icon={Truck}
+          error
+        />
+        <DemoStep
+          value="payment"
+          title="Payment"
+          description="Locked"
+          icon={CreditCard}
+          disabled
+        />
       </StepperList>
 
       <StepperContent value="account" forceMount>
@@ -809,6 +1106,7 @@ function StepperStatusExample() {
           eyebrow="Account"
           title="Account details are complete"
           description="Completed steps keep their primary color so users can see how far they got."
+          icon={Check}
         />
       </StepperContent>
       <StepperContent value="shipping" forceMount>
@@ -816,6 +1114,7 @@ function StepperStatusExample() {
           eyebrow="Needs attention"
           title="Shipping address is missing a postal code"
           description="Error state highlights the current blocker while keeping the next step disabled."
+          icon={AlertCircle}
         >
           <div className="rounded-md border border-destructive/30 bg-background p-3 text-sm text-destructive">
             Add a postal code to unlock payment.
@@ -827,6 +1126,7 @@ function StepperStatusExample() {
           eyebrow="Payment"
           title="Payment is locked"
           description="Disabled steps use a real disabled button and cannot be selected."
+          icon={Lock}
         />
       </StepperContent>
 
@@ -843,13 +1143,26 @@ function StepperControlledExample() {
   return (
     <Stepper value={value} onValueChange={setValue} orientation="horizontal">
       <StepperList>
-        <StepperItem value="details" completed={currentIndex > 0}>
-          Details
-        </StepperItem>
-        <StepperItem value="review" completed={currentIndex > 1}>
-          Review
-        </StepperItem>
-        <StepperItem value="confirm">Confirm</StepperItem>
+        <DemoStep
+          value="details"
+          title="Details"
+          description="Collect"
+          icon={FileCheck}
+          completed={currentIndex > 0}
+        />
+        <DemoStep
+          value="review"
+          title="Review"
+          description="Check"
+          icon={AlertCircle}
+          completed={currentIndex > 1}
+        />
+        <DemoStep
+          value="confirm"
+          title="Confirm"
+          description="Submit"
+          icon={Check}
+        />
       </StepperList>
 
       <StepperContent value="details">
@@ -857,6 +1170,7 @@ function StepperControlledExample() {
           eyebrow="Details"
           title="Collect request details"
           description="Controlled steppers let the application decide when a user can move to the next step."
+          icon={FileCheck}
         >
           <SummaryGrid
             items={[
@@ -872,6 +1186,7 @@ function StepperControlledExample() {
           eyebrow="Review"
           title="Check the request"
           description="The active value is stored in React state and passed back through onValueChange."
+          icon={AlertCircle}
         />
       </StepperContent>
       <StepperContent value="confirm">
@@ -879,6 +1194,7 @@ function StepperControlledExample() {
           eyebrow="Confirm"
           title="Submit the request"
           description="Use a controlled Stepper when validation, routing, or persistence lives outside the component."
+          icon={Check}
         />
       </StepperContent>
 
@@ -892,7 +1208,14 @@ function StepperControlledExample() {
             : {value}
           </span>
         }
-        nextLabel={value === "confirm" ? "Finish" : "Continue"}
+        nextLabel={
+          value === "confirm" ? (
+            <>
+              Finish
+              <Check />
+            </>
+          ) : undefined
+        }
       />
     </Stepper>
   );
@@ -902,6 +1225,7 @@ export {
   Stepper,
   StepperControlledExample,
   StepperContent,
+  StepperDescription,
   StepperExample,
   StepperIndicator,
   StepperItem,
@@ -915,4 +1239,17 @@ export {
   StepperVerticalExample,
 };
 
-export type { StepperOrientation, StepperStepState };
+export type {
+  StepperButtonProps,
+  StepperContentProps,
+  StepperDescriptionProps,
+  StepperIndicatorProps,
+  StepperItemProps,
+  StepperLabelProps,
+  StepperListProps,
+  StepperOrientation,
+  StepperProps,
+  StepperSeparatorProps,
+  StepperStepState,
+  StepperTriggerProps,
+};

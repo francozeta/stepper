@@ -1,8 +1,8 @@
 # Stepper
 
-A lightweight Stepper component for React, Next.js, TypeScript, and Tailwind CSS.
+A lightweight Stepper component for React, Next.js, TypeScript, Tailwind CSS, and shadcn/ui-style projects.
 
-The current implementation is intentionally small and shadcn/ui-friendly. It does not require Radix, Motion, `asChild`, or multiple visual variants.
+The Stepper core is intentionally small and shadcn/ui-friendly. It does not require Radix, Motion, `asChild`, or multiple visual variants.
 
 ## Features
 
@@ -14,8 +14,10 @@ The current implementation is intentionally small and shadcn/ui-friendly. It doe
 - Basic navigation with `StepperPrevious` and `StepperNext`
 - Real buttons, `aria-current="step"` on the active step, and real `disabled`
 - Tailwind tokens such as `border`, `muted-foreground`, `primary`, `destructive`, `background`, and `foreground`
-- Primitive pieces for custom step markup: `StepperTrigger`, `StepperIndicator`, `StepperLabel`, and `StepperSeparator`
+- Primitive pieces for custom step markup: `StepperTrigger`, `StepperIndicator`, `StepperLabel`, `StepperDescription`, and `StepperSeparator`
 - `forceMount` on `StepperContent` for mounted inactive content
+- Guard rails for invalid `value` / `defaultValue` and disabled steps
+- Lightweight step registration so simple wrapper components can still be composed around `StepperItem`
 
 ## Usage
 
@@ -23,6 +25,7 @@ The current implementation is intentionally small and shadcn/ui-friendly. It doe
 import {
   Stepper,
   StepperContent,
+  StepperDescription,
   StepperIndicator,
   StepperItem,
   StepperLabel,
@@ -83,10 +86,34 @@ const [step, setStep] = React.useState("details");
 <StepperItem value="shipping">
   <StepperTrigger>
     <StepperIndicator />
-    <StepperLabel>Shipping</StepperLabel>
+    <span className="flex flex-col gap-1">
+      <StepperLabel>Shipping</StepperLabel>
+      <StepperDescription>Delivery address</StepperDescription>
+    </span>
   </StepperTrigger>
   <StepperSeparator />
 </StepperItem>
+```
+
+## Icon Composition
+
+`StepperIndicator` accepts custom children, so icons can be composed in the demo or application layer without becoming a hard requirement of the Stepper core.
+
+```tsx
+import { Check } from "lucide-react";
+
+<StepperItem value="shipping" completed>
+  <StepperTrigger>
+    <StepperIndicator>
+      <Check />
+    </StepperIndicator>
+    <span className="flex flex-col gap-1">
+      <StepperLabel>Shipping</StepperLabel>
+      <StepperDescription>Delivery address</StepperDescription>
+    </span>
+  </StepperTrigger>
+  <StepperSeparator />
+</StepperItem>;
 ```
 
 ## API
@@ -99,6 +126,8 @@ const [step, setStep] = React.useState("details");
 | `defaultValue` | `string` | Initial active step for uncontrolled usage. |
 | `onValueChange` | `(value: string) => void` | Called when a step changes. |
 | `orientation` | `"horizontal" \| "vertical"` | Layout direction. Defaults to `"horizontal"`. |
+
+If `value` or `defaultValue` points to a missing or disabled step, the Stepper falls back to the first enabled step.
 
 ### `StepperItem`
 
@@ -123,10 +152,11 @@ const [step, setStep] = React.useState("details");
 | `StepperTrigger` | `button` | Real button that selects the step. |
 | `StepperIndicator` | `span` | Visual step number or error marker. |
 | `StepperLabel` | `span` | Label text with responsive truncation. |
+| `StepperDescription` | `span` | Optional secondary text inside a custom trigger. |
 | `StepperSeparator` | `span` | Visual connector between steps. |
 
 ## Notes
 
-This V1 uses `collectSteps(children)` to infer step order from direct `StepperItem` usage. That keeps the component light and copy-paste friendly, but it is a controlled tradeoff: custom wrapper components around `StepperItem` may not be detected.
+This V1 keeps `collectSteps(children)` as a first-render fallback for direct `StepperItem` usage, then uses a small internal registration step after mount. That keeps the component copy-paste friendly while allowing simple wrapper components around `StepperItem`.
 
-The next V2 step would be adding `StepperDescription`, `asChild` with Radix Slot, and optional animated examples where users compose their own `motion.div` instead of making Motion part of the core Stepper.
+The next V2 step would be adding `asChild` with Radix Slot, richer primitive parts for wrapper-heavy composition, and optional animated examples where users compose their own `motion.div` instead of making Motion part of the core Stepper.
