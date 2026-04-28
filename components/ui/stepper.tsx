@@ -5,6 +5,12 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 type StepperOrientation = "horizontal" | "vertical";
+type StepperStepState =
+  | "inactive"
+  | "active"
+  | "completed"
+  | "disabled"
+  | "error";
 
 type StepRecord = {
   value: string;
@@ -250,7 +256,15 @@ function StepperItem({
   } = useStepperContext("StepperItem");
   const index = getStepIndex(value);
   const isActive = currentValue === value;
-  const stepState = isActive ? "active" : completed ? "completed" : "inactive";
+  const stepState: StepperStepState = disabled
+    ? "disabled"
+    : error
+      ? "error"
+      : isActive
+        ? "active"
+        : completed
+          ? "completed"
+          : "inactive";
 
   return (
     <li
@@ -271,8 +285,6 @@ function StepperItem({
         disabled={disabled}
         data-slot="stepper-trigger"
         data-state={stepState}
-        data-disabled={disabled ? "" : undefined}
-        data-error={error ? "" : undefined}
         className={cn(
           "group inline-flex min-w-0 items-center gap-2 rounded-md text-left text-sm font-medium outline-none",
           "text-muted-foreground transition-colors",
@@ -280,7 +292,7 @@ function StepperItem({
           "disabled:pointer-events-none disabled:opacity-50",
           "data-[state=active]:text-foreground",
           "data-[state=completed]:text-foreground",
-          "data-[error]:text-destructive",
+          "data-[state=error]:text-destructive",
           orientation === "horizontal" && "flex-col items-center text-center",
           orientation === "vertical" && "justify-start",
           className
@@ -301,10 +313,10 @@ function StepperItem({
             "flex size-8 shrink-0 items-center justify-center rounded-full border border-border bg-background text-xs font-semibold text-muted-foreground",
             "group-data-[state=active]:border-primary group-data-[state=active]:bg-primary group-data-[state=active]:text-primary-foreground",
             "group-data-[state=completed]:border-primary group-data-[state=completed]:bg-primary group-data-[state=completed]:text-primary-foreground",
-            "group-data-[error]:border-destructive group-data-[error]:bg-destructive group-data-[error]:text-destructive-foreground"
+            "group-data-[state=error]:border-destructive group-data-[state=error]:bg-destructive group-data-[state=error]:text-destructive-foreground"
           )}
         >
-          {error ? "!" : index >= 0 ? index + 1 : null}
+          {stepState === "error" ? "!" : index >= 0 ? index + 1 : null}
         </span>
         <span data-slot="stepper-label" className="min-w-0 leading-none">
           {children}
@@ -327,10 +339,12 @@ function StepperItem({
 
 type StepperContentProps = React.ComponentPropsWithoutRef<"div"> & {
   value: string;
+  forceMount?: boolean;
 };
 
 function StepperContent({
   value,
+  forceMount = false,
   className,
   children,
   ...props
@@ -342,7 +356,7 @@ function StepperContent({
   } = useStepperContext("StepperContent");
   const isActive = currentValue === value;
 
-  if (!isActive) {
+  if (!forceMount && !isActive) {
     return null;
   }
 
@@ -352,7 +366,8 @@ function StepperContent({
       role="region"
       aria-labelledby={getTriggerId(value)}
       data-slot="stepper-content"
-      data-state="active"
+      data-state={isActive ? "active" : "inactive"}
+      hidden={!isActive}
       className={cn(
         "rounded-md border border-border bg-background p-4 text-sm text-foreground",
         className
@@ -438,20 +453,26 @@ function StepperNext({
 
 function StepperExample() {
   return (
-    <Stepper defaultValue="account" orientation="horizontal">
+    <Stepper defaultValue="cart" orientation="horizontal">
       <StepperList>
-        <StepperItem value="account" completed>
-          Account
+        <StepperItem value="cart" completed>
+          Cart
         </StepperItem>
-        <StepperItem value="profile">Profile</StepperItem>
+        <StepperItem value="shipping">Shipping</StepperItem>
         <StepperItem value="payment" disabled>
           Payment
         </StepperItem>
       </StepperList>
 
-      <StepperContent value="account">Account content</StepperContent>
-      <StepperContent value="profile">Profile content</StepperContent>
-      <StepperContent value="payment">Payment content</StepperContent>
+      <StepperContent value="cart">
+        Review the selected products before choosing a shipping method.
+      </StepperContent>
+      <StepperContent value="shipping">
+        Add delivery details and confirm the recipient address.
+      </StepperContent>
+      <StepperContent value="payment">
+        Choose a payment method to complete the order.
+      </StepperContent>
 
       <div className="mt-6 flex justify-between">
         <StepperPrevious />
@@ -461,14 +482,117 @@ function StepperExample() {
   );
 }
 
+function StepperVerticalExample() {
+  return (
+    <Stepper defaultValue="profile" orientation="vertical">
+      <StepperList>
+        <StepperItem value="profile">Profile</StepperItem>
+        <StepperItem value="workspace">Workspace</StepperItem>
+        <StepperItem value="invite" disabled>
+          Invite team
+        </StepperItem>
+      </StepperList>
+
+      <StepperContent value="profile">
+        Start with a name, role, and contact preferences.
+      </StepperContent>
+      <StepperContent value="workspace">
+        Pick the workspace defaults for this onboarding flow.
+      </StepperContent>
+      <StepperContent value="invite">
+        Send invitations after the workspace is ready.
+      </StepperContent>
+
+      <div className="mt-6 flex justify-between">
+        <StepperPrevious />
+        <StepperNext />
+      </div>
+    </Stepper>
+  );
+}
+
+function StepperStatusExample() {
+  return (
+    <Stepper defaultValue="shipping" orientation="horizontal">
+      <StepperList>
+        <StepperItem value="account" completed>
+          Account
+        </StepperItem>
+        <StepperItem value="shipping" error>
+          Shipping
+        </StepperItem>
+        <StepperItem value="payment" disabled>
+          Payment
+        </StepperItem>
+      </StepperList>
+
+      <StepperContent value="account" forceMount>
+        Account details are complete.
+      </StepperContent>
+      <StepperContent value="shipping" forceMount>
+        The saved address needs a postal code before payment can continue.
+      </StepperContent>
+      <StepperContent value="payment" forceMount>
+        Payment unlocks after the shipping issue is resolved.
+      </StepperContent>
+
+      <div className="mt-6 flex justify-between">
+        <StepperPrevious />
+        <StepperNext />
+      </div>
+    </Stepper>
+  );
+}
+
+function StepperControlledExample() {
+  const steps = ["details", "review", "confirm"];
+  const [value, setValue] = React.useState("details");
+  const currentIndex = steps.indexOf(value);
+
+  return (
+    <Stepper value={value} onValueChange={setValue} orientation="horizontal">
+      <StepperList>
+        <StepperItem value="details" completed={currentIndex > 0}>
+          Details
+        </StepperItem>
+        <StepperItem value="review" completed={currentIndex > 1}>
+          Review
+        </StepperItem>
+        <StepperItem value="confirm">Confirm</StepperItem>
+      </StepperList>
+
+      <StepperContent value="details">
+        Collect the core details before reviewing the request.
+      </StepperContent>
+      <StepperContent value="review">
+        Check the information and make any final corrections.
+      </StepperContent>
+      <StepperContent value="confirm">
+        Confirm the flow once every step is ready.
+      </StepperContent>
+
+      <div className="mt-6 flex items-center justify-between gap-3">
+        <p className="text-sm text-muted-foreground">Current: {value}</p>
+        <div className="flex gap-2">
+          <StepperPrevious />
+          <StepperNext />
+        </div>
+      </div>
+    </Stepper>
+  );
+}
+
 export {
   Stepper,
+  StepperControlledExample,
   StepperContent,
   StepperExample,
   StepperItem,
   StepperList,
   StepperNext,
   StepperPrevious,
+  StepperStatusExample,
+  StepperVerticalExample,
 };
 
-export type { StepperOrientation };
+export type { StepperOrientation, StepperStepState };
