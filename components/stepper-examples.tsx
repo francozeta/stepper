@@ -27,8 +27,25 @@ import {
 import { useForm, useWatch, type FieldPath } from "react-hook-form";
 import { z } from "zod/v3";
 
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Stepper,
   StepperContent,
@@ -278,30 +295,19 @@ function WizardField({
   error?: string;
   children: React.ReactNode;
 }) {
+  const invalid = Boolean(error);
+
   return (
-    <div className="flex flex-col gap-2" data-invalid={error ? "" : undefined}>
-      <label htmlFor={id} className="text-sm font-medium text-foreground">
-        {label}
-      </label>
+    <Field data-invalid={invalid ? "true" : undefined}>
+      <FieldLabel htmlFor={id}>{label}</FieldLabel>
       {children}
       {error ? (
-        <p className="text-sm leading-5 text-destructive">{error}</p>
+        <FieldError>{error}</FieldError>
       ) : description ? (
-        <p className="text-sm leading-5 text-muted-foreground">
-          {description}
-        </p>
+        <FieldDescription>{description}</FieldDescription>
       ) : null}
-    </div>
+    </Field>
   );
-}
-
-function fieldClassName(hasError?: boolean) {
-  return [
-    "h-9 w-full rounded-md border bg-background px-3 text-sm text-foreground outline-none transition-[border-color,box-shadow]",
-    "placeholder:text-muted-foreground/70 focus-visible:ring-ring/50 focus-visible:ring-[3px]",
-    "disabled:cursor-not-allowed disabled:opacity-50",
-    hasError ? "border-destructive" : "border-border",
-  ].join(" ");
 }
 
 function StepperActions({
@@ -334,7 +340,7 @@ function StepperActions({
   return (
     <div className="mt-6 flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
       {note ? (
-        <p className="text-sm text-muted-foreground">{note}</p>
+        <div className="min-w-0 text-sm text-muted-foreground">{note}</div>
       ) : (
         <span />
       )}
@@ -523,17 +529,17 @@ function StepperExample() {
           description="Collect the two values the app needs before it can route a new workspace."
           icon={Building2}
         >
-          <div className="grid gap-4 sm:grid-cols-2">
+          <FieldGroup className="grid gap-4 sm:grid-cols-2">
             <WizardField
               id="workspace-name"
               label="Workspace name"
               error={fieldErrors.workspaceName}
             >
-              <input
+              <Input
                 id="workspace-name"
                 placeholder="Acme Design Systems"
+                autoComplete="organization"
                 aria-invalid={Boolean(fieldErrors.workspaceName)}
-                className={fieldClassName(Boolean(fieldErrors.workspaceName))}
                 onInput={() => clearFieldError("workspaceName")}
                 {...form.register("workspaceName")}
               />
@@ -544,16 +550,17 @@ function StepperExample() {
               description="Used in URLs, for example /acme-design."
               error={fieldErrors.workspaceSlug}
             >
-              <input
+              <Input
                 id="workspace-slug"
                 placeholder="acme-design"
+                autoCapitalize="none"
+                autoComplete="off"
                 aria-invalid={Boolean(fieldErrors.workspaceSlug)}
-                className={fieldClassName(Boolean(fieldErrors.workspaceSlug))}
                 onInput={() => clearFieldError("workspaceSlug")}
                 {...form.register("workspaceSlug")}
               />
             </WizardField>
-          </div>
+          </FieldGroup>
         </ExampleContent>
       </StepperContent>
 
@@ -564,23 +571,43 @@ function StepperExample() {
           description="These preferences are not Stepper state. They belong to the form."
           icon={Settings2}
         >
-          <div className="grid gap-4 sm:grid-cols-2">
+          <FieldGroup className="grid gap-4 sm:grid-cols-2">
             <WizardField
               id="workspace-region"
               label="Region"
               description="Pick the closest default region for new projects."
               error={fieldErrors.region}
             >
-              <select
-                id="workspace-region"
-                aria-invalid={Boolean(fieldErrors.region)}
-                className={fieldClassName(Boolean(fieldErrors.region))}
-                {...form.register("region")}
+              <Select
+                value={formValues.region}
+                onValueChange={(nextRegion) => {
+                  clearFieldError("region");
+                  form.setValue(
+                    "region",
+                    nextRegion as WorkspaceWizardValues["region"],
+                    {
+                      shouldDirty: true,
+                      shouldTouch: true,
+                      shouldValidate: true,
+                    }
+                  );
+                }}
               >
-                <option value="iad1">US East - iad1</option>
-                <option value="fra1">Europe - fra1</option>
-                <option value="sin1">Asia Pacific - sin1</option>
-              </select>
+                <SelectTrigger
+                  id="workspace-region"
+                  aria-invalid={Boolean(fieldErrors.region)}
+                  className="w-full"
+                >
+                  <SelectValue placeholder="Select region" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="iad1">US East - iad1</SelectItem>
+                    <SelectItem value="fra1">Europe - fra1</SelectItem>
+                    <SelectItem value="sin1">Asia Pacific - sin1</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </WizardField>
             <WizardField
               id="workspace-visibility"
@@ -588,17 +615,37 @@ function StepperExample() {
               description="Control who can discover the workspace."
               error={fieldErrors.visibility}
             >
-              <select
-                id="workspace-visibility"
-                aria-invalid={Boolean(fieldErrors.visibility)}
-                className={fieldClassName(Boolean(fieldErrors.visibility))}
-                {...form.register("visibility")}
+              <Select
+                value={formValues.visibility}
+                onValueChange={(nextVisibility) => {
+                  clearFieldError("visibility");
+                  form.setValue(
+                    "visibility",
+                    nextVisibility as WorkspaceWizardValues["visibility"],
+                    {
+                      shouldDirty: true,
+                      shouldTouch: true,
+                      shouldValidate: true,
+                    }
+                  );
+                }}
               >
-                <option value="private">Private</option>
-                <option value="team">Team visible</option>
-              </select>
+                <SelectTrigger
+                  id="workspace-visibility"
+                  aria-invalid={Boolean(fieldErrors.visibility)}
+                  className="w-full"
+                >
+                  <SelectValue placeholder="Select visibility" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="private">Private</SelectItem>
+                    <SelectItem value="team">Team visible</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </WizardField>
-          </div>
+          </FieldGroup>
         </ExampleContent>
       </StepperContent>
 
@@ -616,11 +663,12 @@ function StepperExample() {
               description="Leave blank if you want to invite members later."
               error={fieldErrors.inviteEmail}
             >
-              <input
+              <Input
                 id="invite-email"
+                type="email"
                 placeholder="teammate@company.com"
+                autoComplete="email"
                 aria-invalid={Boolean(fieldErrors.inviteEmail)}
-                className={fieldClassName(Boolean(fieldErrors.inviteEmail))}
                 onInput={() => clearFieldError("inviteEmail")}
                 {...form.register("inviteEmail")}
               />
@@ -678,9 +726,17 @@ function StepperExample() {
 
       <StepperActions
         note={
-          currentStepHasErrors
-            ? "Fix the highlighted fields before continuing."
-            : "This example uses react-hook-form and zod. The Stepper core does not depend on them."
+          currentStepHasErrors ? (
+            <Alert variant="destructive" className="max-w-md">
+              <AlertCircle />
+              <AlertTitle>Step needs attention</AlertTitle>
+              <AlertDescription>
+                Fix the highlighted fields before continuing.
+              </AlertDescription>
+            </Alert>
+          ) : (
+            "This example uses react-hook-form and zod. The Stepper core does not depend on them."
+          )
         }
         nextAction={
           value !== "review" ? (
@@ -881,9 +937,13 @@ function StepperStatusExample() {
           description="Error state highlights the current blocker while keeping the next step disabled."
           icon={AlertCircle}
         >
-          <div className="rounded-md border border-destructive/30 bg-background p-3 text-sm text-destructive">
-            Add a postal code to unlock payment.
-          </div>
+          <Alert variant="destructive">
+            <AlertCircle />
+            <AlertTitle>Shipping needs attention</AlertTitle>
+            <AlertDescription>
+              Add a postal code to unlock payment.
+            </AlertDescription>
+          </Alert>
         </ExampleContent>
       </StepperContent>
       <StepperContent value="payment" forceMount>

@@ -542,7 +542,7 @@ function StepperTrigger({
       aria-current={isActive ? "step" : undefined}
       aria-controls={isActive ? contentId : undefined}
       aria-disabled={isDisabled ? true : undefined}
-      disabled={isDisabled}
+      disabled={asChild ? undefined : isDisabled}
       data-slot="stepper-trigger"
       data-state={stepState}
       data-disabled={isDisabled ? "" : undefined}
@@ -551,6 +551,7 @@ function StepperTrigger({
         "text-muted-foreground transition-[color,background-color,box-shadow,transform] active:scale-[0.96]",
         "focus-visible:ring-ring/50 focus-visible:ring-[3px]",
         "disabled:pointer-events-none disabled:opacity-50",
+        "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         "data-[state=active]:text-foreground",
         "data-[state=completed]:text-foreground",
         "data-[state=error]:text-destructive",

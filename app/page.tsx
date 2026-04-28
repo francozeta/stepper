@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { DocsExample } from "@/components/docs-example";
 import { CodeBlock, InfoGrid, PageHeader, Section } from "@/components/docs-content";
 import { StepperExample } from "@/components/stepper-examples";
+import { Button } from "@/components/ui/button";
 import {
   packageNotes,
   quickFacts,
@@ -79,13 +80,12 @@ export default function Home() {
         </div>
       </Section>
 
-      <Link
-        href="/getting-started"
-        className="inline-flex min-h-10 w-fit items-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-[background-color,box-shadow,transform] hover:bg-primary/90 active:scale-[0.96] focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none"
-      >
-        Getting Started
-        <ArrowRight className="size-4" />
-      </Link>
+      <Button asChild size="lg" className="w-fit">
+        <Link href="/getting-started">
+          Getting Started
+          <ArrowRight data-icon="inline-end" />
+        </Link>
+      </Button>
     </>
   );
 }

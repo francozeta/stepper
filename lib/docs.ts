@@ -71,7 +71,7 @@ const quickFacts = [
   "Controlled and uncontrolled",
   "Horizontal and vertical",
   "Composed primitives",
-  "No Radix requirement",
+  "Radix Slot for asChild",
   "No Motion in core",
   "shadcn/ui tokens",
 ];
@@ -82,9 +82,9 @@ const releaseItems = [
   "Step states for active, completed, disabled, and error.",
   "Associated content panels with optional forceMount.",
   "Navigation helpers with StepperPrevious and StepperNext.",
-  "Primitive composition pieces for custom triggers and indicators.",
+  "Primitive composition pieces with asChild support for triggers and content.",
   "Lightweight step registration for simple wrappers around StepperItem.",
-  "Product-style demos for checkout, onboarding, blocked states, and controlled flows.",
+  "Product-style demos with shadcn/ui fields, alerts, checkout, onboarding, and controlled flows.",
 ];
 
 const gettingStartedSnippet = `import {
@@ -171,6 +171,22 @@ import { useForm } from "react-hook-form";
 import { z } from "zod/v3";
 
 import { Button } from "@/components/ui/button";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Stepper,
   StepperContent,
@@ -268,20 +284,72 @@ export function WorkspaceSetup() {
       </StepperList>
 
       <StepperContent value="workspace">
-        <input placeholder="Workspace name" {...form.register("workspaceName")} />
-        <input placeholder="workspace-slug" {...form.register("workspaceSlug")} />
+        <FieldGroup className="grid gap-4 sm:grid-cols-2">
+          <Field>
+            <FieldLabel htmlFor="workspace-name">Workspace name</FieldLabel>
+            <Input
+              id="workspace-name"
+              placeholder="Acme Design Systems"
+              aria-invalid={Boolean(form.formState.errors.workspaceName)}
+              {...form.register("workspaceName")}
+            />
+            <FieldError>
+              {form.formState.errors.workspaceName?.message}
+            </FieldError>
+          </Field>
+          <Field>
+            <FieldLabel htmlFor="workspace-slug">Workspace slug</FieldLabel>
+            <Input
+              id="workspace-slug"
+              placeholder="acme-design"
+              aria-invalid={Boolean(form.formState.errors.workspaceSlug)}
+              {...form.register("workspaceSlug")}
+            />
+            <FieldDescription>Used in URLs, for example /acme-design.</FieldDescription>
+            <FieldError>{form.formState.errors.workspaceSlug?.message}</FieldError>
+          </Field>
+        </FieldGroup>
       </StepperContent>
 
       <StepperContent value="preferences">
-        <select {...form.register("region")}>
-          <option value="iad1">US East</option>
-          <option value="fra1">Europe</option>
-          <option value="sin1">Asia Pacific</option>
-        </select>
+        <Field>
+          <FieldLabel htmlFor="workspace-region">Region</FieldLabel>
+          <Select
+            defaultValue={form.getValues("region")}
+            onValueChange={(region) =>
+              form.setValue("region", region as Values["region"], {
+                shouldDirty: true,
+                shouldValidate: true,
+              })
+            }
+          >
+            <SelectTrigger id="workspace-region" className="w-full">
+              <SelectValue placeholder="Select region" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="iad1">US East</SelectItem>
+                <SelectItem value="fra1">Europe</SelectItem>
+                <SelectItem value="sin1">Asia Pacific</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </Field>
       </StepperContent>
 
       <StepperContent value="members">
-        <input placeholder="teammate@company.com" {...form.register("inviteEmail")} />
+        <Field>
+          <FieldLabel htmlFor="invite-email">Invite email</FieldLabel>
+          <Input
+            id="invite-email"
+            type="email"
+            placeholder="teammate@company.com"
+            aria-invalid={Boolean(form.formState.errors.inviteEmail)}
+            {...form.register("inviteEmail")}
+          />
+          <FieldDescription>Leave blank to invite members later.</FieldDescription>
+          <FieldError>{form.formState.errors.inviteEmail?.message}</FieldError>
+        </Field>
       </StepperContent>
 
       <StepperContent value="review">
@@ -661,7 +729,7 @@ const apiComponents = [
   },
   {
     name: "StepperTrigger",
-    element: "button",
+    element: "button / Slot",
     description: "Real button by default. Can use asChild for custom triggers while keeping step selection logic.",
   },
   {
@@ -671,8 +739,8 @@ const apiComponents = [
   },
   {
     name: "StepperContent",
-    element: "div",
-    description: "Associated panel for a step value. Can stay mounted with forceMount.",
+    element: "div / Slot",
+    description: "Associated panel for a step value. Can stay mounted with forceMount or render asChild.",
   },
   {
     name: "StepperPrevious / StepperNext",
@@ -683,12 +751,12 @@ const apiComponents = [
 
 const v2Roadmap = [
   {
-    title: "asChild",
-    description: "Add Radix Slot once the trigger API needs links or custom button primitives.",
+    title: "Mobile pattern",
+    description: "Document Drawer or Sheet composition without adding responsive props to the core.",
   },
   {
-    title: "Richer primitives",
-    description: "Split label, description, indicator, separator, and trigger examples further.",
+    title: "Linear mode",
+    description: "Explore opt-in navigation rules for forms that must complete steps in order.",
   },
   {
     title: "Animation by composition",

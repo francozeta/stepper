@@ -6,9 +6,11 @@ type DocsTocItem = {
 const docsToc: Record<string, DocsTocItem[]> = {
   "/": [
     { title: "Preview", href: "#preview" },
+    { title: "Create workspace", href: "#create-workspace" },
+    { title: "Usage", href: "#usage" },
+    { title: "Works with", href: "#works-with" },
     { title: "Install shape", href: "#install-shape" },
     { title: "V1 scope", href: "#v1-scope" },
-    { title: "Next direction", href: "#next-direction" },
   ],
   "/getting-started": [
     { title: "Add the component", href: "#add-the-component" },
@@ -18,14 +20,15 @@ const docsToc: Record<string, DocsTocItem[]> = {
   "/api": [
     { title: "Root props", href: "#root-props" },
     { title: "Item props", href: "#item-props" },
+    { title: "Trigger props", href: "#trigger-props" },
     { title: "Content props", href: "#content-props" },
     { title: "Primitive parts", href: "#primitive-parts" },
     { title: "Composable trigger", href: "#composable-trigger" },
   ],
   "/examples": [
+    { title: "Create workspace", href: "#create-workspace" },
     { title: "Checkout flow", href: "#checkout-flow" },
     { title: "Workspace onboarding", href: "#workspace-onboarding" },
-    { title: "Blocked checkout", href: "#blocked-checkout" },
     { title: "Controlled review", href: "#controlled-review" },
   ],
   "/styling": [
@@ -36,6 +39,7 @@ const docsToc: Record<string, DocsTocItem[]> = {
   "/changelog": [
     { title: "Added", href: "#added" },
     { title: "Release link", href: "#release-link" },
+    { title: "Next direction", href: "#next-direction" },
   ],
 };
 

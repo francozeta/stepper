@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { PageHeader, Section } from "@/components/docs-content";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -49,12 +50,11 @@ export default function ChangelogPage() {
       </Section>
 
       <Section title="Release link">
-        <a
-          href="https://github.com/francozeta/stepper/releases/tag/v0.1.0"
-          className="inline-flex min-h-10 w-fit items-center rounded-md border border-border bg-background px-4 text-sm font-medium text-foreground transition-[background-color,box-shadow,transform] hover:bg-muted active:scale-[0.96] focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none"
-        >
-          Open GitHub release
-        </a>
+        <Button asChild variant="outline" className="w-fit">
+          <a href="https://github.com/francozeta/stepper/releases/tag/v0.1.0">
+            Open GitHub release
+          </a>
+        </Button>
       </Section>
 
       <Section

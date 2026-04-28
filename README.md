@@ -2,7 +2,7 @@
 
 A lightweight Stepper component for React, Next.js, TypeScript, Tailwind CSS, and shadcn/ui-style projects.
 
-The Stepper core is intentionally small and shadcn/ui-friendly. It does not require Radix, Motion, `asChild`, or multiple visual variants.
+The Stepper core is intentionally small and shadcn/ui-friendly. It uses Radix Slot only for `asChild` composition and does not require Radix Tabs, Motion, or multiple visual variants.
 
 ## Files
 
@@ -20,6 +20,7 @@ The Stepper core is intentionally small and shadcn/ui-friendly. It does not requ
 - Real buttons, `aria-current="step"` on the active step, and real `disabled`
 - Tailwind tokens such as `border`, `muted-foreground`, `primary`, `destructive`, `background`, and `foreground`
 - Primitive pieces for custom step markup: `StepperTrigger`, `StepperIndicator`, `StepperLabel`, `StepperDescription`, and `StepperSeparator`
+- `asChild` on `StepperTrigger` and `StepperContent` with Radix Slot
 - `forceMount` on `StepperContent` for mounted inactive content
 - Guard rails for invalid `value` / `defaultValue` and disabled steps
 - Lightweight step registration so simple wrapper components can still be composed around `StepperItem`
@@ -149,6 +150,14 @@ If `value` or `defaultValue` points to a missing or disabled step, the Stepper f
 | --- | --- | --- |
 | `value` | `string` | Step value this content belongs to. |
 | `forceMount` | `boolean` | Keeps inactive content mounted with `hidden` and `data-state="inactive"`. |
+| `asChild` | `boolean` | Renders the content props onto a child element with Radix Slot. |
+
+### `StepperTrigger`
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `asChild` | `boolean` | Renders trigger props onto a custom button or link with Radix Slot. |
+| `disabled` | `boolean` | Disables the trigger in addition to the parent `StepperItem` disabled state. |
 
 ### Primitive step parts
 
@@ -164,4 +173,4 @@ If `value` or `defaultValue` points to a missing or disabled step, the Stepper f
 
 This V1 keeps `collectSteps(children)` as a first-render fallback for direct `StepperItem` usage, then uses a small internal registration step after mount. That keeps the component copy-paste friendly while allowing simple wrapper components around `StepperItem`.
 
-The next V2 step would be adding `asChild` with Radix Slot, richer primitive parts for wrapper-heavy composition, and optional animated examples where users compose their own `motion.div` instead of making Motion part of the core Stepper.
+The next V2 step would be richer form and mobile patterns, linear navigation experiments, and optional animated examples where users compose their own `motion.div` instead of making Motion part of the core Stepper.
