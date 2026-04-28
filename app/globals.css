@@ -161,15 +161,35 @@ body {
   margin: 0;
   min-width: max-content;
   overflow: visible !important;
-  padding: 1rem;
+  padding: 1rem 3.5rem 1.25rem 0;
   background: transparent !important;
 }
 
 .docs-code code {
+  counter-reset: docs-code-line;
   font-family: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo,
     Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 0.8125rem;
   line-height: 1.65;
+}
+
+.docs-code .line {
+  position: relative;
+  display: block;
+  min-height: 1.65em;
+  padding-left: 4rem;
+  padding-right: 1rem;
+}
+
+.docs-code .line::before {
+  position: absolute;
+  left: 1rem;
+  width: 2rem;
+  color: color-mix(in oklab, var(--muted-foreground) 62%, transparent);
+  content: counter(docs-code-line);
+  counter-increment: docs-code-line;
+  text-align: right;
+  user-select: none;
 }
 
 .dark {

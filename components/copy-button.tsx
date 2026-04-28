@@ -18,6 +18,7 @@ type CopyButtonProps = Omit<React.ComponentProps<typeof Button>, "value"> & {
   label?: string;
   copiedLabel?: string;
   toastMessage?: string;
+  iconOnly?: boolean;
 };
 
 function CopyButton({
@@ -25,9 +26,12 @@ function CopyButton({
   label = "Copy",
   copiedLabel = "Copied",
   toastMessage = "Copied to clipboard",
+  iconOnly = false,
   className,
   children,
   onClick,
+  size,
+  variant,
   ...props
 }: CopyButtonProps) {
   const [copied, setCopied] = React.useState(false);
@@ -72,10 +76,15 @@ function CopyButton({
       <TooltipTrigger asChild>
         <Button
           type="button"
-          variant="outline"
-          size="sm"
+          variant={variant ?? (iconOnly ? "ghost" : "outline")}
+          size={size ?? (iconOnly ? "icon" : "sm")}
           aria-label={copied ? copiedLabel : label}
-          className={cn("gap-1.5", className)}
+          className={cn(
+            "gap-1.5",
+            iconOnly &&
+              "relative size-8 rounded-md text-muted-foreground before:absolute before:-inset-1.5 hover:text-foreground",
+            className
+          )}
           onClick={handleCopy}
           {...props}
         >
@@ -84,9 +93,9 @@ function CopyButton({
           ) : (
             <Copy data-icon="inline-start" />
           )}
-          {children ?? (
+          {!iconOnly && (children ?? (
             <span className="hidden sm:inline">{copied ? copiedLabel : label}</span>
-          )}
+          ))}
         </Button>
       </TooltipTrigger>
       <TooltipContent sideOffset={6}>

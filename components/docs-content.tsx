@@ -2,7 +2,6 @@ import { codeToHtml } from "shiki";
 
 import { CopyButton } from "@/components/copy-button";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
 type PageHeaderProps = {
@@ -48,18 +47,25 @@ function PageHeader({
 }
 
 function Section({
+  id,
   title,
   description,
   children,
   className,
 }: {
+  id?: string;
   title: string;
   description?: string;
   children: React.ReactNode;
   className?: string;
 }) {
+  const sectionId = id ?? toAnchorId(title);
+
   return (
-    <section className={cn("flex flex-col gap-4", className)}>
+    <section
+      id={sectionId}
+      className={cn("flex scroll-mt-24 flex-col gap-4", className)}
+    >
       <div className="flex max-w-3xl flex-col gap-2">
         <h2 className="text-balance text-xl font-semibold tracking-tight text-foreground">
           {title}
@@ -95,35 +101,47 @@ async function CodeBlock({
   const source = (code ?? children ?? "").trim();
   const html = await codeToHtml(source, {
     lang,
-    theme: "github-dark-default",
+    theme: "vitesse-dark",
   });
 
   return (
     <div
       data-slot="docs-code-block"
       className={cn(
-        "overflow-hidden rounded-lg border border-border bg-[#0d1117] text-sm shadow-sm",
+        "relative overflow-hidden rounded-xl bg-card text-sm ring-1 ring-border/80",
         className
       )}
     >
-      <div className="flex min-h-10 items-center justify-between gap-3 border-b border-white/10 bg-background px-3">
-        <span className="min-w-0 truncate font-mono text-xs text-muted-foreground">
+      {filename ? (
+        <div className="pointer-events-none absolute left-4 top-3 z-10 max-w-[calc(100%-4rem)] truncate font-mono text-xs text-muted-foreground">
           {filename ?? lang}
-        </span>
+        </div>
+      ) : null}
+
+      {showCopy ? (
+        <CopyButton
+          value={source}
+          label="Copy code"
+          iconOnly
+          toastMessage={filename ? `${filename} copied` : "Code copied"}
+          className="absolute right-3 top-2.5 z-10 bg-card/80 backdrop-blur"
+        />
+      ) : null}
+
+      <div
+        className={cn(
+          "docs-scrollbar max-h-[420px] overflow-auto",
+          filename ? "pt-8" : "pt-2"
+        )}
+      >
         {showCopy ? (
-          <CopyButton
-            value={source}
-            label="Copy"
-            toastMessage={filename ? `${filename} copied` : "Code copied"}
-          />
+          <span className="sr-only">Copy code is available in the top right.</span>
         ) : null}
-      </div>
-      <ScrollArea className="max-h-[520px]">
         <div
-          className="docs-code min-w-full"
+          className="docs-code min-w-max"
           dangerouslySetInnerHTML={{ __html: html }}
         />
-      </ScrollArea>
+      </div>
     </div>
   );
 }
@@ -155,6 +173,13 @@ function InfoGrid({
       ))}
     </dl>
   );
+}
+
+function toAnchorId(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
 }
 
 export { CodeBlock, InfoGrid, PageHeader, Section };

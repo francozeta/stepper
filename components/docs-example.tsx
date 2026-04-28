@@ -1,16 +1,7 @@
 import { Code } from "lucide-react";
 
 import { CodeBlock } from "@/components/docs-content";
-import { CopyButton } from "@/components/copy-button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Tabs,
   TabsContent,
@@ -43,55 +34,60 @@ function DocsExample({
   previewClassName,
 }: DocsExampleProps) {
   return (
-    <Card data-slot="docs-example" className={cn("shadow-sm", className)}>
-      <CardHeader className="border-b border-border/70 pb-4">
-        <CardTitle>{title}</CardTitle>
-        <CardDescription className="max-w-xl text-pretty leading-6">
-          {description}
-        </CardDescription>
-        <CardAction className="flex items-center gap-2">
+    <section
+      id={toAnchorId(title)}
+      data-slot="docs-example"
+      className={cn("flex scroll-mt-24 flex-col gap-4", className)}
+    >
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <h2 className="text-xl font-semibold tracking-tight text-foreground">
+            {title}
+          </h2>
           {badge ? (
-            <Badge variant="secondary" className="w-fit">
+            <Badge variant="secondary" className="font-mono">
               {badge}
             </Badge>
           ) : null}
-          <CopyButton value={code.trim()} label="Copy code" />
-        </CardAction>
-      </CardHeader>
-      <CardContent className="p-0">
-        <Tabs defaultValue="preview" className="gap-0">
-          <div className="flex items-center justify-between border-b border-border/70 px-4 py-2">
-            <TabsList variant="line" className="h-8">
-              <TabsTrigger value="preview">Preview</TabsTrigger>
-              <TabsTrigger value="code" className="gap-1.5">
-                <Code data-icon="inline-start" />
-                Code
-              </TabsTrigger>
-            </TabsList>
+        </div>
+        <p className="max-w-2xl text-pretty text-sm leading-6 text-muted-foreground">
+          {description}
+        </p>
+      </div>
+
+      <Tabs defaultValue="preview" className="gap-3">
+        <TabsList variant="line" className="h-8 bg-transparent p-0">
+          <TabsTrigger value="preview" className="px-0">
+            Preview
+          </TabsTrigger>
+          <TabsTrigger value="code" className="gap-1.5 px-0">
+            <Code data-icon="inline-start" />
+            Code
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="preview" className="m-0">
+          <div
+            className={cn(
+              "rounded-xl bg-card p-4 ring-1 ring-border/80 sm:p-5",
+              previewClassName
+            )}
+          >
+            {preview}
           </div>
-          <TabsContent value="preview" className="m-0 p-4">
-            <div
-              className={cn(
-                "rounded-lg border border-border bg-background/70 p-4 sm:p-5",
-                previewClassName
-              )}
-            >
-              {preview}
-            </div>
-          </TabsContent>
-          <TabsContent value="code" className="m-0 p-0">
-            <CodeBlock
-              code={code}
-              filename={filename}
-              lang={lang}
-              showCopy={false}
-              className="rounded-none border-0 shadow-none"
-            />
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
+        </TabsContent>
+        <TabsContent value="code" className="m-0">
+          <CodeBlock code={code} filename={filename} lang={lang} />
+        </TabsContent>
+      </Tabs>
+    </section>
   );
+}
+
+function toAnchorId(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
 }
 
 export { DocsExample };
