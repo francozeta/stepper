@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { AnimatePresence, motion, type HTMLMotionProps } from "motion/react";
 
 import { cn } from "@/lib/utils";
 
@@ -216,9 +217,9 @@ function StepperList({ className, ...props }: StepperListProps) {
       data-slot="stepper-list"
       data-orientation={orientation}
       className={cn(
-        "flex gap-4",
-        "data-[orientation=horizontal]:items-start",
-        "data-[orientation=vertical]:flex-col",
+        "flex min-w-0",
+        "data-[orientation=horizontal]:w-full data-[orientation=horizontal]:gap-3 data-[orientation=horizontal]:overflow-x-auto data-[orientation=horizontal]:pb-2",
+        "data-[orientation=vertical]:flex-col data-[orientation=vertical]:gap-4",
         "[&>li:last-child_[data-slot=stepper-separator]]:hidden",
         className
       )}
@@ -273,7 +274,7 @@ function StepperItem({
       data-state={stepState}
       className={cn(
         "group/stepper-item relative flex min-w-0",
-        "data-[orientation=horizontal]:flex-1 data-[orientation=horizontal]:items-start",
+        "data-[orientation=horizontal]:min-w-24 data-[orientation=horizontal]:flex-1 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:items-center",
         "data-[orientation=vertical]:items-start data-[orientation=vertical]:gap-3"
       )}
     >
@@ -286,14 +287,14 @@ function StepperItem({
         data-slot="stepper-trigger"
         data-state={stepState}
         className={cn(
-          "group inline-flex min-w-0 items-center gap-2 rounded-md text-left text-sm font-medium outline-none",
-          "text-muted-foreground transition-colors",
+          "group inline-flex min-h-10 min-w-0 items-center gap-2 rounded-md text-left text-sm font-medium outline-none",
+          "text-muted-foreground transition-[color,background-color,box-shadow,transform] active:scale-[0.96]",
           "focus-visible:ring-ring/50 focus-visible:ring-[3px]",
           "disabled:pointer-events-none disabled:opacity-50",
           "data-[state=active]:text-foreground",
           "data-[state=completed]:text-foreground",
           "data-[state=error]:text-destructive",
-          orientation === "horizontal" && "flex-col items-center text-center",
+          orientation === "horizontal" && "w-full flex-col items-center text-center",
           orientation === "vertical" && "justify-start",
           className
         )}
@@ -310,7 +311,7 @@ function StepperItem({
           aria-hidden="true"
           data-slot="stepper-indicator"
           className={cn(
-            "flex size-8 shrink-0 items-center justify-center rounded-full border border-border bg-background text-xs font-semibold text-muted-foreground",
+            "flex size-9 shrink-0 items-center justify-center rounded-full border border-border bg-background text-xs font-semibold text-muted-foreground shadow-sm",
             "group-data-[state=active]:border-primary group-data-[state=active]:bg-primary group-data-[state=active]:text-primary-foreground",
             "group-data-[state=completed]:border-primary group-data-[state=completed]:bg-primary group-data-[state=completed]:text-primary-foreground",
             "group-data-[state=error]:border-destructive group-data-[state=error]:bg-destructive group-data-[state=error]:text-destructive-foreground"
@@ -318,7 +319,13 @@ function StepperItem({
         >
           {stepState === "error" ? "!" : index >= 0 ? index + 1 : null}
         </span>
-        <span data-slot="stepper-label" className="min-w-0 leading-none">
+        <span
+          data-slot="stepper-label"
+          className={cn(
+            "min-w-0 leading-none",
+            orientation === "horizontal" && "max-w-24 truncate"
+          )}
+        >
           {children}
         </span>
       </button>
@@ -326,18 +333,18 @@ function StepperItem({
         aria-hidden="true"
         data-slot="stepper-separator"
         className={cn(
-          "bg-border",
+          "bg-muted-foreground/25",
           orientation === "horizontal" &&
-            "mt-4 ml-4 h-px flex-1 group-data-[state=completed]/stepper-item:bg-primary",
+            "absolute left-[calc(50%+1.25rem)] right-[calc(-50%+1.25rem)] top-[1.125rem] h-px group-data-[state=completed]/stepper-item:bg-primary",
           orientation === "vertical" &&
-            "absolute left-4 top-9 h-[calc(100%-1rem)] w-px group-data-[state=completed]/stepper-item:bg-primary"
+            "absolute left-[1.125rem] top-11 h-[calc(100%-1.5rem)] w-px group-data-[state=completed]/stepper-item:bg-primary"
         )}
       />
     </li>
   );
 }
 
-type StepperContentProps = React.ComponentPropsWithoutRef<"div"> & {
+type StepperContentProps = Omit<HTMLMotionProps<"div">, "value"> & {
   value: string;
   forceMount?: boolean;
 };
@@ -356,26 +363,37 @@ function StepperContent({
   } = useStepperContext("StepperContent");
   const isActive = currentValue === value;
 
-  if (!forceMount && !isActive) {
-    return null;
-  }
-
-  return (
-    <div
+  const content = (
+    <motion.div
+      key={value}
       id={getContentId(value)}
       role="region"
       aria-labelledby={getTriggerId(value)}
       data-slot="stepper-content"
       data-state={isActive ? "active" : "inactive"}
       hidden={!isActive}
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -4 }}
+      transition={{ type: "spring", duration: 0.3, bounce: 0 }}
       className={cn(
-        "rounded-md border border-border bg-background p-4 text-sm text-foreground",
+        "rounded-lg border border-border/70 bg-muted/25 p-4 text-sm text-foreground shadow-sm",
         className
       )}
       {...props}
     >
       {children}
-    </div>
+    </motion.div>
+  );
+
+  if (forceMount) {
+    return content;
+  }
+
+  return (
+    <AnimatePresence initial={false} mode="wait">
+      {isActive ? content : null}
+    </AnimatePresence>
   );
 }
 
@@ -396,8 +414,8 @@ function StepperPrevious({
       disabled={disabled || !canGoPrevious}
       data-slot="stepper-previous"
       className={cn(
-        "inline-flex h-9 items-center justify-center gap-2 rounded-md border border-border bg-background px-3 text-sm font-medium text-foreground",
-        "transition-colors hover:bg-muted hover:text-foreground",
+        "inline-flex h-10 items-center justify-center gap-2 rounded-md border border-border bg-background px-4 text-sm font-medium text-foreground",
+        "transition-[color,background-color,box-shadow,transform] hover:bg-muted hover:text-foreground active:scale-[0.96]",
         "focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none",
         "disabled:pointer-events-none disabled:opacity-50",
         className
@@ -431,8 +449,8 @@ function StepperNext({
       disabled={disabled || !canGoNext}
       data-slot="stepper-next"
       className={cn(
-        "inline-flex h-9 items-center justify-center gap-2 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground",
-        "transition-colors hover:bg-primary/90",
+        "inline-flex h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground",
+        "transition-[background-color,box-shadow,transform] hover:bg-primary/90 active:scale-[0.96]",
         "focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none",
         "disabled:pointer-events-none disabled:opacity-50",
         className
@@ -451,12 +469,92 @@ function StepperNext({
   );
 }
 
+type ExampleContentProps = {
+  eyebrow: string;
+  title: string;
+  description: string;
+  children?: React.ReactNode;
+};
+
+function ExampleContent({
+  eyebrow,
+  title,
+  description,
+  children,
+}: ExampleContentProps) {
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-1">
+        <p className="text-xs font-medium text-muted-foreground">{eyebrow}</p>
+        <h3 className="text-balance text-sm font-medium text-foreground">
+          {title}
+        </h3>
+        <p className="text-pretty text-sm leading-6 text-muted-foreground">
+          {description}
+        </p>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+type SummaryItem = {
+  label: string;
+  value: string;
+  help?: string;
+};
+
+function SummaryGrid({ items }: { items: SummaryItem[] }) {
+  return (
+    <dl className="grid gap-3 sm:grid-cols-3">
+      {items.map((item) => (
+        <div
+          key={item.label}
+          className="rounded-md border border-border bg-background p-3"
+        >
+          <dt className="text-xs text-muted-foreground">{item.label}</dt>
+          <dd className="mt-1 text-sm font-medium text-foreground">
+            {item.value}
+          </dd>
+          {item.help ? (
+            <dd className="mt-1 text-xs text-muted-foreground">{item.help}</dd>
+          ) : null}
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+function StepperActions({
+  note,
+  previousLabel = "Back",
+  nextLabel = "Continue",
+}: {
+  note?: React.ReactNode;
+  previousLabel?: React.ReactNode;
+  nextLabel?: React.ReactNode;
+}) {
+  return (
+    <div className="mt-6 flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
+      {note ? (
+        <p className="text-sm text-muted-foreground">{note}</p>
+      ) : (
+        <span />
+      )}
+      <div className="flex gap-2 sm:justify-end">
+        <StepperPrevious>{previousLabel}</StepperPrevious>
+        <StepperNext>{nextLabel}</StepperNext>
+      </div>
+    </div>
+  );
+}
+
 function StepperExample() {
   return (
-    <Stepper defaultValue="cart" orientation="horizontal">
+    <Stepper defaultValue="shipping" orientation="horizontal">
       <StepperList>
         <StepperItem value="cart" completed>
-          Cart
+          Cart review
         </StepperItem>
         <StepperItem value="shipping">Shipping</StepperItem>
         <StepperItem value="payment" disabled>
@@ -465,28 +563,55 @@ function StepperExample() {
       </StepperList>
 
       <StepperContent value="cart">
-        Review the selected products before choosing a shipping method.
+        <ExampleContent
+          eyebrow="Cart"
+          title="Review selected products"
+          description="Confirm the items in the order before choosing how they should be delivered."
+        >
+          <SummaryGrid
+            items={[
+              { label: "Items", value: "3 products", help: "Ready to ship" },
+              { label: "Subtotal", value: "$128.00", help: "Before tax" },
+              { label: "Discount", value: "-$12.00", help: "Spring offer" },
+            ]}
+          />
+        </ExampleContent>
       </StepperContent>
       <StepperContent value="shipping">
-        Add delivery details and confirm the recipient address.
+        <ExampleContent
+          eyebrow="Shipping"
+          title="Confirm delivery details"
+          description="A horizontal stepper works well when users move through a short linear checkout."
+        >
+          <SummaryGrid
+            items={[
+              { label: "Recipient", value: "Avery Stone", help: "Primary" },
+              { label: "Method", value: "Express", help: "2 business days" },
+              { label: "Address", value: "Missing ZIP", help: "Required" },
+            ]}
+          />
+        </ExampleContent>
       </StepperContent>
       <StepperContent value="payment">
-        Choose a payment method to complete the order.
+        <ExampleContent
+          eyebrow="Payment"
+          title="Choose a payment method"
+          description="This step stays disabled until the required shipping details are complete."
+        />
       </StepperContent>
 
-      <div className="mt-6 flex justify-between">
-        <StepperPrevious />
-        <StepperNext />
-      </div>
+      <StepperActions note="Payment unlocks after the shipping address is complete." />
     </Stepper>
   );
 }
 
 function StepperVerticalExample() {
   return (
-    <Stepper defaultValue="profile" orientation="vertical">
+    <Stepper defaultValue="workspace" orientation="vertical">
       <StepperList>
-        <StepperItem value="profile">Profile</StepperItem>
+        <StepperItem value="profile" completed>
+          Profile
+        </StepperItem>
         <StepperItem value="workspace">Workspace</StepperItem>
         <StepperItem value="invite" disabled>
           Invite team
@@ -494,19 +619,36 @@ function StepperVerticalExample() {
       </StepperList>
 
       <StepperContent value="profile">
-        Start with a name, role, and contact preferences.
+        <ExampleContent
+          eyebrow="Profile"
+          title="Personal details are ready"
+          description="The user has already added their name, role, and notification preferences."
+        />
       </StepperContent>
       <StepperContent value="workspace">
-        Pick the workspace defaults for this onboarding flow.
+        <ExampleContent
+          eyebrow="Workspace"
+          title="Set team defaults"
+          description="Vertical orientation gives each step room to carry extra explanation without compressing the labels."
+        >
+          <SummaryGrid
+            items={[
+              { label: "Plan", value: "Team", help: "14-day trial" },
+              { label: "Region", value: "US East", help: "Lowest latency" },
+              { label: "Seats", value: "8 seats", help: "2 unused" },
+            ]}
+          />
+        </ExampleContent>
       </StepperContent>
       <StepperContent value="invite">
-        Send invitations after the workspace is ready.
+        <ExampleContent
+          eyebrow="Invites"
+          title="Invite teammates"
+          description="Invitations become available once the workspace defaults have been saved."
+        />
       </StepperContent>
 
-      <div className="mt-6 flex justify-between">
-        <StepperPrevious />
-        <StepperNext />
-      </div>
+      <StepperActions note="Invite controls stay disabled until the workspace setup is complete." />
     </Stepper>
   );
 }
@@ -527,19 +669,32 @@ function StepperStatusExample() {
       </StepperList>
 
       <StepperContent value="account" forceMount>
-        Account details are complete.
+        <ExampleContent
+          eyebrow="Account"
+          title="Account details are complete"
+          description="Completed steps keep their primary color so users can see how far they got."
+        />
       </StepperContent>
       <StepperContent value="shipping" forceMount>
-        The saved address needs a postal code before payment can continue.
+        <ExampleContent
+          eyebrow="Needs attention"
+          title="Shipping address is missing a postal code"
+          description="Error state highlights the current blocker while keeping the next step disabled."
+        >
+          <div className="rounded-md border border-destructive/30 bg-background p-3 text-sm text-destructive">
+            Add a postal code to unlock payment.
+          </div>
+        </ExampleContent>
       </StepperContent>
       <StepperContent value="payment" forceMount>
-        Payment unlocks after the shipping issue is resolved.
+        <ExampleContent
+          eyebrow="Payment"
+          title="Payment is locked"
+          description="Disabled steps use a real disabled button and cannot be selected."
+        />
       </StepperContent>
 
-      <div className="mt-6 flex justify-between">
-        <StepperPrevious />
-        <StepperNext />
-      </div>
+      <StepperActions note="The next action is unavailable until the error is resolved." />
     </Stepper>
   );
 }
@@ -562,22 +717,47 @@ function StepperControlledExample() {
       </StepperList>
 
       <StepperContent value="details">
-        Collect the core details before reviewing the request.
+        <ExampleContent
+          eyebrow="Details"
+          title="Collect request details"
+          description="Controlled steppers let the application decide when a user can move to the next step."
+        >
+          <SummaryGrid
+            items={[
+              { label: "Owner", value: "Finance", help: "Assigned" },
+              { label: "Budget", value: "$4,800", help: "Estimated" },
+              { label: "Due date", value: "May 12", help: "Flexible" },
+            ]}
+          />
+        </ExampleContent>
       </StepperContent>
       <StepperContent value="review">
-        Check the information and make any final corrections.
+        <ExampleContent
+          eyebrow="Review"
+          title="Check the request"
+          description="The active value is stored in React state and passed back through onValueChange."
+        />
       </StepperContent>
       <StepperContent value="confirm">
-        Confirm the flow once every step is ready.
+        <ExampleContent
+          eyebrow="Confirm"
+          title="Submit the request"
+          description="Use a controlled Stepper when validation, routing, or persistence lives outside the component."
+        />
       </StepperContent>
 
-      <div className="mt-6 flex items-center justify-between gap-3">
-        <p className="text-sm text-muted-foreground">Current: {value}</p>
-        <div className="flex gap-2">
-          <StepperPrevious />
-          <StepperNext />
-        </div>
-      </div>
+      <StepperActions
+        note={
+          <span>
+            Step{" "}
+            <span className="tabular-nums">
+              {currentIndex + 1} of {steps.length}
+            </span>
+            : {value}
+          </span>
+        }
+        nextLabel={value === "confirm" ? "Finish" : "Continue"}
+      />
     </Stepper>
   );
 }
