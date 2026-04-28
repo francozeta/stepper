@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { releaseItems } from "@/lib/docs";
+import { releaseItems, v2Roadmap } from "@/lib/docs";
 
 export const metadata: Metadata = {
   title: "Release 0.1.0",
@@ -55,6 +55,22 @@ export default function ChangelogPage() {
         >
           Open GitHub release
         </a>
+      </Section>
+
+      <Section
+        title="Next direction"
+        description="The next version can become more composable without making V1 heavier."
+      >
+        <div className="grid gap-3 md:grid-cols-3">
+          {v2Roadmap.map((item) => (
+            <Card key={item.title} size="sm">
+              <CardHeader>
+                <CardTitle>{item.title}</CardTitle>
+                <CardDescription>{item.description}</CardDescription>
+              </CardHeader>
+            </Card>
+          ))}
+        </div>
       </Section>
     </>
   );

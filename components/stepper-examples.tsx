@@ -5,18 +5,27 @@ import {
   AlertCircle,
   ArrowLeft,
   ArrowRight,
+  Bell,
   Building2,
   Check,
   CreditCard,
   FileCheck,
+  Globe2,
   Lock,
+  Send,
+  Server,
+  Settings2,
+  ShieldCheck,
   ShoppingCart,
+  Sparkles,
   Truck,
   UserRound,
   Users,
   type LucideIcon,
 } from "lucide-react";
 
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Stepper,
   StepperContent,
@@ -146,8 +155,56 @@ function SummaryGrid({ items }: { items: SummaryItem[] }) {
   );
 }
 
+function WorkflowRow({
+  icon: Icon,
+  title,
+  description,
+  status,
+  tone = "default",
+  action,
+}: {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  status: string;
+  tone?: "default" | "success" | "warning";
+  action?: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col gap-3 py-3 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex min-w-0 items-start gap-3">
+        <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-md bg-background text-muted-foreground ring-1 ring-border [&>svg]:size-4 [&>svg]:shrink-0">
+          <Icon />
+        </span>
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-foreground">{title}</p>
+          <p className="mt-0.5 text-sm leading-5 text-muted-foreground">
+            {description}
+          </p>
+        </div>
+      </div>
+      <div className="flex shrink-0 items-center gap-2 pl-11 sm:pl-0">
+        <Badge
+          variant={
+            tone === "warning"
+              ? "destructive"
+              : tone === "success"
+                ? "secondary"
+                : "outline"
+          }
+          className="font-mono"
+        >
+          {status}
+        </Badge>
+        {action}
+      </div>
+    </div>
+  );
+}
+
 function StepperActions({
   note,
+  nextDisabled,
   previousLabel = (
     <>
       <ArrowLeft data-icon="inline-start" />
@@ -162,6 +219,7 @@ function StepperActions({
   ),
 }: {
   note?: React.ReactNode;
+  nextDisabled?: boolean;
   previousLabel?: React.ReactNode;
   nextLabel?: React.ReactNode;
 }) {
@@ -174,13 +232,212 @@ function StepperActions({
       )}
       <div className="flex gap-2 sm:justify-end">
         <StepperPrevious>{previousLabel}</StepperPrevious>
-        <StepperNext>{nextLabel}</StepperNext>
+        <StepperNext disabled={nextDisabled}>{nextLabel}</StepperNext>
       </div>
     </div>
   );
 }
 
 function StepperExample() {
+  const [value, setValue] = React.useState("workspace");
+  const [workspaceReady, setWorkspaceReady] = React.useState(false);
+  const [preferencesReady, setPreferencesReady] = React.useState(false);
+  const preferencesDisabled = !workspaceReady;
+  const preferencesComplete = workspaceReady && preferencesReady;
+  const inviteDisabled = !preferencesComplete;
+  const currentStepHasBlocker =
+    (value === "workspace" && !workspaceReady) ||
+    (value === "preferences" && !preferencesReady);
+
+  return (
+    <Stepper value={value} onValueChange={setValue} orientation="horizontal">
+      <StepperList>
+        <DemoStep
+          value="profile"
+          title="Profile"
+          description="Complete"
+          icon={UserRound}
+          completed
+        />
+        <DemoStep
+          value="workspace"
+          title="Workspace"
+          description={workspaceReady ? "Ready" : "Needs slug"}
+          icon={Building2}
+          completed={workspaceReady}
+          error={!workspaceReady}
+        />
+        <DemoStep
+          value="preferences"
+          title="Preferences"
+          description={preferencesDisabled ? "Locked" : "Defaults"}
+          icon={Settings2}
+          completed={preferencesComplete}
+          disabled={preferencesDisabled}
+        />
+        <DemoStep
+          value="invite"
+          title="Invite"
+          description={inviteDisabled ? "Locked" : "Ready"}
+          icon={Send}
+          disabled={inviteDisabled}
+        />
+      </StepperList>
+
+      <StepperContent value="profile">
+        <ExampleContent
+          eyebrow="Step 1"
+          title="Profile details are already verified"
+          description="The flow starts after the user has confirmed their identity, role, and recovery email."
+          icon={UserRound}
+        >
+          <div className="divide-y divide-border/70">
+            <WorkflowRow
+              icon={ShieldCheck}
+              title="Identity"
+              description="Personal account verified with a recovery email."
+              status="complete"
+              tone="success"
+            />
+            <WorkflowRow
+              icon={Bell}
+              title="Notifications"
+              description="Security and product updates are enabled."
+              status="ready"
+              tone="success"
+            />
+          </div>
+        </ExampleContent>
+      </StepperContent>
+
+      <StepperContent value="workspace">
+        <ExampleContent
+          eyebrow="Step 2"
+          title="Create the workspace"
+          description="The next step stays locked until the workspace has a URL-safe slug."
+          icon={Building2}
+        >
+          <div className="divide-y divide-border/70">
+            <WorkflowRow
+              icon={Server}
+              title="Workspace name"
+              description="Acme Design Systems"
+              status="saved"
+              tone="success"
+            />
+            <WorkflowRow
+              icon={Globe2}
+              title="Workspace slug"
+              description={
+                workspaceReady
+                  ? "acme-design is available."
+                  : "Missing slug. This blocks preferences and invites."
+              }
+              status={workspaceReady ? "available" : "required"}
+              tone={workspaceReady ? "success" : "warning"}
+              action={
+                workspaceReady ? null : (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setWorkspaceReady(true)}
+                  >
+                    <Sparkles data-icon="inline-start" />
+                    Generate
+                  </Button>
+                )
+              }
+            />
+          </div>
+        </ExampleContent>
+      </StepperContent>
+
+      <StepperContent value="preferences">
+        <ExampleContent
+          eyebrow="Step 3"
+          title="Set team defaults"
+          description="Preferences become available only after the workspace can be routed."
+          icon={Settings2}
+        >
+          <div className="divide-y divide-border/70">
+            <WorkflowRow
+              icon={ShieldCheck}
+              title="Access policy"
+              description="Require verified domains before joining."
+              status={preferencesReady ? "saved" : "draft"}
+              tone={preferencesReady ? "success" : "default"}
+            />
+            <WorkflowRow
+              icon={Bell}
+              title="Product updates"
+              description="Send release notes to workspace admins."
+              status={preferencesReady ? "saved" : "draft"}
+              tone={preferencesReady ? "success" : "default"}
+              action={
+                preferencesReady ? null : (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setPreferencesReady(true)}
+                  >
+                    <Check data-icon="inline-start" />
+                    Save
+                  </Button>
+                )
+              }
+            />
+          </div>
+        </ExampleContent>
+      </StepperContent>
+
+      <StepperContent value="invite">
+        <ExampleContent
+          eyebrow="Step 4"
+          title="Invite the first teammates"
+          description="The final step summarizes what is ready before sending invitations."
+          icon={Send}
+        >
+          <div className="divide-y divide-border/70">
+            <WorkflowRow
+              icon={Building2}
+              title="Workspace"
+              description="Acme Design Systems - acme-design"
+              status="ready"
+              tone="success"
+            />
+            <WorkflowRow
+              icon={Users}
+              title="Pending invites"
+              description="3 teammates can be invited with admin defaults."
+              status="queued"
+            />
+          </div>
+        </ExampleContent>
+      </StepperContent>
+
+      <StepperActions
+        note={
+          currentStepHasBlocker
+            ? "Fix the blocker in this step before continuing."
+            : "The next step is available."
+        }
+        nextDisabled={currentStepHasBlocker}
+        nextLabel={
+          value === "invite" ? (
+            <>
+              Send invites
+              <Send data-icon="inline-end" />
+            </>
+          ) : undefined
+        }
+      />
+    </Stepper>
+  );
+}
+
+function StepperCheckoutExample() {
   return (
     <Stepper defaultValue="shipping" orientation="horizontal">
       <StepperList>
@@ -464,6 +721,7 @@ function StepperControlledExample() {
 }
 
 export {
+  StepperCheckoutExample,
   StepperControlledExample,
   StepperExample,
   StepperStatusExample,

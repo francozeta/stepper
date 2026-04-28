@@ -135,6 +135,106 @@ const controlledSnippet = `const [step, setStep] = React.useState("details");
   <StepperContent value="confirm">Confirm the flow.</StepperContent>
 </Stepper>;`;
 
+const workspaceExampleCode = `"use client";
+
+import * as React from "react";
+import { Building2, Check, Lock, Send, Settings2, UserRound } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import {
+  Stepper,
+  StepperContent,
+  StepperIndicator,
+  StepperItem,
+  StepperLabel,
+  StepperList,
+  StepperNext,
+  StepperPrevious,
+  StepperSeparator,
+  StepperTrigger,
+} from "@/components/ui/stepper";
+
+export function WorkspaceSetup() {
+  const [step, setStep] = React.useState("workspace");
+  const [workspaceReady, setWorkspaceReady] = React.useState(false);
+  const [preferencesReady, setPreferencesReady] = React.useState(false);
+  const preferencesDisabled = !workspaceReady;
+  const inviteDisabled = !preferencesReady;
+  const blocked =
+    (step === "workspace" && !workspaceReady) ||
+    (step === "preferences" && !preferencesReady);
+
+  return (
+    <Stepper value={step} onValueChange={setStep}>
+      <StepperList>
+        <StepperItem value="profile" completed>
+          <StepperTrigger>
+            <StepperIndicator><UserRound /></StepperIndicator>
+            <StepperLabel>Profile</StepperLabel>
+          </StepperTrigger>
+          <StepperSeparator />
+        </StepperItem>
+
+        <StepperItem value="workspace" completed={workspaceReady} error={!workspaceReady}>
+          <StepperTrigger>
+            <StepperIndicator><Building2 /></StepperIndicator>
+            <StepperLabel>Workspace</StepperLabel>
+          </StepperTrigger>
+          <StepperSeparator />
+        </StepperItem>
+
+        <StepperItem value="preferences" completed={preferencesReady} disabled={preferencesDisabled}>
+          <StepperTrigger>
+            <StepperIndicator>{preferencesDisabled ? <Lock /> : <Settings2 />}</StepperIndicator>
+            <StepperLabel>Preferences</StepperLabel>
+          </StepperTrigger>
+          <StepperSeparator />
+        </StepperItem>
+
+        <StepperItem value="invite" disabled={inviteDisabled}>
+          <StepperTrigger>
+            <StepperIndicator>{inviteDisabled ? <Lock /> : <Send />}</StepperIndicator>
+            <StepperLabel>Invite</StepperLabel>
+          </StepperTrigger>
+        </StepperItem>
+      </StepperList>
+
+      <StepperContent value="workspace">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-sm text-muted-foreground">
+            Generate a URL-safe slug before preferences unlock.
+          </p>
+          <Button size="sm" variant="outline" onClick={() => setWorkspaceReady(true)}>
+            <Check data-icon="inline-start" />
+            Generate slug
+          </Button>
+        </div>
+      </StepperContent>
+
+      <StepperContent value="preferences">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-sm text-muted-foreground">
+            Save access policy and notification defaults.
+          </p>
+          <Button size="sm" variant="outline" onClick={() => setPreferencesReady(true)}>
+            <Check data-icon="inline-start" />
+            Save defaults
+          </Button>
+        </div>
+      </StepperContent>
+
+      <StepperContent value="invite">
+        Ready to invite teammates.
+      </StepperContent>
+
+      <div className="mt-6 flex justify-between">
+        <StepperPrevious />
+        <StepperNext disabled={blocked}>Next</StepperNext>
+      </div>
+    </Stepper>
+  );
+}`;
+
 const checkoutExampleCode = `import { Check, CreditCard, Truck } from "lucide-react";
 
 import {
@@ -524,6 +624,7 @@ export {
   statusExampleCode,
   verticalExampleCode,
   v2Roadmap,
+  workspaceExampleCode,
 };
 
 export type { DocsNavGroup, DocsNavItem };

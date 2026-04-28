@@ -3,16 +3,16 @@ import type { Metadata } from "next";
 import { DocsExample } from "@/components/docs-example";
 import { PageHeader } from "@/components/docs-content";
 import {
+  StepperCheckoutExample,
   StepperControlledExample,
   StepperExample,
-  StepperStatusExample,
   StepperVerticalExample,
 } from "@/components/stepper-examples";
 import {
   checkoutExampleCode,
   controlledExampleCode,
-  statusExampleCode,
   verticalExampleCode,
+  workspaceExampleCode,
 } from "@/lib/docs";
 
 export const metadata: Metadata = {
@@ -21,13 +21,22 @@ export const metadata: Metadata = {
 
 const examples = [
   {
+    title: "Create workspace",
+    description:
+      "Show a product setup flow with blockers, completion, and disabled future steps.",
+    badge: "Product flow",
+    code: workspaceExampleCode,
+    filename: "workspace-setup.tsx",
+    component: <StepperExample />,
+  },
+  {
     title: "Checkout flow",
     description:
       "Guide customers through cart review, shipping details, and payment.",
     badge: "Horizontal",
     code: checkoutExampleCode,
     filename: "checkout-flow.tsx",
-    component: <StepperExample />,
+    component: <StepperCheckoutExample />,
   },
   {
     title: "Workspace onboarding",
@@ -37,15 +46,6 @@ const examples = [
     code: verticalExampleCode,
     filename: "workspace-onboarding.tsx",
     component: <StepperVerticalExample />,
-  },
-  {
-    title: "Blocked checkout",
-    description:
-      "Show validation problems, completed progress, and steps that are not available yet.",
-    badge: "States",
-    code: statusExampleCode,
-    filename: "stepper-with-states.tsx",
-    component: <StepperStatusExample />,
   },
   {
     title: "Controlled review",
@@ -64,7 +64,7 @@ export default function ExamplesPage() {
       <PageHeader
         eyebrow="api"
         title="Examples"
-        description="Realistic Stepper demos for checkout, onboarding, validation states, and controlled React state."
+        description="Focused Stepper demos for product setup, checkout, vertical onboarding, and controlled React state."
       />
 
       <div className="flex flex-col gap-6">

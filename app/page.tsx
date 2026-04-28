@@ -5,16 +5,9 @@ import { DocsExample } from "@/components/docs-example";
 import { CodeBlock, InfoGrid, PageHeader, Section } from "@/components/docs-content";
 import { StepperExample } from "@/components/stepper-examples";
 import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  checkoutExampleCode,
   packageNotes,
   quickFacts,
-  v2Roadmap,
+  workspaceExampleCode,
 } from "@/lib/docs";
 
 export default function Home() {
@@ -27,25 +20,25 @@ export default function Home() {
         badge="v0.1.0"
       />
 
-      <InfoGrid items={packageNotes} />
-
       <Section
         title="Preview"
-        description="The first screen is now the component experience, with docs navigation wrapped around it."
+        description="A real workspace setup flow where the Stepper blocks progress, marks errors, and unlocks later steps as requirements are completed."
       >
         <DocsExample
-          title="Checkout flow"
-          description="A realistic horizontal Stepper with completed, active, and disabled states."
-          badge="Horizontal"
-          code={checkoutExampleCode}
-          filename="checkout-flow.tsx"
+          title="Create workspace"
+          description="The active step has a missing slug, preferences are locked, and invites only unlock after defaults are saved."
+          badge="Product flow"
+          code={workspaceExampleCode}
+          filename="workspace-setup.tsx"
           preview={<StepperExample />}
         />
       </Section>
 
+      <InfoGrid items={packageNotes} />
+
       <Section
         title="Install shape"
-        description="The reusable primitive lives in one shadcn-style file. Demo code stays outside the core."
+        description="The primitive stays copy-paste friendly. Product examples live outside the core component."
       >
         <CodeBlock filename="project tree" lang="text">{`components/
   stepper-examples.tsx
@@ -62,22 +55,6 @@ export default function Home() {
             >
               {fact}
             </div>
-          ))}
-        </div>
-      </Section>
-
-      <Section
-        title="Next direction"
-        description="The primitive is ready for docs. The next version can become more composable without making V1 heavier."
-      >
-        <div className="grid gap-3 md:grid-cols-3">
-          {v2Roadmap.map((item) => (
-            <Card key={item.title} size="sm">
-              <CardHeader>
-                <CardTitle>{item.title}</CardTitle>
-                <CardDescription>{item.description}</CardDescription>
-              </CardHeader>
-            </Card>
           ))}
         </div>
       </Section>
