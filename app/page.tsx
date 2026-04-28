@@ -7,6 +7,8 @@ import { StepperExample } from "@/components/stepper-examples";
 import {
   packageNotes,
   quickFacts,
+  usageSnippet,
+  worksWith,
   workspaceExampleCode,
 } from "@/lib/docs";
 
@@ -32,6 +34,24 @@ export default function Home() {
           filename="workspace-setup.tsx"
           preview={<StepperExample />}
         />
+      </Section>
+
+      <Section
+        title="Usage"
+        description="Copy the primitive, import the pieces you need, then connect validation in your app layer."
+      >
+        <CodeBlock code={usageSnippet} filename="import.tsx" />
+        <p className="max-w-2xl text-pretty text-sm leading-6 text-muted-foreground">
+          The main demo uses react-hook-form and zod for validation. The
+          Stepper primitive does not depend on either library.
+        </p>
+      </Section>
+
+      <Section
+        title="Works with"
+        description="The core stays agnostic while examples show common production integrations."
+      >
+        <InfoGrid items={worksWith} />
       </Section>
 
       <InfoGrid items={packageNotes} />

@@ -15,6 +15,7 @@ import {
   contentProps,
   itemProps,
   rootProps,
+  triggerProps,
 } from "@/lib/docs";
 
 export const metadata: Metadata = {
@@ -36,6 +37,10 @@ export default function ApiPage() {
 
       <Section title="Item props">
         <PropsTable rows={itemProps} />
+      </Section>
+
+      <Section title="Trigger props">
+        <PropsTable rows={triggerProps} />
       </Section>
 
       <Section title="Content props">

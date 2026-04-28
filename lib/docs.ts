@@ -135,10 +135,40 @@ const controlledSnippet = `const [step, setStep] = React.useState("details");
   <StepperContent value="confirm">Confirm the flow.</StepperContent>
 </Stepper>;`;
 
+const usageSnippet = `import {
+  Stepper,
+  StepperContent,
+  StepperItem,
+  StepperList,
+  StepperNext,
+  StepperPrevious,
+} from "@/components/ui/stepper";`;
+
+const worksWith = [
+  {
+    label: "react-hook-form",
+    value: "Validation",
+    help: "Owns field state and step validation in examples.",
+  },
+  {
+    label: "zod",
+    value: "Schema",
+    help: "Defines form rules without coupling to the primitive.",
+  },
+  {
+    label: "Radix Slot",
+    value: "asChild",
+    help: "Used only for custom trigger/content composition.",
+  },
+];
+
 const workspaceExampleCode = `"use client";
 
 import * as React from "react";
-import { Building2, Check, Lock, Send, Settings2, UserRound } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Building2, Check, Lock, Send, Settings2, Users } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { z } from "zod/v3";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -148,88 +178,128 @@ import {
   StepperItem,
   StepperLabel,
   StepperList,
-  StepperNext,
   StepperPrevious,
   StepperSeparator,
   StepperTrigger,
 } from "@/components/ui/stepper";
 
+const schema = z.object({
+  workspaceName: z.string().min(2, "Enter a workspace name."),
+  workspaceSlug: z
+    .string()
+    .min(3, "Use at least 3 characters.")
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Use a URL-safe slug."),
+  region: z.enum(["iad1", "fra1", "sin1"]),
+  visibility: z.enum(["private", "team"]),
+  inviteEmail: z.string().email("Enter a valid email.").or(z.literal("")),
+});
+
+type Values = z.infer<typeof schema>;
+type Step = "workspace" | "preferences" | "members" | "review";
+
+const steps: Step[] = ["workspace", "preferences", "members", "review"];
+const fields = {
+  workspace: ["workspaceName", "workspaceSlug"],
+  preferences: ["region", "visibility"],
+  members: ["inviteEmail"],
+  review: [],
+} satisfies Record<Step, Array<keyof Values>>;
+
 export function WorkspaceSetup() {
-  const [step, setStep] = React.useState("workspace");
-  const [workspaceReady, setWorkspaceReady] = React.useState(false);
-  const [preferencesReady, setPreferencesReady] = React.useState(false);
-  const preferencesDisabled = !workspaceReady;
-  const inviteDisabled = !preferencesReady;
-  const blocked =
-    (step === "workspace" && !workspaceReady) ||
-    (step === "preferences" && !preferencesReady);
+  const [step, setStep] = React.useState<Step>("workspace");
+  const [completed, setCompleted] = React.useState<Partial<Record<Step, boolean>>>({});
+  const [attempted, setAttempted] = React.useState<Partial<Record<Step, boolean>>>({});
+  const form = useForm<Values>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      workspaceName: "",
+      workspaceSlug: "",
+      region: "iad1",
+      visibility: "private",
+      inviteEmail: "",
+    },
+  });
+
+  async function next() {
+    setAttempted((current) => ({ ...current, [step]: true }));
+
+    const isValid = await form.trigger(fields[step], { shouldFocus: true });
+
+    if (!isValid) return;
+
+    setCompleted((current) => ({ ...current, [step]: true }));
+    setStep(steps[steps.indexOf(step) + 1] ?? step);
+  }
 
   return (
-    <Stepper value={step} onValueChange={setStep}>
+    <Stepper value={step} onValueChange={(value) => setStep(value as Step)}>
       <StepperList>
-        <StepperItem value="profile" completed>
-          <StepperTrigger>
-            <StepperIndicator><UserRound /></StepperIndicator>
-            <StepperLabel>Profile</StepperLabel>
-          </StepperTrigger>
-          <StepperSeparator />
-        </StepperItem>
-
-        <StepperItem value="workspace" completed={workspaceReady} error={!workspaceReady}>
+        <StepperItem
+          value="workspace"
+          completed={completed.workspace}
+          error={attempted.workspace && !completed.workspace}
+        >
           <StepperTrigger>
             <StepperIndicator><Building2 /></StepperIndicator>
             <StepperLabel>Workspace</StepperLabel>
           </StepperTrigger>
           <StepperSeparator />
         </StepperItem>
-
-        <StepperItem value="preferences" completed={preferencesReady} disabled={preferencesDisabled}>
+        <StepperItem value="preferences" completed={completed.preferences} disabled={!completed.workspace}>
           <StepperTrigger>
-            <StepperIndicator>{preferencesDisabled ? <Lock /> : <Settings2 />}</StepperIndicator>
+            <StepperIndicator>{completed.workspace ? <Settings2 /> : <Lock />}</StepperIndicator>
             <StepperLabel>Preferences</StepperLabel>
           </StepperTrigger>
           <StepperSeparator />
         </StepperItem>
-
-        <StepperItem value="invite" disabled={inviteDisabled}>
+        <StepperItem value="members" completed={completed.members} disabled={!completed.preferences}>
           <StepperTrigger>
-            <StepperIndicator>{inviteDisabled ? <Lock /> : <Send />}</StepperIndicator>
-            <StepperLabel>Invite</StepperLabel>
+            <StepperIndicator>{completed.preferences ? <Users /> : <Lock />}</StepperIndicator>
+            <StepperLabel>Members</StepperLabel>
+          </StepperTrigger>
+          <StepperSeparator />
+        </StepperItem>
+        <StepperItem value="review" disabled={!completed.members}>
+          <StepperTrigger>
+            <StepperIndicator><Send /></StepperIndicator>
+            <StepperLabel>Review</StepperLabel>
           </StepperTrigger>
         </StepperItem>
       </StepperList>
 
       <StepperContent value="workspace">
-        <div className="flex items-center justify-between gap-3">
-          <p className="text-sm text-muted-foreground">
-            Generate a URL-safe slug before preferences unlock.
-          </p>
-          <Button size="sm" variant="outline" onClick={() => setWorkspaceReady(true)}>
-            <Check data-icon="inline-start" />
-            Generate slug
-          </Button>
-        </div>
+        <input placeholder="Workspace name" {...form.register("workspaceName")} />
+        <input placeholder="workspace-slug" {...form.register("workspaceSlug")} />
       </StepperContent>
 
       <StepperContent value="preferences">
-        <div className="flex items-center justify-between gap-3">
-          <p className="text-sm text-muted-foreground">
-            Save access policy and notification defaults.
-          </p>
-          <Button size="sm" variant="outline" onClick={() => setPreferencesReady(true)}>
-            <Check data-icon="inline-start" />
-            Save defaults
-          </Button>
-        </div>
+        <select {...form.register("region")}>
+          <option value="iad1">US East</option>
+          <option value="fra1">Europe</option>
+          <option value="sin1">Asia Pacific</option>
+        </select>
       </StepperContent>
 
-      <StepperContent value="invite">
-        Ready to invite teammates.
+      <StepperContent value="members">
+        <input placeholder="teammate@company.com" {...form.register("inviteEmail")} />
+      </StepperContent>
+
+      <StepperContent value="review">
+        Review the workspace and create it.
       </StepperContent>
 
       <div className="mt-6 flex justify-between">
         <StepperPrevious />
-        <StepperNext disabled={blocked}>Next</StepperNext>
+        {step === "review" ? (
+          <Button type="button">
+            Create workspace
+            <Check data-icon="inline-end" />
+          </Button>
+        ) : (
+          <Button type="button" onClick={() => void next()}>
+            Continue
+          </Button>
+        )}
       </div>
     </Stepper>
   );
@@ -532,6 +602,27 @@ const contentProps = [
     defaultValue: "false",
     description: "Keeps inactive content mounted and hidden for advanced composition.",
   },
+  {
+    name: "asChild",
+    type: "boolean",
+    defaultValue: "false",
+    description: "Render the content props onto a child element with Radix Slot.",
+  },
+];
+
+const triggerProps = [
+  {
+    name: "asChild",
+    type: "boolean",
+    defaultValue: "false",
+    description: "Render the trigger props onto a custom button or link with Radix Slot.",
+  },
+  {
+    name: "disabled",
+    type: "boolean",
+    defaultValue: "false",
+    description: "Disables the trigger in addition to the parent StepperItem disabled state.",
+  },
 ];
 
 const packageNotes = [
@@ -571,7 +662,7 @@ const apiComponents = [
   {
     name: "StepperTrigger",
     element: "button",
-    description: "Real button that selects the step and receives aria-current on the active item.",
+    description: "Real button by default. Can use asChild for custom triggers while keeping step selection logic.",
   },
   {
     name: "StepperIndicator",
@@ -622,8 +713,11 @@ export {
   rootProps,
   stateSelectorsCode,
   statusExampleCode,
+  triggerProps,
+  usageSnippet,
   verticalExampleCode,
   v2Roadmap,
+  worksWith,
   workspaceExampleCode,
 };
 

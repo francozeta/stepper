@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { Slot } from "radix-ui";
 
 import { cn } from "@/lib/utils";
 
@@ -509,9 +510,12 @@ function hasStepperPrimitiveChild(children: React.ReactNode): boolean {
   });
 }
 
-type StepperTriggerProps = React.ComponentPropsWithoutRef<"button">;
+type StepperTriggerProps = React.ComponentPropsWithoutRef<"button"> & {
+  asChild?: boolean;
+};
 
 function StepperTrigger({
+  asChild = false,
   className,
   children,
   disabled,
@@ -529,11 +533,12 @@ function StepperTrigger({
     contentId,
   } = useStepperItemContext("StepperTrigger");
   const isDisabled = itemDisabled || disabled;
+  const Comp = asChild ? Slot.Root : "button";
 
   return (
-    <button
+    <Comp
       id={triggerId}
-      type="button"
+      type={asChild ? undefined : "button"}
       aria-current={isActive ? "step" : undefined}
       aria-controls={isActive ? contentId : undefined}
       aria-disabled={isDisabled ? true : undefined}
@@ -556,14 +561,19 @@ function StepperTrigger({
       onClick={(event) => {
         onClick?.(event);
 
-        if (!event.defaultPrevented && !isDisabled) {
+        if (isDisabled) {
+          event.preventDefault();
+          return;
+        }
+
+        if (!event.defaultPrevented) {
           setValue(value);
         }
       }}
       {...props}
     >
       {children}
-    </button>
+    </Comp>
   );
 }
 
@@ -661,11 +671,13 @@ function StepperSeparator({ className, ...props }: StepperSeparatorProps) {
 type StepperContentProps = React.ComponentPropsWithoutRef<"div"> & {
   value: string;
   forceMount?: boolean;
+  asChild?: boolean;
 };
 
 function StepperContent({
   value,
   forceMount = false,
+  asChild = false,
   className,
   children,
   ...props
@@ -681,8 +693,10 @@ function StepperContent({
     return null;
   }
 
+  const Comp = asChild ? Slot.Root : "div";
+
   return (
-    <div
+    <Comp
       id={getContentId(value)}
       role="region"
       aria-labelledby={getTriggerId(value)}
@@ -696,7 +710,7 @@ function StepperContent({
       {...props}
     >
       {children}
-    </div>
+    </Comp>
   );
 }
 
