@@ -1,3 +1,13 @@
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import {
   StepperControlledExample,
   StepperExample,
@@ -64,36 +74,30 @@ export default function Home() {
           </div>
           <div className="flex flex-wrap gap-2">
             {features.map((feature) => (
-              <span
-                key={feature}
-                className="rounded-full border border-border bg-background px-2.5 py-1 text-xs font-medium text-muted-foreground"
-              >
+              <Badge key={feature} variant="outline">
                 {feature}
-              </span>
+              </Badge>
             ))}
           </div>
         </header>
 
+        <Separator />
+
         {examples.map((example) => (
-          <section
-            key={example.title}
-            className="rounded-xl border border-border bg-background p-4 shadow-sm sm:p-6"
-          >
-            <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-              <div className="flex flex-col gap-1">
-                <h2 className="text-sm font-medium text-foreground">
-                  {example.title}
-                </h2>
-                <p className="max-w-xl text-pretty text-sm leading-6 text-muted-foreground">
-                  {example.description}
-                </p>
-              </div>
-              <span className="w-fit rounded-full border border-border bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground">
-                {example.badge}
-              </span>
-            </div>
-            {example.component}
-          </section>
+          <Card key={example.title} className="shadow-sm">
+            <CardHeader>
+              <CardTitle>{example.title}</CardTitle>
+              <CardDescription className="max-w-xl text-pretty leading-6">
+                {example.description}
+              </CardDescription>
+              <CardAction>
+                <Badge variant="secondary" className="w-fit">
+                  {example.badge}
+                </Badge>
+              </CardAction>
+            </CardHeader>
+            <CardContent>{example.component}</CardContent>
+          </Card>
         ))}
       </div>
     </main>
