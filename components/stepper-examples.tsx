@@ -359,6 +359,7 @@ function StepperActions({
 
 function StepperExample() {
   const [value, setValue] = React.useState<WizardStep>("workspace");
+  const valueRef = React.useRef<WizardStep>("workspace");
   const [completedSteps, setCompletedSteps] = React.useState<
     Partial<Record<WizardStep, boolean>>
   >({});
@@ -381,13 +382,22 @@ function StepperExample() {
     },
   });
   const watchedValues = useWatch({ control: form.control });
-  const formValues: WorkspaceWizardValues = {
-    workspaceName: watchedValues.workspaceName ?? "",
-    workspaceSlug: watchedValues.workspaceSlug ?? "",
-    region: watchedValues.region ?? "iad1",
-    visibility: watchedValues.visibility ?? "private",
-    inviteEmail: watchedValues.inviteEmail ?? "",
-  };
+  const formValues = React.useMemo<WorkspaceWizardValues>(
+    () => ({
+      workspaceName: watchedValues.workspaceName ?? "",
+      workspaceSlug: watchedValues.workspaceSlug ?? "",
+      region: watchedValues.region ?? "iad1",
+      visibility: watchedValues.visibility ?? "private",
+      inviteEmail: watchedValues.inviteEmail ?? "",
+    }),
+    [
+      watchedValues.inviteEmail,
+      watchedValues.region,
+      watchedValues.visibility,
+      watchedValues.workspaceName,
+      watchedValues.workspaceSlug,
+    ]
+  );
   const workspaceValid = workspaceStepSchema.safeParse(formValues).success;
   const preferencesValid = preferencesStepSchema.safeParse(formValues).success;
   const membersValid = membersStepSchema.safeParse(formValues).success;
@@ -397,9 +407,12 @@ function StepperExample() {
   const preferencesDisabled = !workspaceCompleted;
   const membersDisabled = !preferencesCompleted;
   const reviewDisabled = !membersCompleted;
-  const currentIndex = wizardSteps.indexOf(value);
   const currentFields = wizardStepFields[value];
   const currentStepHasErrors = currentFields.some((field) => fieldErrors[field]);
+
+  React.useEffect(() => {
+    valueRef.current = value;
+  }, [value]);
 
   const clearFieldError = React.useCallback(
     (field: FieldPath<WorkspaceWizardValues>) => {
@@ -419,19 +432,24 @@ function StepperExample() {
   );
 
   const handleNext = React.useCallback(async () => {
-    setAttemptedSteps((current) => ({ ...current, [value]: true }));
+    const activeValue = valueRef.current;
+    const activeFields = wizardStepFields[activeValue];
+    const activeIndex = wizardSteps.indexOf(activeValue);
+    const latestValues = { ...formValues, ...form.getValues() };
+
+    setAttemptedSteps((current) => ({ ...current, [activeValue]: true }));
 
     setFieldErrors((current) => {
       const nextErrors = { ...current };
 
-      currentFields.forEach((field) => {
+      activeFields.forEach((field) => {
         delete nextErrors[field];
       });
 
       return nextErrors;
     });
 
-    const result = validateWizardStep(value, form.getValues());
+    const result = validateWizardStep(activeValue, latestValues);
 
     if (!result.success) {
       const firstIssue = result.error.issues[0];
@@ -442,7 +460,7 @@ function StepperExample() {
       result.error.issues.forEach((issue) => {
         const field = issue.path[0] as FieldPath<WorkspaceWizardValues>;
 
-        if (currentFields.includes(field) && !nextErrors[field]) {
+        if (activeFields.includes(field) && !nextErrors[field]) {
           nextErrors[field] = issue.message;
         }
       });
@@ -453,7 +471,7 @@ function StepperExample() {
         const firstField =
           firstIssue.path[0] as FieldPath<WorkspaceWizardValues>;
 
-        if (currentFields.includes(firstField)) {
+        if (activeFields.includes(firstField)) {
           form.setFocus(firstField);
         }
       }
@@ -461,24 +479,25 @@ function StepperExample() {
       return;
     }
 
-    setCompletedSteps((current) => ({ ...current, [value]: true }));
+    setCompletedSteps((current) => ({ ...current, [activeValue]: true }));
 
-    const nextStep = wizardSteps[currentIndex + 1];
+    const nextStep = wizardSteps[activeIndex + 1];
 
     if (nextStep) {
       setValue(nextStep);
     }
-  }, [currentFields, currentIndex, form, value]);
+  }, [form, formValues]);
 
   const completeReview = React.useCallback(async () => {
-    const result = workspaceWizardSchema.safeParse(form.getValues());
+    const latestValues = { ...formValues, ...form.getValues() };
+    const result = workspaceWizardSchema.safeParse(latestValues);
 
     if (!result.success) {
       return;
     }
 
     setSubmitted(true);
-  }, [form]);
+  }, [form, formValues]);
 
   return (
     <Stepper

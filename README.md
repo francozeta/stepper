@@ -20,7 +20,8 @@ The Stepper core is intentionally small and shadcn/ui-friendly. It uses Radix Sl
 - Real buttons, `aria-current="step"` on the active step, and real `disabled`
 - Tailwind tokens such as `border`, `muted-foreground`, `primary`, `destructive`, `background`, and `foreground`
 - Primitive pieces for custom step markup: `StepperTrigger`, `StepperIndicator`, `StepperLabel`, `StepperDescription`, and `StepperSeparator`
-- `asChild` on `StepperTrigger` and `StepperContent` with Radix Slot
+- `asChild` on `StepperTrigger`, `StepperContent`, `StepperPrevious`, and `StepperNext` with Radix Slot
+- Public `useStepper()` hook for custom footers and form controls
 - `forceMount` on `StepperContent` for mounted inactive content
 - Guard rails for invalid `value` / `defaultValue` and disabled steps
 - Lightweight step registration so simple wrapper components can still be composed around `StepperItem`
@@ -40,6 +41,7 @@ import {
   StepperPrevious,
   StepperSeparator,
   StepperTrigger,
+  useStepper,
 } from "@/components/ui/stepper";
 
 export function CheckoutStepper() {
@@ -135,6 +137,12 @@ import { Check } from "lucide-react";
 
 If `value` or `defaultValue` points to a missing or disabled step, the Stepper falls back to the first enabled step.
 
+### `StepperList`
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `aria-label` | `string` | Accessible name for the ordered list. Defaults to `"Progress steps"`. |
+
 ### `StepperItem`
 
 | Prop | Type | Description |
@@ -158,6 +166,34 @@ If `value` or `defaultValue` points to a missing or disabled step, the Stepper f
 | --- | --- | --- |
 | `asChild` | `boolean` | Renders trigger props onto a custom button or link with Radix Slot. |
 | `disabled` | `boolean` | Disables the trigger in addition to the parent `StepperItem` disabled state. |
+
+When `asChild` is used on a disabled trigger, the component applies `aria-disabled`, `data-disabled`, and `tabIndex={-1}` instead of passing a native `disabled` attribute to links.
+
+### `StepperPrevious` / `StepperNext`
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `asChild` | `boolean` | Renders navigation props onto a custom button primitive with Radix Slot. |
+| `disabled` | `boolean` | Disables navigation in addition to `canGoPrevious` / `canGoNext`. |
+
+### `useStepper`
+
+```tsx
+function WizardFooter() {
+  const { canGoPrevious, canGoNext, goPrevious, goNext } = useStepper();
+
+  return (
+    <div className="flex justify-between">
+      <button type="button" disabled={!canGoPrevious} onClick={goPrevious}>
+        Back
+      </button>
+      <button type="button" disabled={!canGoNext} onClick={goNext}>
+        Continue
+      </button>
+    </div>
+  );
+}
+```
 
 ### Primitive step parts
 

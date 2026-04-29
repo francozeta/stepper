@@ -18,25 +18,30 @@ type StepRecord = {
   disabled: boolean;
 };
 
+type StepperStep = StepRecord;
+
 type RegisteredStep = StepRecord & {
   element: HTMLLIElement | null;
   order: number;
 };
 
-type StepperContextValue = {
+type StepperApi = {
   value: string | undefined;
   orientation: StepperOrientation;
-  steps: StepRecord[];
-  registerStep: (step: Omit<RegisteredStep, "order">) => void;
-  unregisterStep: (value: string) => void;
+  steps: StepperStep[];
   setValue: (value: string) => void;
   getStepIndex: (value: string) => number;
-  getTriggerId: (value: string) => string;
-  getContentId: (value: string) => string;
   canGoPrevious: boolean;
   canGoNext: boolean;
   goPrevious: () => void;
   goNext: () => void;
+};
+
+type StepperContextValue = StepperApi & {
+  registerStep: (step: Omit<RegisteredStep, "order">) => void;
+  unregisterStep: (value: string) => void;
+  getTriggerId: (value: string) => string;
+  getContentId: (value: string) => string;
 };
 
 type StepperStepMeta = {
@@ -60,6 +65,24 @@ type StepperItemContextValue = {
 const StepperContext = React.createContext<StepperContextValue | null>(null);
 const StepperItemContext =
   React.createContext<StepperItemContextValue | null>(null);
+const STEPPER_PRIMITIVES = {
+  item: "StepperItem",
+  trigger: "StepperTrigger",
+  indicator: "StepperIndicator",
+  label: "StepperLabel",
+  description: "StepperDescription",
+  separator: "StepperSeparator",
+} as const;
+
+type StepperPrimitiveName =
+  (typeof STEPPER_PRIMITIVES)[keyof typeof STEPPER_PRIMITIVES];
+
+type StepperPrimitiveComponent = React.ElementType & {
+  displayName?: string;
+  __stepperPrimitive?: StepperPrimitiveName;
+  render?: unknown;
+  type?: unknown;
+};
 
 function useStepperContext(component: string) {
   const context = React.useContext(StepperContext);
@@ -81,8 +104,62 @@ function useStepperItemContext(component: string) {
   return context;
 }
 
+function useStepper(): StepperApi {
+  const context = useStepperContext("useStepper");
+
+  return {
+    value: context.value,
+    orientation: context.orientation,
+    steps: context.steps,
+    setValue: context.setValue,
+    getStepIndex: context.getStepIndex,
+    canGoPrevious: context.canGoPrevious,
+    canGoNext: context.canGoNext,
+    goPrevious: context.goPrevious,
+    goNext: context.goNext,
+  };
+}
+
 function getSafeId(value: string) {
   return value.replace(/[^a-zA-Z0-9_-]/g, "-");
+}
+
+function getStepperPrimitiveName(type: unknown): StepperPrimitiveName | undefined {
+  if (!type || (typeof type !== "function" && typeof type !== "object")) {
+    return undefined;
+  }
+
+  const primitive = type as StepperPrimitiveComponent;
+
+  if (primitive.__stepperPrimitive) {
+    return primitive.__stepperPrimitive;
+  }
+
+  if (
+    primitive.displayName &&
+    Object.values(STEPPER_PRIMITIVES).includes(
+      primitive.displayName as StepperPrimitiveName
+    )
+  ) {
+    return primitive.displayName as StepperPrimitiveName;
+  }
+
+  return (
+    getStepperPrimitiveName(primitive.type) ??
+    getStepperPrimitiveName(primitive.render)
+  );
+}
+
+function isStepperPrimitive(type: unknown, name: StepperPrimitiveName) {
+  return getStepperPrimitiveName(type) === name;
+}
+
+function markStepperPrimitive<T extends StepperPrimitiveComponent>(
+  component: T,
+  name: StepperPrimitiveName
+) {
+  component.displayName = name;
+  component.__stepperPrimitive = name;
 }
 
 function getNextEnabledStep(
@@ -191,7 +268,7 @@ function collectSteps(children: React.ReactNode) {
       return;
     }
 
-    if (child.type === StepperItem) {
+    if (isStepperPrimitive(child.type, STEPPER_PRIMITIVES.item)) {
       const props = child.props as Pick<StepperItemProps, "disabled" | "value">;
 
       steps.push({
@@ -243,14 +320,27 @@ function Stepper({
   const steps = React.useMemo(
     () =>
       registeredSteps.length > 0
-        ? registeredSteps.map(toStepRecord)
+        ? registeredSteps.map((step) => {
+            const collectedStep = collectedSteps.find(
+              (currentStep) => currentStep.value === step.value
+            );
+
+            return {
+              ...toStepRecord(step),
+              disabled: collectedStep?.disabled ?? step.disabled,
+            };
+          })
         : collectedSteps,
     [collectedSteps, registeredSteps]
   );
   const selectedValue = isControlled ? value : uncontrolledValue;
-  const { currentValue } = React.useMemo(
+  const { currentValue, selectedStep } = React.useMemo(
     () => getStepperStepMeta(steps, selectedValue),
     [selectedValue, steps]
+  );
+  const selectedCollectedStep = React.useMemo(
+    () => collectedSteps.find((step) => step.value === selectedValue),
+    [collectedSteps, selectedValue]
   );
   const previousStep = React.useMemo(
     () => getPreviousEnabledStep(steps, currentValue),
@@ -264,6 +354,10 @@ function Stepper({
   const registerStep = React.useCallback(
     (step: Omit<RegisteredStep, "order">) => {
       setRegisteredSteps((currentSteps) => {
+        if (currentSteps.length === 0) {
+          stepOrderRef.current = 0;
+        }
+
         const existingStep = currentSteps.find(
           (currentStep) => currentStep.value === step.value
         );
@@ -308,6 +402,29 @@ function Stepper({
     },
     [isControlled, onValueChange, steps]
   );
+
+  React.useEffect(() => {
+    if (!isControlled || selectedValue === undefined || currentValue === undefined) {
+      return;
+    }
+
+    const shouldSyncFallback =
+      !selectedStep || selectedCollectedStep?.disabled === true;
+
+    if (selectedValue === currentValue || !shouldSyncFallback) {
+      return;
+    }
+
+    onValueChange?.(currentValue);
+  }, [
+    collectedSteps,
+    currentValue,
+    isControlled,
+    onValueChange,
+    selectedCollectedStep,
+    selectedStep,
+    selectedValue,
+  ]);
 
   const context = React.useMemo<StepperContextValue>(
     () => ({
@@ -363,11 +480,16 @@ function Stepper({
 
 type StepperListProps = React.ComponentPropsWithoutRef<"ol">;
 
-function StepperList({ className, ...props }: StepperListProps) {
+function StepperList({
+  className,
+  "aria-label": ariaLabel = "Progress steps",
+  ...props
+}: StepperListProps) {
   const { orientation } = useStepperContext("StepperList");
 
   return (
     <ol
+      aria-label={props["aria-labelledby"] ? undefined : ariaLabel}
       data-slot="stepper-list"
       data-orientation={orientation}
       className={cn(
@@ -425,7 +547,7 @@ function StepperItem({
           : "inactive";
   const hasCustomChildren = hasStepperPrimitiveChild(children);
 
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     registerStep({
       value,
       disabled,
@@ -434,6 +556,20 @@ function StepperItem({
 
     return () => unregisterStep(value);
   }, [disabled, registerStep, unregisterStep, value]);
+
+  React.useEffect(() => {
+    if (process.env.NODE_ENV === "production" || index >= 0) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      console.warn(
+        `StepperItem with value "${value}" could not be found in the Stepper order. Check that it is rendered inside StepperList and not hidden behind an unsupported wrapper.`
+      );
+    }, 0);
+
+    return () => window.clearTimeout(timeout);
+  }, [index, value]);
 
   const itemContext = React.useMemo<StepperItemContextValue>(
     () => ({
@@ -471,6 +607,7 @@ function StepperItem({
       data-completed={completed ? "" : undefined}
       className={cn(
         "group/stepper-item relative flex min-w-0",
+        "[--stepper-indicator-size:2.25rem] [--stepper-separator-offset:calc(var(--stepper-indicator-size)/2+0.125rem)]",
         "data-[orientation=horizontal]:min-w-24 data-[orientation=horizontal]:flex-1 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:items-center",
         "data-[orientation=vertical]:items-start data-[orientation=vertical]:gap-3",
         className
@@ -500,13 +637,29 @@ function hasStepperPrimitiveChild(children: React.ReactNode): boolean {
       return false;
     }
 
-    return (
-      child.type === StepperTrigger ||
-      child.type === StepperIndicator ||
-      child.type === StepperLabel ||
-      child.type === StepperDescription ||
-      child.type === StepperSeparator
-    );
+    const primitiveName = getStepperPrimitiveName(child.type);
+
+    if (
+      primitiveName === STEPPER_PRIMITIVES.trigger ||
+      primitiveName === STEPPER_PRIMITIVES.indicator ||
+      primitiveName === STEPPER_PRIMITIVES.label ||
+      primitiveName === STEPPER_PRIMITIVES.description ||
+      primitiveName === STEPPER_PRIMITIVES.separator
+    ) {
+      return true;
+    }
+
+    if (
+      typeof child.props === "object" &&
+      child.props !== null &&
+      "children" in child.props
+    ) {
+      const childProps = child.props as { children?: React.ReactNode };
+
+      return hasStepperPrimitiveChild(childProps.children);
+    }
+
+    return false;
   });
 }
 
@@ -520,6 +673,7 @@ function StepperTrigger({
   children,
   disabled,
   onClick,
+  tabIndex,
   ...props
 }: StepperTriggerProps) {
   const {
@@ -543,6 +697,7 @@ function StepperTrigger({
       aria-controls={isActive ? contentId : undefined}
       aria-disabled={isDisabled ? true : undefined}
       disabled={asChild ? undefined : isDisabled}
+      tabIndex={asChild && isDisabled ? -1 : tabIndex}
       data-slot="stepper-trigger"
       data-state={stepState}
       data-disabled={isDisabled ? "" : undefined}
@@ -586,31 +741,37 @@ function StepperIndicator({
   ...props
 }: StepperIndicatorProps) {
   const { index, stepState } = useStepperItemContext("StepperIndicator");
+  const stepNumber = index >= 0 ? index + 1 : undefined;
   const content =
     children !== undefined
       ? children
       : stepState === "error"
         ? "!"
-        : index >= 0
-          ? index + 1
+        : stepNumber
+          ? stepNumber
           : null;
 
   return (
-    <span
-      aria-hidden="true"
-      data-slot="stepper-indicator"
-      className={cn(
-        "flex size-9 shrink-0 items-center justify-center rounded-full border border-border bg-background text-xs font-semibold text-muted-foreground shadow-sm",
-        "group-data-[state=active]:border-primary group-data-[state=active]:bg-primary group-data-[state=active]:text-primary-foreground",
-        "group-data-[state=completed]:border-primary group-data-[state=completed]:bg-primary group-data-[state=completed]:text-primary-foreground",
-        "group-data-[state=error]:border-destructive group-data-[state=error]:bg-destructive group-data-[state=error]:text-destructive-foreground",
-        "[&>svg]:size-4 [&>svg]:shrink-0",
-        className
-      )}
-      {...props}
-    >
-      {content}
-    </span>
+    <>
+      {stepNumber ? (
+        <span className="sr-only">Step {stepNumber}:</span>
+      ) : null}
+      <span
+        aria-hidden="true"
+        data-slot="stepper-indicator"
+        className={cn(
+          "flex size-(--stepper-indicator-size) shrink-0 items-center justify-center rounded-full border border-border bg-background text-xs font-semibold text-muted-foreground shadow-sm",
+          "group-data-[state=active]:border-primary group-data-[state=active]:bg-primary group-data-[state=active]:text-primary-foreground",
+          "group-data-[state=completed]:border-primary group-data-[state=completed]:bg-primary group-data-[state=completed]:text-primary-foreground",
+          "group-data-[state=error]:border-destructive group-data-[state=error]:bg-destructive group-data-[state=error]:text-destructive-foreground",
+          "[&>svg]:size-4 [&>svg]:shrink-0",
+          className
+        )}
+        {...props}
+      >
+        {content}
+      </span>
+    </>
   );
 }
 
@@ -659,9 +820,9 @@ function StepperSeparator({ className, ...props }: StepperSeparatorProps) {
       className={cn(
         "bg-muted-foreground/25",
         orientation === "horizontal" &&
-          "absolute left-[calc(50%+1.25rem)] right-[calc(-50%+1.25rem)] top-[1.125rem] h-px group-data-[state=completed]/stepper-item:bg-primary",
+          "absolute left-[calc(50%+var(--stepper-separator-offset))] right-[calc(-50%+var(--stepper-separator-offset))] top-[calc(var(--stepper-indicator-size)/2)] h-px group-data-[state=completed]/stepper-item:bg-primary",
         orientation === "vertical" &&
-          "absolute left-[1.125rem] top-11 h-[calc(100%-1.5rem)] w-px group-data-[state=completed]/stepper-item:bg-primary",
+          "absolute left-[calc(var(--stepper-indicator-size)/2)] top-[calc(var(--stepper-indicator-size)+0.5rem)] h-[calc(100%-var(--stepper-indicator-size)+0.75rem)] w-px group-data-[state=completed]/stepper-item:bg-primary",
         className
       )}
       {...props}
@@ -715,32 +876,47 @@ function StepperContent({
   );
 }
 
-type StepperButtonProps = React.ComponentPropsWithoutRef<"button">;
+type StepperButtonProps = React.ComponentPropsWithoutRef<"button"> & {
+  asChild?: boolean;
+};
 
 function StepperPrevious({
+  asChild = false,
   className,
   children = "Previous",
   disabled,
   onClick,
+  tabIndex,
   ...props
 }: StepperButtonProps) {
   const { canGoPrevious, goPrevious } = useStepperContext("StepperPrevious");
+  const isDisabled = disabled || !canGoPrevious;
+  const Comp = asChild ? Slot.Root : "button";
 
   return (
-    <button
-      type="button"
-      disabled={disabled || !canGoPrevious}
+    <Comp
+      type={asChild ? undefined : "button"}
+      disabled={asChild ? undefined : isDisabled}
+      aria-disabled={isDisabled ? true : undefined}
+      tabIndex={asChild && isDisabled ? -1 : tabIndex}
       data-slot="stepper-previous"
+      data-disabled={isDisabled ? "" : undefined}
       className={cn(
         "inline-flex h-10 items-center justify-center gap-2 rounded-md border border-border bg-background px-4 text-sm font-medium text-foreground",
         "transition-[color,background-color,box-shadow,transform] hover:bg-muted hover:text-foreground active:scale-[0.96]",
         "focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none",
         "disabled:pointer-events-none disabled:opacity-50",
+        "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         "[&>svg]:size-4 [&>svg]:shrink-0",
         className
       )}
       onClick={(event) => {
         onClick?.(event);
+
+        if (isDisabled) {
+          event.preventDefault();
+          return;
+        }
 
         if (!event.defaultPrevented) {
           goPrevious();
@@ -749,34 +925,47 @@ function StepperPrevious({
       {...props}
     >
       {children}
-    </button>
+    </Comp>
   );
 }
 
 function StepperNext({
+  asChild = false,
   className,
   children = "Next",
   disabled,
   onClick,
+  tabIndex,
   ...props
 }: StepperButtonProps) {
   const { canGoNext, goNext } = useStepperContext("StepperNext");
+  const isDisabled = disabled || !canGoNext;
+  const Comp = asChild ? Slot.Root : "button";
 
   return (
-    <button
-      type="button"
-      disabled={disabled || !canGoNext}
+    <Comp
+      type={asChild ? undefined : "button"}
+      disabled={asChild ? undefined : isDisabled}
+      aria-disabled={isDisabled ? true : undefined}
+      tabIndex={asChild && isDisabled ? -1 : tabIndex}
       data-slot="stepper-next"
+      data-disabled={isDisabled ? "" : undefined}
       className={cn(
         "inline-flex h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground",
         "transition-[background-color,box-shadow,transform] hover:bg-primary/90 active:scale-[0.96]",
         "focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none",
         "disabled:pointer-events-none disabled:opacity-50",
+        "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         "[&>svg]:size-4 [&>svg]:shrink-0",
         className
       )}
       onClick={(event) => {
         onClick?.(event);
+
+        if (isDisabled) {
+          event.preventDefault();
+          return;
+        }
 
         if (!event.defaultPrevented) {
           goNext();
@@ -785,9 +974,16 @@ function StepperNext({
       {...props}
     >
       {children}
-    </button>
+    </Comp>
   );
 }
+
+markStepperPrimitive(StepperItem, STEPPER_PRIMITIVES.item);
+markStepperPrimitive(StepperTrigger, STEPPER_PRIMITIVES.trigger);
+markStepperPrimitive(StepperIndicator, STEPPER_PRIMITIVES.indicator);
+markStepperPrimitive(StepperLabel, STEPPER_PRIMITIVES.label);
+markStepperPrimitive(StepperDescription, STEPPER_PRIMITIVES.description);
+markStepperPrimitive(StepperSeparator, STEPPER_PRIMITIVES.separator);
 
 export {
   Stepper,
@@ -801,9 +997,11 @@ export {
   StepperPrevious,
   StepperSeparator,
   StepperTrigger,
+  useStepper,
 };
 
 export type {
+  StepperApi,
   StepperButtonProps,
   StepperContentProps,
   StepperDescriptionProps,
@@ -814,6 +1012,7 @@ export type {
   StepperOrientation,
   StepperProps,
   StepperSeparatorProps,
+  StepperStep,
   StepperStepState,
   StepperTriggerProps,
 };

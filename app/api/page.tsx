@@ -14,8 +14,12 @@ import {
   compositionCode,
   contentProps,
   itemProps,
+  listProps,
+  navigationProps,
   rootProps,
   triggerProps,
+  useStepperRows,
+  useStepperSnippet,
 } from "@/lib/docs";
 
 export const metadata: Metadata = {
@@ -35,6 +39,10 @@ export default function ApiPage() {
         <PropsTable rows={rootProps} />
       </Section>
 
+      <Section title="List props">
+        <PropsTable rows={listProps} />
+      </Section>
+
       <Section title="Item props">
         <PropsTable rows={itemProps} />
       </Section>
@@ -45,6 +53,20 @@ export default function ApiPage() {
 
       <Section title="Content props">
         <PropsTable rows={contentProps} />
+      </Section>
+
+      <Section title="Navigation props">
+        <PropsTable rows={navigationProps} />
+      </Section>
+
+      <Section
+        title="useStepper hook"
+        description="Use the public hook for custom footers, async validation controls, or buttons outside the visual list."
+      >
+        <div className="flex flex-col gap-4">
+          <PropsTable rows={useStepperRows} />
+          <CodeBlock code={useStepperSnippet} filename="wizard-footer.tsx" />
+        </div>
       </Section>
 
       <Section

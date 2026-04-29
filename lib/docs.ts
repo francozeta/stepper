@@ -72,6 +72,7 @@ const quickFacts = [
   "Horizontal and vertical",
   "Composed primitives",
   "Radix Slot for asChild",
+  "Public useStepper hook",
   "No Motion in core",
   "shadcn/ui tokens",
 ];
@@ -82,7 +83,8 @@ const releaseItems = [
   "Step states for active, completed, disabled, and error.",
   "Associated content panels with optional forceMount.",
   "Navigation helpers with StepperPrevious and StepperNext.",
-  "Primitive composition pieces with asChild support for triggers and content.",
+  "Primitive composition pieces with asChild support for triggers, content, and navigation.",
+  "Public useStepper hook for external controls and form footers.",
   "Lightweight step registration for simple wrappers around StepperItem.",
   "Product-style demos with shadcn/ui fields, alerts, checkout, onboarding, and controlled flows.",
 ];
@@ -142,7 +144,26 @@ const usageSnippet = `import {
   StepperList,
   StepperNext,
   StepperPrevious,
+  useStepper,
 } from "@/components/ui/stepper";`;
+
+const useStepperSnippet = `function WizardFooter() {
+  const { canGoPrevious, canGoNext, goPrevious, goNext, value } = useStepper();
+
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-sm text-muted-foreground">Current: {value}</span>
+      <div className="flex gap-2">
+        <Button type="button" variant="outline" disabled={!canGoPrevious} onClick={goPrevious}>
+          Back
+        </Button>
+        <Button type="button" disabled={!canGoNext} onClick={goNext}>
+          Continue
+        </Button>
+      </div>
+    </div>
+  );
+}`;
 
 const worksWith = [
   {
@@ -622,13 +643,22 @@ const rootProps = [
   {
     name: "onValueChange",
     type: "(value: string) => void",
-    description: "Called when the selected step changes.",
+    description: "Called when the selected step changes, including controlled fallbacks to the first enabled step.",
   },
   {
     name: "orientation",
     type: '"horizontal" | "vertical"',
     defaultValue: '"horizontal"',
     description: "Controls list layout and connector direction.",
+  },
+];
+
+const listProps = [
+  {
+    name: "aria-label",
+    type: "string",
+    defaultValue: '"Progress steps"',
+    description: "Accessible name for the ordered list. Use aria-labelledby when the list has an external heading.",
   },
 ];
 
@@ -689,7 +719,50 @@ const triggerProps = [
     name: "disabled",
     type: "boolean",
     defaultValue: "false",
-    description: "Disables the trigger in addition to the parent StepperItem disabled state.",
+    description: "Disables the trigger in addition to the parent StepperItem disabled state. With asChild, aria-disabled and tabIndex are applied instead of a native disabled attribute.",
+  },
+];
+
+const navigationProps = [
+  {
+    name: "asChild",
+    type: "boolean",
+    defaultValue: "false",
+    description: "Render StepperPrevious or StepperNext onto a custom button primitive with Radix Slot.",
+  },
+  {
+    name: "disabled",
+    type: "boolean",
+    defaultValue: "false",
+    description: "Disables the navigation button in addition to canGoPrevious or canGoNext.",
+  },
+];
+
+const useStepperRows = [
+  {
+    name: "value",
+    type: "string | undefined",
+    description: "Current active step after fallback resolution.",
+  },
+  {
+    name: "steps",
+    type: "{ value: string; disabled: boolean }[]",
+    description: "Registered step order used by navigation helpers.",
+  },
+  {
+    name: "setValue",
+    type: "(value: string) => void",
+    description: "Selects an enabled step by value.",
+  },
+  {
+    name: "canGoPrevious / canGoNext",
+    type: "boolean",
+    description: "Whether previous or next enabled steps exist.",
+  },
+  {
+    name: "goPrevious / goNext",
+    type: "() => void",
+    description: "Moves to the previous or next enabled step.",
   },
 ];
 
@@ -744,8 +817,13 @@ const apiComponents = [
   },
   {
     name: "StepperPrevious / StepperNext",
-    element: "button",
-    description: "Basic navigation helpers that skip disabled steps.",
+    element: "button / Slot",
+    description: "Basic navigation helpers that skip disabled steps and support asChild.",
+  },
+  {
+    name: "useStepper",
+    element: "hook",
+    description: "Public hook for external form footers, validation controls, and custom navigation.",
   },
 ];
 
@@ -775,6 +853,8 @@ export {
   gettingStartedSnippet,
   indicatorCode,
   itemProps,
+  listProps,
+  navigationProps,
   packageNotes,
   quickFacts,
   releaseItems,
@@ -783,6 +863,8 @@ export {
   statusExampleCode,
   triggerProps,
   usageSnippet,
+  useStepperRows,
+  useStepperSnippet,
   verticalExampleCode,
   v2Roadmap,
   worksWith,

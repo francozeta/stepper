@@ -19,9 +19,12 @@ const docsToc: Record<string, DocsTocItem[]> = {
   ],
   "/api": [
     { title: "Root props", href: "#root-props" },
+    { title: "List props", href: "#list-props" },
     { title: "Item props", href: "#item-props" },
     { title: "Trigger props", href: "#trigger-props" },
     { title: "Content props", href: "#content-props" },
+    { title: "Navigation props", href: "#navigation-props" },
+    { title: "useStepper hook", href: "#usestepper-hook" },
     { title: "Primitive parts", href: "#primitive-parts" },
     { title: "Composable trigger", href: "#composable-trigger" },
   ],

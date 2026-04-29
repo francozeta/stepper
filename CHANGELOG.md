@@ -12,7 +12,9 @@ Initial V1 release candidate for the Stepper component.
 - Associated content panels with optional `forceMount`.
 - Navigation helpers with `StepperPrevious` and `StepperNext`.
 - Primitive composition pieces: `StepperTrigger`, `StepperIndicator`, `StepperLabel`, `StepperDescription`, and `StepperSeparator`.
-- `asChild` support on `StepperTrigger` and `StepperContent` through Radix Slot.
+- `asChild` support on `StepperTrigger`, `StepperContent`, `StepperPrevious`, and `StepperNext` through Radix Slot.
+- Public `useStepper()` hook for custom controls outside the visual step list.
+- Accessible list labelling and screen-reader step positions.
 - Lightweight step registration so wrappers around `StepperItem` still work.
 - Product-style local demos using shadcn/ui fields, alerts, checkout, onboarding, and controlled flows.
 
