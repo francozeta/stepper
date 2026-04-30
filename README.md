@@ -6,8 +6,20 @@ The Stepper core is intentionally small and shadcn/ui-friendly. It uses Radix Sl
 
 ## Files
 
-- `components/ui/stepper.tsx` contains the reusable Stepper primitive.
+- `components/ui/stepper.tsx` is the public import surface for the reusable Stepper primitive.
+- `components/ui/stepper/*` contains the maintainable source split by responsibility.
+- `registry/default/ui/stepper.tsx` is the generated single-file copy-paste artifact.
 - `components/stepper-examples.tsx` contains the product-style demos used by the local preview.
+
+## Registry Output
+
+The source is maintained as small modules, while the shadcn-style distribution file is generated:
+
+```bash
+pnpm registry:build
+```
+
+Use `pnpm registry:check` to verify the generated file is in sync with `components/ui/stepper/*`. The normal `pnpm check` command runs this verification before lint, tests, and build.
 
 ## Features
 

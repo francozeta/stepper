@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "stepper",
+  "type": "registry:ui",
+  "title": "Stepper",
+  "description": "A lightweight, composable stepper primitive for shadcn/ui-style multi-step flows.",
+  "dependencies": [
+    "radix-ui"
+  ],
+  "files": [
+    {
+      "path": "registry/default/ui/stepper.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/stepper.tsx"
+    }
+  ]
+}

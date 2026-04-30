@@ -8,8 +8,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "registry:build": "node scripts/build-stepper-registry.mjs",
+    "registry:check": "node scripts/build-stepper-registry.mjs --check",
     "test": "vitest run",
-    "check": "pnpm lint && pnpm test && pnpm build"
+    "check": "pnpm registry:check && pnpm lint && pnpm test && pnpm build"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
