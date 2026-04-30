@@ -1,5 +1,9 @@
 # @francozeta/stepper Changelog
 
+## 0.1.2
+
+- Added package-level `devDependencies` metadata so npm shows the build and test stack used by the package.
+
 ## 0.1.1
 
 - Initial npm package build for the Stepper primitive.

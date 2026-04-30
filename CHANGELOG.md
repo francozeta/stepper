@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.2
+
+Package metadata polish.
+
+### Changed
+
+- Added package-level `devDependencies` metadata to `@francozeta/stepper` so npm shows the build and test stack used by the package.
+
 ## 0.1.1
 
 Launch-ready docs and registry polish for the first public pass.
