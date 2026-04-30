@@ -8,6 +8,7 @@ const docsToc: Record<string, DocsTocItem[]> = {
     { title: "Preview", href: "#preview" },
     { title: "Create workspace", href: "#create-workspace" },
     { title: "Usage", href: "#usage" },
+    { title: "Why another Stepper?", href: "#why-another-stepper" },
     { title: "Works with", href: "#works-with" },
     { title: "Install shape", href: "#install-shape" },
     { title: "V1 scope", href: "#v1-scope" },
@@ -16,6 +17,15 @@ const docsToc: Record<string, DocsTocItem[]> = {
     { title: "Add the component", href: "#add-the-component" },
     { title: "Use it uncontrolled", href: "#use-it-uncontrolled" },
     { title: "Use it controlled", href: "#use-it-controlled" },
+  ],
+  "/forms": [
+    { title: "Primitive boundary", href: "#primitive-boundary" },
+    { title: "Validation flow", href: "#validation-flow" },
+    { title: "Full example", href: "#full-example" },
+  ],
+  "/patterns": [
+    { title: "Route-based stepper", href: "#route-based-stepper" },
+    { title: "Mobile drawer pattern", href: "#mobile-drawer-pattern" },
   ],
   "/api": [
     { title: "Root props", href: "#root-props" },

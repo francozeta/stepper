@@ -3,8 +3,10 @@ import {
   BookOpen,
   Boxes,
   Code2,
+  FileCheck,
   GalleryVerticalEnd,
   Palette,
+  Route,
   Rocket,
 } from "lucide-react";
 
@@ -53,6 +55,16 @@ const docsNav: DocsNavGroup[] = [
   {
     title: "Guides",
     items: [
+      {
+        title: "Form Wizard",
+        href: "/forms",
+        icon: FileCheck,
+      },
+      {
+        title: "Patterns",
+        href: "/patterns",
+        icon: Route,
+      },
       {
         title: "Styling",
         href: "/styling",
@@ -147,6 +159,24 @@ const usageSnippet = `import {
   useStepper,
 } from "@/components/ui/stepper";`;
 
+const whyStepper = [
+  {
+    label: "Compose first",
+    value: "JSX-native",
+    help: "Define the flow where the UI is rendered, not in a separate workflow factory.",
+  },
+  {
+    label: "Own the code",
+    value: "Copy-paste",
+    help: "Ship a generated single-file primitive while keeping source modules maintainable.",
+  },
+  {
+    label: "Style the states",
+    value: "data attributes",
+    help: "Use data-slot, data-state, and semantic Tailwind tokens for product-ready styling.",
+  },
+];
+
 const useStepperSnippet = `function WizardFooter() {
   const { canGoPrevious, canGoNext, goPrevious, goNext, value } = useStepper();
 
@@ -177,11 +207,207 @@ const worksWith = [
     help: "Defines form rules without coupling to the primitive.",
   },
   {
+    label: "Next.js",
+    value: "Routes",
+    help: "Use StepperTrigger asChild with Link for route-based flows.",
+  },
+  {
+    label: "shadcn/ui Form",
+    value: "Fields",
+    help: "Compose Field, Input, Select, Alert, and Button around the primitive.",
+  },
+  {
+    label: "Server Actions",
+    value: "Submit",
+    help: "Keep persistence outside the Stepper while the UI reflects progress.",
+  },
+  {
     label: "Radix Slot",
     value: "asChild",
     help: "Used only for custom trigger/content composition.",
   },
 ];
+
+const formWizardGuideSnippet = `"use client";
+
+import * as React from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod/v3";
+
+import { Button } from "@/components/ui/button";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import {
+  Stepper,
+  StepperContent,
+  StepperItem,
+  StepperList,
+} from "@/components/ui/stepper";
+
+const schema = z.object({
+  workspaceName: z.string().min(2, "Enter a workspace name."),
+  workspaceSlug: z.string().min(3, "Enter a workspace slug."),
+});
+
+type Values = z.infer<typeof schema>;
+type Step = "workspace" | "review";
+
+export function FormWizard() {
+  const [step, setStep] = React.useState<Step>("workspace");
+  const [completed, setCompleted] = React.useState(false);
+  const form = useForm<Values>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      workspaceName: "",
+      workspaceSlug: "",
+    },
+  });
+
+  async function continueToReview() {
+    const isValid = await form.trigger(["workspaceName", "workspaceSlug"], {
+      shouldFocus: true,
+    });
+
+    if (!isValid) return;
+
+    setCompleted(true);
+    setStep("review");
+  }
+
+  return (
+    <Stepper value={step} onValueChange={(value) => setStep(value as Step)}>
+      <StepperList>
+        <StepperItem value="workspace" completed={completed}>
+          Workspace
+        </StepperItem>
+        <StepperItem value="review" disabled={!completed}>
+          Review
+        </StepperItem>
+      </StepperList>
+
+      <StepperContent value="workspace">
+        <Field data-invalid={Boolean(form.formState.errors.workspaceName)}>
+          <FieldLabel htmlFor="workspace-name">Workspace name</FieldLabel>
+          <Input
+            id="workspace-name"
+            aria-invalid={Boolean(form.formState.errors.workspaceName)}
+            {...form.register("workspaceName")}
+          />
+          <FieldError>{form.formState.errors.workspaceName?.message}</FieldError>
+        </Field>
+      </StepperContent>
+
+      <StepperContent value="review">
+        Review the workspace before creating it.
+      </StepperContent>
+
+      <Button type="button" onClick={() => void continueToReview()}>
+        Continue
+      </Button>
+    </Stepper>
+  );
+}`;
+
+const routeBasedPatternSnippet = `import Link from "next/link";
+
+import {
+  Stepper,
+  StepperIndicator,
+  StepperItem,
+  StepperLabel,
+  StepperList,
+  StepperSeparator,
+  StepperTrigger,
+} from "@/components/ui/stepper";
+
+export function SetupRoutes({ currentStep }: { currentStep: string }) {
+  return (
+    <Stepper value={currentStep} onValueChange={() => {}}>
+      <StepperList>
+        <StepperItem value="workspace" completed>
+          <StepperTrigger asChild>
+            <Link href="/setup/workspace">
+              <StepperIndicator />
+              <StepperLabel>Workspace</StepperLabel>
+            </Link>
+          </StepperTrigger>
+          <StepperSeparator />
+        </StepperItem>
+
+        <StepperItem value="members">
+          <StepperTrigger asChild>
+            <Link href="/setup/members">
+              <StepperIndicator />
+              <StepperLabel>Members</StepperLabel>
+            </Link>
+          </StepperTrigger>
+        </StepperItem>
+      </StepperList>
+    </Stepper>
+  );
+}`;
+
+const mobileDrawerPatternSnippet = `"use client";
+
+import { Menu } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
+  Stepper,
+  StepperItem,
+  StepperList,
+  useStepper,
+} from "@/components/ui/stepper";
+
+function MobileStepSummary() {
+  const { value, steps } = useStepper();
+  const index = steps.findIndex((step) => step.value === value);
+
+  return (
+    <div className="flex items-center justify-between gap-3 md:hidden">
+      <p className="text-sm font-medium">
+        Step {index + 1} of {steps.length}: {value}
+      </p>
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button type="button" variant="outline" size="sm">
+            <Menu data-icon="inline-start" />
+            Steps
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="bottom">
+          <SheetHeader>
+            <SheetTitle>Setup steps</SheetTitle>
+          </SheetHeader>
+          <StepperList className="mt-4" />
+        </SheetContent>
+      </Sheet>
+    </div>
+  );
+}
+
+export function MobileStepperPattern() {
+  return (
+    <Stepper defaultValue="workspace" orientation="vertical">
+      <MobileStepSummary />
+      <StepperList className="hidden md:flex">
+        <StepperItem value="workspace">Workspace</StepperItem>
+        <StepperItem value="members">Members</StepperItem>
+        <StepperItem value="review" disabled>
+          Review
+        </StepperItem>
+      </StepperList>
+    </Stepper>
+  );
+}`;
 
 const workspaceExampleCode = `"use client";
 
@@ -850,15 +1076,18 @@ export {
   controlledExampleCode,
   controlledSnippet,
   docsNav,
+  formWizardGuideSnippet,
   gettingStartedSnippet,
   indicatorCode,
   itemProps,
   listProps,
+  mobileDrawerPatternSnippet,
   navigationProps,
   packageNotes,
   quickFacts,
   releaseItems,
   rootProps,
+  routeBasedPatternSnippet,
   stateSelectorsCode,
   statusExampleCode,
   triggerProps,
@@ -869,6 +1098,7 @@ export {
   v2Roadmap,
   worksWith,
   workspaceExampleCode,
+  whyStepper,
 };
 
 export type { DocsNavGroup, DocsNavItem };

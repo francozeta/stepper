@@ -1,4 +1,5 @@
 import * as React from "react";
+import Link from "next/link";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
@@ -6,6 +7,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   Stepper,
   StepperContent,
+  StepperDescription,
   StepperIndicator,
   StepperItem,
   StepperLabel,
@@ -74,6 +76,15 @@ describe("Stepper", () => {
     });
   });
 
+  it("falls back to the first enabled step when defaultValue is missing", () => {
+    render(<BasicStepper defaultValue="missing" />);
+
+    expect(screen.getByText("Account content")).toBeVisible();
+    expect(
+      screen.getByRole("button", { name: /Step 1:\s*Account/ })
+    ).toHaveAttribute("aria-current", "step");
+  });
+
   it("syncs a controlled value away from a step that becomes disabled", async () => {
     const user = userEvent.setup();
 
@@ -110,6 +121,92 @@ describe("Stepper", () => {
     await waitFor(() => {
       expect(screen.getByTestId("current-value")).toHaveTextContent("account");
     });
+    expect(screen.getByText("Account content")).toBeVisible();
+  });
+
+  it("syncs a controlled value away from a wrapped step that becomes disabled", async () => {
+    const user = userEvent.setup();
+
+    const WrappedStep = React.memo(function WrappedStep(
+      props: StepperItemProps
+    ) {
+      return <StepperItem {...props} />;
+    });
+
+    function ControlledStepper() {
+      const [value, setValue] = React.useState("profile");
+      const [isProfileDisabled, setIsProfileDisabled] = React.useState(false);
+
+      return (
+        <>
+          <button type="button" onClick={() => setIsProfileDisabled(true)}>
+            Disable wrapped profile
+          </button>
+          <output data-testid="wrapped-current-value">{value}</output>
+
+          <Stepper value={value} onValueChange={setValue}>
+            <StepperList>
+              <WrappedStep value="account">Account</WrappedStep>
+              <WrappedStep value="profile" disabled={isProfileDisabled}>
+                Profile
+              </WrappedStep>
+            </StepperList>
+
+            <StepperContent value="account">Account content</StepperContent>
+            <StepperContent value="profile">Profile content</StepperContent>
+          </Stepper>
+        </>
+      );
+    }
+
+    render(<ControlledStepper />);
+
+    await user.click(
+      screen.getByRole("button", { name: "Disable wrapped profile" })
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("wrapped-current-value")).toHaveTextContent(
+        "account"
+      );
+    });
+  });
+
+  it("falls back when the active uncontrolled step is removed", async () => {
+    const user = userEvent.setup();
+
+    function ConditionalStepper() {
+      const [showProfile, setShowProfile] = React.useState(true);
+
+      return (
+        <>
+          <button type="button" onClick={() => setShowProfile(false)}>
+            Remove profile
+          </button>
+
+          <Stepper defaultValue="profile">
+            <StepperList>
+              <StepperItem value="account">Account</StepperItem>
+              {showProfile ? (
+                <StepperItem value="profile">Profile</StepperItem>
+              ) : null}
+            </StepperList>
+
+            <StepperContent value="account">Account content</StepperContent>
+            {showProfile ? (
+              <StepperContent value="profile">Profile content</StepperContent>
+            ) : null}
+          </Stepper>
+        </>
+      );
+    }
+
+    render(<ConditionalStepper />);
+
+    expect(screen.getByText("Profile content")).toBeVisible();
+
+    await user.click(screen.getByRole("button", { name: "Remove profile" }));
+
     expect(screen.getByText("Account content")).toBeVisible();
   });
 
@@ -188,6 +285,76 @@ describe("Stepper", () => {
 
     expect(screen.getByText("Account content")).toBeVisible();
     expect(screen.queryByText("Payment content")).not.toBeInTheDocument();
+  });
+
+  it("supports disabled asChild triggers rendered with Next Link", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <Stepper defaultValue="account">
+        <StepperList>
+          <StepperItem value="account">Account</StepperItem>
+          <StepperItem value="payment" disabled>
+            <StepperTrigger asChild>
+              <Link href="/payment">Payment</Link>
+            </StepperTrigger>
+          </StepperItem>
+        </StepperList>
+
+        <StepperContent value="account">Account content</StepperContent>
+        <StepperContent value="payment">Payment content</StepperContent>
+      </Stepper>
+    );
+
+    const payment = screen.getByRole("link", { name: "Payment" });
+
+    expect(payment).toHaveAttribute("href", "/payment");
+    expect(payment).toHaveAttribute("aria-disabled", "true");
+    expect(payment).toHaveAttribute("tabindex", "-1");
+
+    await user.click(payment);
+
+    expect(screen.getByText("Account content")).toBeVisible();
+    expect(screen.queryByText("Payment content")).not.toBeInTheDocument();
+  });
+
+  it("keeps horizontal lists scrollable on narrow screens", () => {
+    const { container } = render(<BasicStepper />);
+    const list = container.querySelector('[data-slot="stepper-list"]');
+
+    expect(list).toHaveAttribute("data-orientation", "horizontal");
+    expect(list).toHaveClass("data-[orientation=horizontal]:overflow-x-auto");
+  });
+
+  it("supports long descriptions in vertical orientation", () => {
+    render(
+      <Stepper defaultValue="workspace" orientation="vertical">
+        <StepperList>
+          <StepperItem value="workspace">
+            <StepperTrigger>
+              <StepperIndicator />
+              <span>
+                <StepperLabel>Workspace</StepperLabel>
+                <StepperDescription>
+                  Configure a workspace with a very long description that
+                  should remain associated with the trigger.
+                </StepperDescription>
+              </span>
+            </StepperTrigger>
+          </StepperItem>
+        </StepperList>
+
+        <StepperContent value="workspace">Workspace content</StepperContent>
+      </Stepper>
+    );
+
+    expect(screen.getByRole("list")).toHaveAttribute(
+      "data-orientation",
+      "vertical"
+    );
+    expect(
+      screen.getByRole("button", { name: /Configure a workspace/ })
+    ).toHaveAttribute("aria-current", "step");
   });
 
   it("allows navigation buttons to compose with asChild", async () => {

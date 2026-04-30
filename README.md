@@ -4,6 +4,12 @@ A lightweight Stepper component for React, Next.js, TypeScript, Tailwind CSS, an
 
 The Stepper core is intentionally small and shadcn/ui-friendly. It uses Radix Slot only for `asChild` composition and does not require Radix Tabs, Motion, or multiple visual variants.
 
+## Positioning
+
+Most stepper libraries focus on workflow state. This component focuses on shadcn-style composition, UI states, and copy-paste ownership.
+
+Stepper does not own your form state. It coordinates the UI around it. Keep validation, persistence, server actions, and routing in the app layer, then map those decisions onto `completed`, `disabled`, and `error`.
+
 ## Files
 
 - `components/ui/stepper.tsx` is the public import surface for the reusable Stepper primitive.
@@ -37,6 +43,14 @@ Use `pnpm registry:check` to verify the generated file is in sync with `componen
 - `forceMount` on `StepperContent` for mounted inactive content
 - Guard rails for invalid `value` / `defaultValue` and disabled steps
 - Lightweight step registration so simple wrapper components can still be composed around `StepperItem`
+
+## Works With
+
+- `react-hook-form` and `zod` in examples, not in the primitive.
+- Next.js routing through `StepperTrigger asChild` with `Link`.
+- shadcn/ui `Field`, `Input`, `Select`, `Alert`, and `Button` in product flows.
+- Server Actions or API mutations owned by the app layer.
+- Radix Slot only for `asChild` composition.
 
 ## Usage
 

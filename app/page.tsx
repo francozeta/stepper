@@ -11,6 +11,7 @@ import {
   usageSnippet,
   worksWith,
   workspaceExampleCode,
+  whyStepper,
 } from "@/lib/docs";
 
 export default function Home() {
@@ -49,6 +50,13 @@ export default function Home() {
       </Section>
 
       <Section
+        title="Why another Stepper?"
+        description="Most stepper libraries focus on workflow state. This primitive focuses on shadcn-style composition, UI states, and copy-paste ownership."
+      >
+        <InfoGrid items={whyStepper} />
+      </Section>
+
+      <Section
         title="Works with"
         description="The core stays agnostic while examples show common production integrations."
       >
@@ -64,7 +72,21 @@ export default function Home() {
         <CodeBlock filename="project tree" lang="text">{`components/
   stepper-examples.tsx
   ui/
-    stepper.tsx`}</CodeBlock>
+    stepper.tsx
+    stepper/
+      content.tsx
+      context.tsx
+      item.tsx
+      list.tsx
+      navigation.tsx
+      root.tsx
+      types.ts
+      utils.ts
+registry/
+  default/
+    ui/
+      stepper.tsx
+      stepper.json`}</CodeBlock>
       </Section>
 
       <Section title="V1 scope">

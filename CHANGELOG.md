@@ -18,6 +18,7 @@ Initial V1 release candidate for the Stepper component.
 - Lightweight step registration so wrappers around `StepperItem` still work.
 - Modular source files with a generated single-file registry artifact for shadcn-style distribution.
 - Product-style local demos using shadcn/ui fields, alerts, checkout, onboarding, and controlled flows.
+- Strategy docs for react-hook-form integration, route-based steppers, and mobile drawer composition.
 
 ### Notes
 

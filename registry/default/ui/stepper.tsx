@@ -487,7 +487,9 @@ function Stepper({
     }
 
     const shouldSyncFallback =
-      !selectedStep || selectedCollectedStep?.disabled === true;
+      !selectedStep ||
+      selectedStep.disabled ||
+      selectedCollectedStep?.disabled === true;
 
     if (selectedValue === currentValue || !shouldSyncFallback) {
       return;
