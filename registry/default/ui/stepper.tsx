@@ -4,7 +4,7 @@
 // Edit components/ui/stepper/*, then run pnpm registry:build.
 
 import * as React from "react";
-import { Slot } from "radix-ui";
+import { Slot } from "@radix-ui/react-slot";
 
 import { cn } from "@/lib/utils";
 
@@ -720,7 +720,7 @@ function StepperTrigger({
     contentId,
   } = useStepperItemContext("StepperTrigger");
   const isDisabled = itemDisabled || disabled;
-  const Comp = asChild ? Slot.Root : "button";
+  const Comp = asChild ? Slot : "button";
 
   return (
     <Comp
@@ -747,7 +747,7 @@ function StepperTrigger({
         orientation === "vertical" && "justify-start",
         className
       )}
-      onClick={(event) => {
+      onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
         onClick?.(event);
 
         if (isDisabled) {
@@ -882,7 +882,7 @@ function StepperContent({
     return null;
   }
 
-  const Comp = asChild ? Slot.Root : "div";
+  const Comp = asChild ? Slot : "div";
 
   return (
     <Comp
@@ -915,7 +915,7 @@ function StepperPrevious({
 }: StepperButtonProps) {
   const { canGoPrevious, goPrevious } = useStepperContext("StepperPrevious");
   const isDisabled = disabled || !canGoPrevious;
-  const Comp = asChild ? Slot.Root : "button";
+  const Comp = asChild ? Slot : "button";
 
   return (
     <Comp
@@ -934,7 +934,7 @@ function StepperPrevious({
         "[&>svg]:size-4 [&>svg]:shrink-0",
         className
       )}
-      onClick={(event) => {
+      onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
         onClick?.(event);
 
         if (isDisabled) {
@@ -964,7 +964,7 @@ function StepperNext({
 }: StepperButtonProps) {
   const { canGoNext, goNext } = useStepperContext("StepperNext");
   const isDisabled = disabled || !canGoNext;
-  const Comp = asChild ? Slot.Root : "button";
+  const Comp = asChild ? Slot : "button";
 
   return (
     <Comp
@@ -983,7 +983,7 @@ function StepperNext({
         "[&>svg]:size-4 [&>svg]:shrink-0",
         className
       )}
-      onClick={(event) => {
+      onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
         onClick?.(event);
 
         if (isDisabled) {

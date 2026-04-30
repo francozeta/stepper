@@ -5,7 +5,7 @@
   "title": "Stepper",
   "description": "A lightweight, composable stepper primitive for shadcn/ui-style multi-step flows.",
   "dependencies": [
-    "radix-ui"
+    "@radix-ui/react-slot"
   ],
   "files": [
     {

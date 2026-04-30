@@ -46,11 +46,13 @@ const docsToc: Record<string, DocsTocItem[]> = {
   ],
   "/styling": [
     { title: "Theme tokens", href: "#theme-tokens" },
+    { title: "NPM package usage", href: "#npm-package-usage" },
+    { title: "Required tokens", href: "#required-tokens" },
     { title: "State selectors", href: "#state-selectors" },
     { title: "Customize by composition", href: "#customize-by-composition" },
   ],
   "/changelog": [
-    { title: "Added", href: "#added" },
+    { title: "Changed", href: "#changed" },
     { title: "Tag link", href: "#tag-link" },
     { title: "Next direction", href: "#next-direction" },
   ],

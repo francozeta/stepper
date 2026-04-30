@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.3
+
+NPM package DX polish.
+
+### Changed
+
+- Replaced the Stepper package runtime dependency on the Radix umbrella package with `@radix-ui/react-slot`.
+- Updated the generated registry item to install only `@radix-ui/react-slot`.
+- Documented direct npm usage for Tailwind v4, Tailwind v3, and required shadcn semantic tokens.
+
 ## 0.1.2
 
 Package metadata polish.

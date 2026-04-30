@@ -71,7 +71,7 @@ const docsNav: DocsNavGroup[] = [
         icon: Palette,
       },
       {
-        title: "Release 0.1.1",
+        title: "Release 0.1.3",
         href: "/changelog",
         icon: Rocket,
       },
@@ -90,12 +90,12 @@ const quickFacts = [
 ];
 
 const releaseItems = [
-  "Main pnpm check now includes registry sync, lint, typecheck, tests, and production build.",
-  "Form Wizard guide now ships as a live Preview / Code example.",
-  "Patterns guide now includes live route-based and mobile drawer examples.",
-  "Mobile Sheet pattern includes an accessible dialog description.",
+  "The npm package now depends on @radix-ui/react-slot instead of the Radix umbrella package.",
+  "The generated registry item installs only @radix-ui/react-slot for asChild composition.",
+  "The package README documents Tailwind v4 source scanning for direct npm usage.",
+  "Tailwind v3 content setup and required shadcn semantic tokens are documented explicitly.",
+  "The core still avoids Radix Tabs, Motion, react-hook-form, zod, and icon dependencies.",
   "Registry output remains generated from modular source for copy-paste distribution.",
-  "Core positioning stays focused on shadcn-style composition instead of workflow-library features.",
 ];
 
 const gettingStartedSnippet = `import {
@@ -224,6 +224,48 @@ const worksWith = [
     help: "Used only for custom trigger/content composition.",
   },
 ];
+
+const tailwindV4SourceSnippet = `@import "tailwindcss";
+
+@source "../node_modules/@francozeta/stepper/dist";`;
+
+const tailwindV3ContentSnippet = `import type { Config } from "tailwindcss";
+
+const config = {
+  content: [
+    "./app/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./node_modules/@francozeta/stepper/dist/**/*.{js,mjs,cjs}",
+  ],
+} satisfies Config;
+
+export default config;`;
+
+const themeTokensSnippet = `:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --border: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+}`;
 
 const formWizardGuideSnippet = `"use client";
 
@@ -1111,6 +1153,9 @@ export {
   routeBasedPatternSnippet,
   stateSelectorsCode,
   statusExampleCode,
+  tailwindV3ContentSnippet,
+  tailwindV4SourceSnippet,
+  themeTokensSnippet,
   triggerProps,
   usageSnippet,
   useStepperRows,

@@ -40,6 +40,16 @@ pnpm package:publish
 
 The package name is `@francozeta/stepper`. The docs app remains private; only `packages/stepper` is meant to be published.
 
+Direct npm consumers must include the package output in Tailwind and provide shadcn-style semantic tokens. For Tailwind v4:
+
+```css
+@import "tailwindcss";
+
+@source "../node_modules/@francozeta/stepper/dist";
+```
+
+For Tailwind v3, include `./node_modules/@francozeta/stepper/dist/**/*.{js,mjs,cjs}` in `content`. The required token names are `background`, `foreground`, `border`, `ring`, `primary`, `primary-foreground`, `muted`, `muted-foreground`, `destructive`, and `destructive-foreground`.
+
 ## Features
 
 - Controlled state with `value` and `onValueChange`
@@ -51,7 +61,7 @@ The package name is `@francozeta/stepper`. The docs app remains private; only `p
 - Real buttons, `aria-current="step"` on the active step, and real `disabled`
 - Tailwind tokens such as `border`, `muted-foreground`, `primary`, `destructive`, `background`, and `foreground`
 - Primitive pieces for custom step markup: `StepperTrigger`, `StepperIndicator`, `StepperLabel`, `StepperDescription`, and `StepperSeparator`
-- `asChild` on `StepperTrigger`, `StepperContent`, `StepperPrevious`, and `StepperNext` with Radix Slot
+- `asChild` on `StepperTrigger`, `StepperContent`, `StepperPrevious`, and `StepperNext` with `@radix-ui/react-slot`
 - Public `useStepper()` hook for custom footers and form controls
 - `forceMount` on `StepperContent` for mounted inactive content
 - Guard rails for invalid `value` / `defaultValue` and disabled steps
@@ -63,7 +73,7 @@ The package name is `@francozeta/stepper`. The docs app remains private; only `p
 - Next.js routing through `StepperTrigger asChild` with `Link`.
 - shadcn/ui `Field`, `Input`, `Select`, `Alert`, and `Button` in product flows.
 - Server Actions or API mutations owned by the app layer.
-- Radix Slot only for `asChild` composition.
+- `@radix-ui/react-slot` only for `asChild` composition.
 
 ## Usage
 

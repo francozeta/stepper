@@ -77,7 +77,7 @@ async function buildStepperSource() {
     "// Edit components/ui/stepper/*, then run pnpm registry:build.",
     "",
     'import * as React from "react";',
-    'import { Slot } from "radix-ui";',
+    'import { Slot } from "@radix-ui/react-slot";',
     "",
     'import { cn } from "@/lib/utils";',
     "",
@@ -113,7 +113,7 @@ function buildRegistryItem() {
       title: "Stepper",
       description:
         "A lightweight, composable stepper primitive for shadcn/ui-style multi-step flows.",
-      dependencies: ["radix-ui"],
+      dependencies: ["@radix-ui/react-slot"],
       files: [
         {
           path: "registry/default/ui/stepper.tsx",

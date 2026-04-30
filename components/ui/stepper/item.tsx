@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Slot } from "radix-ui";
+import { Slot } from "@radix-ui/react-slot";
 
 import { cn } from "@/lib/utils";
 
@@ -159,7 +159,7 @@ function StepperTrigger({
     contentId,
   } = useStepperItemContext("StepperTrigger");
   const isDisabled = itemDisabled || disabled;
-  const Comp = asChild ? Slot.Root : "button";
+  const Comp = asChild ? Slot : "button";
 
   return (
     <Comp
@@ -186,7 +186,7 @@ function StepperTrigger({
         orientation === "vertical" && "justify-start",
         className
       )}
-      onClick={(event) => {
+      onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
         onClick?.(event);
 
         if (isDisabled) {

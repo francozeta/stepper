@@ -1,6 +1,7 @@
 "use client";
 
-import { Slot } from "radix-ui";
+import type * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
 
 import { cn } from "@/lib/utils";
 
@@ -18,7 +19,7 @@ function StepperPrevious({
 }: StepperButtonProps) {
   const { canGoPrevious, goPrevious } = useStepperContext("StepperPrevious");
   const isDisabled = disabled || !canGoPrevious;
-  const Comp = asChild ? Slot.Root : "button";
+  const Comp = asChild ? Slot : "button";
 
   return (
     <Comp
@@ -37,7 +38,7 @@ function StepperPrevious({
         "[&>svg]:size-4 [&>svg]:shrink-0",
         className
       )}
-      onClick={(event) => {
+      onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
         onClick?.(event);
 
         if (isDisabled) {
@@ -67,7 +68,7 @@ function StepperNext({
 }: StepperButtonProps) {
   const { canGoNext, goNext } = useStepperContext("StepperNext");
   const isDisabled = disabled || !canGoNext;
-  const Comp = asChild ? Slot.Root : "button";
+  const Comp = asChild ? Slot : "button";
 
   return (
     <Comp
@@ -86,7 +87,7 @@ function StepperNext({
         "[&>svg]:size-4 [&>svg]:shrink-0",
         className
       )}
-      onClick={(event) => {
+      onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
         onClick?.(event);
 
         if (isDisabled) {

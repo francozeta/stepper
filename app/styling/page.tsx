@@ -9,7 +9,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { indicatorCode, stateSelectorsCode } from "@/lib/docs";
+import {
+  indicatorCode,
+  stateSelectorsCode,
+  tailwindV3ContentSnippet,
+  tailwindV4SourceSnippet,
+  themeTokensSnippet,
+} from "@/lib/docs";
 
 export const metadata: Metadata = {
   title: "Styling",
@@ -48,6 +54,35 @@ export default function StylingPage() {
             </Badge>
           ))}
         </div>
+      </Section>
+
+      <Section
+        title="NPM package usage"
+        description="When importing the compiled package directly, Tailwind must scan the package output. Copy-paste registry usage does not need this because the component lives in your app source."
+      >
+        <div className="grid gap-4">
+          <CodeBlock
+            code={tailwindV4SourceSnippet}
+            filename="app/globals.css"
+            lang="css"
+          />
+          <CodeBlock
+            code={tailwindV3ContentSnippet}
+            filename="tailwind.config.ts"
+            lang="ts"
+          />
+        </div>
+      </Section>
+
+      <Section
+        title="Required tokens"
+        description="Vanilla Tailwind apps need the same semantic color names that shadcn/ui projects already provide."
+      >
+        <CodeBlock
+          code={themeTokensSnippet}
+          filename="globals.css"
+          lang="css"
+        />
       </Section>
 
       <Section title="State selectors">

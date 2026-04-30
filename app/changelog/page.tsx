@@ -13,7 +13,7 @@ import {
 import { releaseItems, v2Roadmap } from "@/lib/docs";
 
 export const metadata: Metadata = {
-  title: "Release 0.1.1",
+  title: "Release 0.1.3",
 };
 
 export default function ChangelogPage() {
@@ -21,17 +21,17 @@ export default function ChangelogPage() {
     <>
       <PageHeader
         eyebrow="guides"
-        title="Release 0.1.1"
-        description="The launch-ready pass aligns the registry, docs examples, validation pipeline, and release metadata."
-        badge="published"
+        title="Release 0.1.3"
+        description="This pass tightens npm package DX: smaller Radix dependency, explicit Tailwind setup, and clearer style contracts."
+        badge="ready"
       />
 
-      <Section title="Added">
+      <Section title="Changed">
         <Card>
           <CardHeader>
-            <CardTitle>Stepper 0.1.1</CardTitle>
+            <CardTitle>Stepper 0.1.3</CardTitle>
             <CardDescription>
-              Tagged with v0.1.1 and deployed to Vercel production.
+              Prepared for @francozeta/stepper v0.1.3.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -51,7 +51,7 @@ export default function ChangelogPage() {
 
       <Section title="Tag link">
         <Button asChild variant="outline" className="w-fit">
-          <a href="https://github.com/francozeta/stepper/tree/v0.1.1">
+          <a href="https://github.com/francozeta/stepper/tree/v0.1.3">
             Open GitHub tag
           </a>
         </Button>
