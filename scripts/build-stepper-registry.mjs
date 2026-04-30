@@ -46,6 +46,7 @@ const publicTypeExports = [
   "StepperProps",
   "StepperSeparatorProps",
   "StepperStep",
+  "StepperStepPosition",
   "StepperStepState",
   "StepperTriggerProps",
 ];

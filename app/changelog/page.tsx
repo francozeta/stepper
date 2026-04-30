@@ -13,7 +13,7 @@ import {
 import { releaseItems, v2Roadmap } from "@/lib/docs";
 
 export const metadata: Metadata = {
-  title: "Release 0.1.3",
+  title: "Release 0.1.4",
 };
 
 export default function ChangelogPage() {
@@ -21,17 +21,17 @@ export default function ChangelogPage() {
     <>
       <PageHeader
         eyebrow="guides"
-        title="Release 0.1.3"
-        description="This pass tightens npm package DX: smaller Radix dependency, explicit Tailwind setup, and clearer style contracts."
+        title="Release 0.1.4"
+        description="This pass improves default step clarity and trims the docs home page around the path to install, import, and try."
         badge="ready"
       />
 
       <Section title="Changed">
         <Card>
           <CardHeader>
-            <CardTitle>Stepper 0.1.3</CardTitle>
+            <CardTitle>Stepper 0.1.4</CardTitle>
             <CardDescription>
-              Prepared for @francozeta/stepper v0.1.3.
+              Prepared for @francozeta/stepper v0.1.4.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -51,7 +51,7 @@ export default function ChangelogPage() {
 
       <Section title="Tag link">
         <Button asChild variant="outline" className="w-fit">
-          <a href="https://github.com/francozeta/stepper/tree/v0.1.3">
+          <a href="https://github.com/francozeta/stepper/tree/v0.1.4">
             Open GitHub tag
           </a>
         </Button>

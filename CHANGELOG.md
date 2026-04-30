@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.4
+
+UI clarity and docs simplification.
+
+### Changed
+
+- Default completed indicators now render a completion mark instead of repeating the step number.
+- Step items expose `data-position="previous|current|next"` for clearer styling and future variants.
+- Simplified the docs home page around preview, install, usage, and positioning.
+- Added explicit npm install commands to the docs site.
+
 ## 0.1.3
 
 NPM package DX polish.

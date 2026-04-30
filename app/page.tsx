@@ -2,14 +2,18 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { DocsExample } from "@/components/docs-example";
-import { CodeBlock, InfoGrid, PageHeader, Section } from "@/components/docs-content";
+import {
+  CodeBlock,
+  InfoGrid,
+  PageHeader,
+  Section,
+} from "@/components/docs-content";
 import { StepperExample } from "@/components/stepper-examples";
 import { Button } from "@/components/ui/button";
 import {
-  packageNotes,
-  quickFacts,
+  npmInstallSnippet,
+  pnpmInstallSnippet,
   usageSnippet,
-  worksWith,
   workspaceExampleCode,
   whyStepper,
 } from "@/lib/docs";
@@ -21,7 +25,7 @@ export default function Home() {
         eyebrow="components/ui"
         title="Stepper"
         description="A lightweight primitive for guided multi-step flows in React, Next.js, Tailwind CSS, and shadcn/ui-style projects."
-        badge="v0.1.3"
+        badge="v0.1.4"
       />
 
       <Section
@@ -39,13 +43,23 @@ export default function Home() {
       </Section>
 
       <Section
+        title="Install"
+        description="Use the npm package for normal dependency management, or copy the registry file when you want full source ownership."
+      >
+        <div className="grid gap-4 md:grid-cols-2">
+          <CodeBlock code={pnpmInstallSnippet} filename="pnpm" lang="bash" />
+          <CodeBlock code={npmInstallSnippet} filename="npm" lang="bash" />
+        </div>
+      </Section>
+
+      <Section
         title="Usage"
-        description="Copy the primitive, import the pieces you need, then connect validation in your app layer."
+        description="Import the pieces you need, then connect validation and routing in your app layer."
       >
         <CodeBlock code={usageSnippet} filename="import.tsx" />
         <p className="max-w-2xl text-pretty text-sm leading-6 text-muted-foreground">
-          The main demo uses react-hook-form and zod for validation. The
-          Stepper primitive does not depend on either library.
+          Direct npm usage needs Tailwind to scan the package output. The
+          Styling page includes the Tailwind v4, Tailwind v3, and token setup.
         </p>
       </Section>
 
@@ -54,52 +68,6 @@ export default function Home() {
         description="Most stepper libraries focus on workflow state. This primitive focuses on shadcn-style composition, UI states, and copy-paste ownership."
       >
         <InfoGrid items={whyStepper} />
-      </Section>
-
-      <Section
-        title="Works with"
-        description="The core stays agnostic while examples show common production integrations."
-      >
-        <InfoGrid items={worksWith} />
-      </Section>
-
-      <InfoGrid items={packageNotes} />
-
-      <Section
-        title="Install shape"
-        description="The primitive stays copy-paste friendly. Product examples live outside the core component."
-      >
-        <CodeBlock filename="project tree" lang="text">{`components/
-  stepper-examples.tsx
-  ui/
-    stepper.tsx
-    stepper/
-      content.tsx
-      context.tsx
-      item.tsx
-      list.tsx
-      navigation.tsx
-      root.tsx
-      types.ts
-      utils.ts
-registry/
-  default/
-    ui/
-      stepper.tsx
-      stepper.json`}</CodeBlock>
-      </Section>
-
-      <Section title="V1 scope">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {quickFacts.map((fact) => (
-            <div
-              key={fact}
-              className="rounded-lg border border-border bg-muted/25 p-4 text-sm font-medium text-foreground"
-            >
-              {fact}
-            </div>
-          ))}
-        </div>
       </Section>
 
       <Button asChild size="lg" className="w-fit">

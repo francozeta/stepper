@@ -10,6 +10,10 @@ The package ships compiled React components plus the generated shadcn-style regi
 npm install @francozeta/stepper
 ```
 
+```bash
+pnpm add @francozeta/stepper
+```
+
 ```tsx
 import {
   Stepper,
@@ -144,6 +148,10 @@ Runtime dependencies are intentionally small:
 - `clsx` and `tailwind-merge` for the package-local `cn()` helper
 
 React is a peer dependency. The primitive does not depend on Radix Tabs, Motion, `react-hook-form`, `zod`, or icon libraries.
+
+## Styling hooks
+
+The primitive exposes `data-slot`, `data-state`, and `data-position` attributes for customization. `data-state` describes the item state (`inactive`, `active`, `completed`, `disabled`, `error`). `data-position` describes where the item sits relative to the active step (`previous`, `current`, `next`).
 
 ## Docs
 

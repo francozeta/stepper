@@ -27,6 +27,7 @@ export type {
   StepperProps,
   StepperSeparatorProps,
   StepperStep,
+  StepperStepPosition,
   StepperStepState,
   StepperTriggerProps,
 } from "./stepper/types";

@@ -1,5 +1,11 @@
 # @francozeta/stepper Changelog
 
+## 0.1.4
+
+- Default completed indicators now render a completion mark instead of repeating the step number.
+- Step items expose `data-position="previous|current|next"` for custom styling and variants.
+- Package docs include clearer npm install guidance.
+
 ## 0.1.3
 
 - Replaced the `radix-ui` umbrella dependency with `@radix-ui/react-slot`.

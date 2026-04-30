@@ -64,6 +64,7 @@ For Tailwind v3, include `./node_modules/@francozeta/stepper/dist/**/*.{js,mjs,c
 - `asChild` on `StepperTrigger`, `StepperContent`, `StepperPrevious`, and `StepperNext` with `@radix-ui/react-slot`
 - Public `useStepper()` hook for custom footers and form controls
 - `forceMount` on `StepperContent` for mounted inactive content
+- `data-position="previous|current|next"` on `StepperItem` for styling progress without implying completion
 - Guard rails for invalid `value` / `defaultValue` and disabled steps
 - Lightweight step registration so simple wrapper components can still be composed around `StepperItem`
 

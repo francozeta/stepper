@@ -1,6 +1,7 @@
 import type * as React from "react";
 
 type StepperOrientation = "horizontal" | "vertical";
+type StepperStepPosition = "previous" | "current" | "next";
 type StepperStepState =
   | "inactive"
   | "active"
@@ -51,6 +52,7 @@ type StepperItemContextValue = {
   disabled: boolean;
   isActive: boolean;
   stepState: StepperStepState;
+  stepPosition: StepperStepPosition;
   orientation: StepperOrientation;
   setValue: (value: string) => void;
   triggerId: string;
@@ -111,6 +113,7 @@ export type {
   StepperLabelProps,
   StepperListProps,
   StepperOrientation,
+  StepperStepPosition,
   StepperProps,
   StepperSeparatorProps,
   StepperStep,

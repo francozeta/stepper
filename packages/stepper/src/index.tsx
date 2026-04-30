@@ -15,6 +15,7 @@ function cn(...inputs: ClassValue[]) {
 
 // components/ui/stepper/types.ts
 type StepperOrientation = "horizontal" | "vertical";
+type StepperStepPosition = "previous" | "current" | "next";
 type StepperStepState =
   | "inactive"
   | "active"
@@ -65,6 +66,7 @@ type StepperItemContextValue = {
   disabled: boolean;
   isActive: boolean;
   stepState: StepperStepState;
+  stepPosition: StepperStepPosition;
   orientation: StepperOrientation;
   setValue: (value: string) => void;
   triggerId: string;
@@ -609,7 +611,17 @@ function StepperItem({
   } = useStepperContext("StepperItem");
   const itemRef = React.useRef<HTMLLIElement>(null);
   const index = getStepIndex(value);
+  const currentIndex =
+    currentValue === undefined ? -1 : getStepIndex(currentValue);
   const isActive = currentValue === value;
+  const stepPosition =
+    currentIndex < 0 || index < 0
+      ? "next"
+      : index < currentIndex
+        ? "previous"
+        : index === currentIndex
+          ? "current"
+          : "next";
   const stepState: StepperStepState = disabled
     ? "disabled"
     : error
@@ -652,6 +664,7 @@ function StepperItem({
       disabled,
       isActive,
       stepState,
+      stepPosition,
       orientation,
       setValue,
       triggerId: getTriggerId(value),
@@ -663,6 +676,7 @@ function StepperItem({
       disabled,
       isActive,
       stepState,
+      stepPosition,
       orientation,
       setValue,
       getTriggerId,
@@ -676,6 +690,7 @@ function StepperItem({
       data-slot="stepper-item"
       data-orientation={orientation}
       data-state={stepState}
+      data-position={stepPosition}
       data-disabled={disabled ? "" : undefined}
       data-error={error ? "" : undefined}
       data-completed={completed ? "" : undefined}
@@ -783,9 +798,11 @@ function StepperIndicator({
       ? children
       : stepState === "error"
         ? "!"
-        : stepNumber
-          ? stepNumber
-          : null;
+        : stepState === "completed"
+          ? "\u2713"
+          : stepNumber
+            ? stepNumber
+            : null;
 
   return (
     <>
@@ -800,6 +817,7 @@ function StepperIndicator({
           "group-data-[state=active]:border-primary group-data-[state=active]:bg-primary group-data-[state=active]:text-primary-foreground",
           "group-data-[state=completed]:border-primary group-data-[state=completed]:bg-primary group-data-[state=completed]:text-primary-foreground",
           "group-data-[state=error]:border-destructive group-data-[state=error]:bg-destructive group-data-[state=error]:text-destructive-foreground",
+          "group-data-[position=previous]:text-foreground",
           "[&>svg]:size-4 [&>svg]:shrink-0",
           className
         )}
@@ -1035,6 +1053,7 @@ export type {
   StepperProps,
   StepperSeparatorProps,
   StepperStep,
+  StepperStepPosition,
   StepperStepState,
   StepperTriggerProps,
 };

@@ -71,7 +71,7 @@ const docsNav: DocsNavGroup[] = [
         icon: Palette,
       },
       {
-        title: "Release 0.1.3",
+        title: "Release 0.1.4",
         href: "/changelog",
         icon: Rocket,
       },
@@ -90,11 +90,10 @@ const quickFacts = [
 ];
 
 const releaseItems = [
-  "The npm package now depends on @radix-ui/react-slot instead of the Radix umbrella package.",
-  "The generated registry item installs only @radix-ui/react-slot for asChild composition.",
-  "The package README documents Tailwind v4 source scanning for direct npm usage.",
-  "Tailwind v3 content setup and required shadcn semantic tokens are documented explicitly.",
-  "The core still avoids Radix Tabs, Motion, react-hook-form, zod, and icon dependencies.",
+  "Default completed indicators now render a completion mark instead of repeating the step number.",
+  "Step items expose data-position for previous, current, and next styling hooks.",
+  "The docs home page is reduced to preview, install, usage, and positioning.",
+  "Install commands are visible before advanced implementation details.",
   "Registry output remains generated from modular source for copy-paste distribution.",
 ];
 
@@ -155,6 +154,10 @@ const usageSnippet = `import {
   StepperPrevious,
   useStepper,
 } from "@/components/ui/stepper";`;
+
+const pnpmInstallSnippet = `pnpm add @francozeta/stepper`;
+
+const npmInstallSnippet = `npm install @francozeta/stepper`;
 
 const whyStepper = [
   {
@@ -900,6 +903,10 @@ const stateSelectorsCode = `[data-slot="stepper-item"][data-state="active"]
 [data-slot="stepper-item"][data-state="disabled"]
 [data-slot="stepper-item"][data-state="error"]
 
+[data-slot="stepper-item"][data-position="previous"]
+[data-slot="stepper-item"][data-position="current"]
+[data-slot="stepper-item"][data-position="next"]
+
 [data-slot="stepper-content"][data-state="active"]
 [data-slot="stepper-content"][data-state="inactive"]`;
 
@@ -1058,8 +1065,8 @@ const useStepperRows = [
 const packageNotes = [
   {
     label: "Version",
-    value: "0.1.1",
-    help: "Launch-ready registry and docs polish.",
+    value: "0.1.4",
+    help: "Indicator clarity and install docs polish.",
   },
   {
     label: "Core file",
@@ -1097,7 +1104,7 @@ const apiComponents = [
   {
     name: "StepperIndicator",
     element: "span",
-    description: "Visual number, status, or custom icon slot for a step.",
+    description: "Visual number, completed mark, error marker, or custom icon slot for a step.",
   },
   {
     name: "StepperContent",
@@ -1146,7 +1153,9 @@ export {
   listProps,
   mobileDrawerPatternSnippet,
   navigationProps,
+  npmInstallSnippet,
   packageNotes,
+  pnpmInstallSnippet,
   quickFacts,
   releaseItems,
   rootProps,

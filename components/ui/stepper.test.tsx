@@ -64,6 +64,44 @@ describe("Stepper", () => {
     expect(screen.queryByText("Account content")).not.toBeInTheDocument();
   });
 
+  it("distinguishes completed, current, and future steps in the default UI", () => {
+    const { container } = render(
+      <Stepper defaultValue="payment">
+        <StepperList>
+          <StepperItem value="account" completed>
+            Account
+          </StepperItem>
+          <StepperItem value="shipping">Shipping</StepperItem>
+          <StepperItem value="payment">Payment</StepperItem>
+        </StepperList>
+
+        <StepperContent value="account">Account content</StepperContent>
+        <StepperContent value="shipping">Shipping content</StepperContent>
+        <StepperContent value="payment">Payment content</StepperContent>
+      </Stepper>
+    );
+
+    const account = container.querySelector(
+      '[data-slot="stepper-item"][data-state="completed"]'
+    );
+    const shipping = container.querySelector(
+      '[data-slot="stepper-item"][data-position="previous"][data-state="inactive"]'
+    );
+    const payment = container.querySelector(
+      '[data-slot="stepper-item"][data-position="current"][data-state="active"]'
+    );
+
+    expect(account).toBeInTheDocument();
+    expect(shipping).toBeInTheDocument();
+    expect(payment).toBeInTheDocument();
+    expect(
+      account?.querySelector('[data-slot="stepper-indicator"]')
+    ).toHaveTextContent("\u2713");
+    expect(
+      payment?.querySelector('[data-slot="stepper-indicator"]')
+    ).toHaveTextContent("3");
+  });
+
   it("falls back to the first enabled step when the controlled value is missing", async () => {
     const onValueChange = vi.fn();
 

@@ -2,7 +2,13 @@ import type { Metadata } from "next";
 
 import { CopyButton } from "@/components/copy-button";
 import { CodeBlock, PageHeader, Section } from "@/components/docs-content";
-import { controlledSnippet, gettingStartedSnippet } from "@/lib/docs";
+import {
+  controlledSnippet,
+  gettingStartedSnippet,
+  npmInstallSnippet,
+  pnpmInstallSnippet,
+  tailwindV4SourceSnippet,
+} from "@/lib/docs";
 
 export const metadata: Metadata = {
   title: "Getting Started",
@@ -24,7 +30,25 @@ export default function GettingStartedPage() {
         }
       />
 
-      <Section title="Add the component">
+      <Section
+        title="Install package"
+        description="Use this path when you want Stepper as a normal npm dependency."
+      >
+        <div className="grid gap-4 md:grid-cols-2">
+          <CodeBlock code={pnpmInstallSnippet} filename="pnpm" lang="bash" />
+          <CodeBlock code={npmInstallSnippet} filename="npm" lang="bash" />
+        </div>
+        <CodeBlock
+          code={tailwindV4SourceSnippet}
+          filename="app/globals.css"
+          lang="css"
+        />
+      </Section>
+
+      <Section
+        title="Copy the component"
+        description="Use the registry or copy-paste source path when you want to own the component file."
+      >
         <CodeBlock filename="project tree" lang="text">{`components/
   ui/
     stepper.tsx`}</CodeBlock>

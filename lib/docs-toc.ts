@@ -7,14 +7,13 @@ const docsToc: Record<string, DocsTocItem[]> = {
   "/": [
     { title: "Preview", href: "#preview" },
     { title: "Create workspace", href: "#create-workspace" },
+    { title: "Install", href: "#install" },
     { title: "Usage", href: "#usage" },
     { title: "Why another Stepper?", href: "#why-another-stepper" },
-    { title: "Works with", href: "#works-with" },
-    { title: "Install shape", href: "#install-shape" },
-    { title: "V1 scope", href: "#v1-scope" },
   ],
   "/getting-started": [
-    { title: "Add the component", href: "#add-the-component" },
+    { title: "Install package", href: "#install-package" },
+    { title: "Copy the component", href: "#copy-the-component" },
     { title: "Use it uncontrolled", href: "#use-it-uncontrolled" },
     { title: "Use it controlled", href: "#use-it-controlled" },
   ],
