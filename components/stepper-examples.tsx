@@ -13,7 +13,9 @@ import {
   FileCheck,
   Globe2,
   Lock,
+  Menu,
   Mail,
+  Route,
   Send,
   Server,
   Settings2,
@@ -46,6 +48,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import {
   Stepper,
   StepperContent,
@@ -1065,10 +1075,159 @@ function StepperControlledExample() {
   );
 }
 
+function StepperRoutePatternExample() {
+  const [value, setValue] = React.useState("workspace");
+  const steps = [
+    {
+      value: "workspace",
+      title: "Workspace",
+      href: "#route-workspace",
+      completed: true,
+    },
+    {
+      value: "members",
+      title: "Members",
+      href: "#route-members",
+      completed: false,
+    },
+    {
+      value: "review",
+      title: "Review",
+      href: "#route-review",
+      completed: false,
+    },
+  ];
+
+  return (
+    <Stepper value={value} onValueChange={setValue}>
+      <StepperList>
+        {steps.map((step, index) => (
+          <StepperItem
+            key={step.value}
+            value={step.value}
+            completed={step.completed}
+          >
+            <StepperTrigger asChild>
+              <a href={step.href}>
+                <StepperIndicator>
+                  {step.completed ? <Check /> : <Route />}
+                </StepperIndicator>
+                <StepperLabel>{step.title}</StepperLabel>
+              </a>
+            </StepperTrigger>
+            {index < steps.length - 1 ? <StepperSeparator /> : null}
+          </StepperItem>
+        ))}
+      </StepperList>
+
+      <StepperContent value={value} forceMount>
+        <ExampleContent
+          eyebrow="Route pattern"
+          title={`Current route: /setup/${value}`}
+          description="The preview uses hash links, while the code tab shows the same shape with Next.js Link."
+          icon={Route}
+        />
+      </StepperContent>
+    </Stepper>
+  );
+}
+
+function MobilePatternList() {
+  return (
+    <StepperList>
+      <DemoStep
+        value="workspace"
+        title="Workspace"
+        description="Ready"
+        icon={Building2}
+        completed
+      />
+      <DemoStep
+        value="members"
+        title="Members"
+        description="Active"
+        icon={Users}
+      />
+      <DemoStep
+        value="review"
+        title="Review"
+        description="Locked"
+        icon={Send}
+        disabled
+      />
+    </StepperList>
+  );
+}
+
+function StepperMobilePatternExample() {
+  const [value, setValue] = React.useState("members");
+  const stepNumber =
+    value === "workspace" ? "1" : value === "members" ? "2" : "3";
+  const contentIcon =
+    value === "workspace" ? Building2 : value === "review" ? Send : Users;
+
+  return (
+    <div className="mx-auto max-w-sm rounded-lg border border-border bg-background p-4">
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-foreground">
+            Step {stepNumber} of 3: {value}
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Keep the step list in a Sheet without changing the primitive.
+          </p>
+        </div>
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button type="button" variant="outline" size="sm">
+              <Menu data-icon="inline-start" />
+              Steps
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="bottom">
+            <SheetHeader>
+              <SheetTitle>Setup steps</SheetTitle>
+              <SheetDescription>
+                Select a step from the compact mobile navigation.
+              </SheetDescription>
+            </SheetHeader>
+            <div className="px-4 pb-4">
+              <Stepper
+                value={value}
+                onValueChange={setValue}
+                orientation="vertical"
+              >
+                <MobilePatternList />
+              </Stepper>
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
+
+      <div className="mt-4 rounded-lg border border-border bg-muted/25 p-4">
+        <ExampleContent
+          eyebrow="Mobile"
+          title={
+            value === "workspace"
+              ? "Create workspace"
+              : value === "review"
+                ? "Review setup"
+                : "Invite teammates"
+          }
+          description="The page owns the content while Stepper remains a reusable navigation primitive inside the drawer."
+          icon={contentIcon}
+        />
+      </div>
+    </div>
+  );
+}
+
 export {
   StepperCheckoutExample,
   StepperControlledExample,
   StepperExample,
+  StepperMobilePatternExample,
+  StepperRoutePatternExample,
   StepperStatusExample,
   StepperVerticalExample,
 };

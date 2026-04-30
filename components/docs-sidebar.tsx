@@ -121,14 +121,14 @@ function SidebarFooter() {
         href="/changelog"
         className="rounded-lg border border-border bg-muted/30 p-3 outline-none transition-[background-color,box-shadow] hover:bg-muted/60 focus-visible:ring-ring/50 focus-visible:ring-[3px]"
       >
-        <p className="text-sm font-medium text-foreground">Release 0.1.0</p>
+        <p className="text-sm font-medium text-foreground">Release 0.1.1</p>
         <p className="mt-1 text-xs leading-5 text-muted-foreground">
           Core primitive, docs shell, and product demos are ready.
         </p>
       </Link>
       <div className="flex items-center justify-between">
         <span className="rounded-md border border-border bg-background px-2 py-1 font-mono text-xs text-muted-foreground">
-          v0.1.0
+          v0.1.1
         </span>
         <a
           href="https://github.com/francozeta/stepper"

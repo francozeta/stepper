@@ -21,7 +21,7 @@ export default function Home() {
         eyebrow="components/ui"
         title="Stepper"
         description="A lightweight primitive for guided multi-step flows in React, Next.js, Tailwind CSS, and shadcn/ui-style projects."
-        badge="v0.1.0"
+        badge="v0.1.1"
       />
 
       <Section

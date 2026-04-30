@@ -21,7 +21,7 @@ const docsToc: Record<string, DocsTocItem[]> = {
   "/forms": [
     { title: "Primitive boundary", href: "#primitive-boundary" },
     { title: "Validation flow", href: "#validation-flow" },
-    { title: "Full example", href: "#full-example" },
+    { title: "Form wizard", href: "#form-wizard" },
   ],
   "/patterns": [
     { title: "Route-based stepper", href: "#route-based-stepper" },

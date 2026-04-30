@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.1
+
+Launch-ready docs and registry polish for the first public pass.
+
+### Changed
+
+- Added `typecheck` to the main `pnpm check` pipeline.
+- Promoted the Form Wizard guide to a live Preview / Code example.
+- Promoted Patterns to live Preview / Code examples for route-based and mobile drawer composition.
+- Added an accessible description to the mobile Sheet pattern.
+- Kept the registry artifact generated from modular source and verified by `pnpm registry:check`.
+
 ## 0.1.0
 
 Initial V1 release candidate for the Stepper component.

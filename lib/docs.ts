@@ -71,7 +71,7 @@ const docsNav: DocsNavGroup[] = [
         icon: Palette,
       },
       {
-        title: "Release 0.1.0",
+        title: "Release 0.1.1",
         href: "/changelog",
         icon: Rocket,
       },
@@ -90,15 +90,12 @@ const quickFacts = [
 ];
 
 const releaseItems = [
-  "Controlled and uncontrolled Stepper state.",
-  "Horizontal and vertical layouts.",
-  "Step states for active, completed, disabled, and error.",
-  "Associated content panels with optional forceMount.",
-  "Navigation helpers with StepperPrevious and StepperNext.",
-  "Primitive composition pieces with asChild support for triggers, content, and navigation.",
-  "Public useStepper hook for external controls and form footers.",
-  "Lightweight step registration for simple wrappers around StepperItem.",
-  "Product-style demos with shadcn/ui fields, alerts, checkout, onboarding, and controlled flows.",
+  "Main pnpm check now includes registry sync, lint, typecheck, tests, and production build.",
+  "Form Wizard guide now ships as a live Preview / Code example.",
+  "Patterns guide now includes live route-based and mobile drawer examples.",
+  "Mobile Sheet pattern includes an accessible dialog description.",
+  "Registry output remains generated from modular source for copy-paste distribution.",
+  "Core positioning stays focused on shadcn-style composition instead of workflow-library features.",
 ];
 
 const gettingStartedSnippet = `import {
@@ -350,12 +347,14 @@ export function SetupRoutes({ currentStep }: { currentStep: string }) {
 
 const mobileDrawerPatternSnippet = `"use client";
 
+import * as React from "react";
 import { Menu } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -364,48 +363,70 @@ import {
   Stepper,
   StepperItem,
   StepperList,
-  useStepper,
 } from "@/components/ui/stepper";
 
-function MobileStepSummary() {
-  const { value, steps } = useStepper();
-  const index = steps.findIndex((step) => step.value === value);
+type Step = "workspace" | "members" | "review";
 
+function SetupStepList() {
   return (
-    <div className="flex items-center justify-between gap-3 md:hidden">
-      <p className="text-sm font-medium">
-        Step {index + 1} of {steps.length}: {value}
-      </p>
-      <Sheet>
-        <SheetTrigger asChild>
-          <Button type="button" variant="outline" size="sm">
-            <Menu data-icon="inline-start" />
-            Steps
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="bottom">
-          <SheetHeader>
-            <SheetTitle>Setup steps</SheetTitle>
-          </SheetHeader>
-          <StepperList className="mt-4" />
-        </SheetContent>
-      </Sheet>
-    </div>
+    <StepperList>
+      <StepperItem value="workspace" completed>
+        Workspace
+      </StepperItem>
+      <StepperItem value="members">Members</StepperItem>
+      <StepperItem value="review" disabled>
+        Review
+      </StepperItem>
+    </StepperList>
   );
 }
 
 export function MobileStepperPattern() {
+  const [step, setStep] = React.useState<Step>("members");
+
   return (
-    <Stepper defaultValue="workspace" orientation="vertical">
-      <MobileStepSummary />
-      <StepperList className="hidden md:flex">
-        <StepperItem value="workspace">Workspace</StepperItem>
-        <StepperItem value="members">Members</StepperItem>
-        <StepperItem value="review" disabled>
-          Review
-        </StepperItem>
-      </StepperList>
-    </Stepper>
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-between gap-3 md:hidden">
+        <p className="text-sm font-medium">Current step: {step}</p>
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button type="button" variant="outline" size="sm">
+              <Menu data-icon="inline-start" />
+              Steps
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="bottom">
+            <SheetHeader>
+              <SheetTitle>Setup steps</SheetTitle>
+              <SheetDescription>
+                Select a step from the compact mobile navigation.
+              </SheetDescription>
+            </SheetHeader>
+            <div className="px-4 pb-4">
+              <Stepper
+                value={step}
+                onValueChange={(value) => setStep(value as Step)}
+                orientation="vertical"
+              >
+                <SetupStepList />
+              </Stepper>
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
+
+      <Stepper
+        value={step}
+        onValueChange={(value) => setStep(value as Step)}
+        className="hidden md:flex"
+      >
+        <SetupStepList />
+      </Stepper>
+
+      <div className="rounded-lg border p-4">
+        Content for {step}.
+      </div>
+    </div>
   );
 }`;
 
@@ -995,8 +1016,8 @@ const useStepperRows = [
 const packageNotes = [
   {
     label: "Version",
-    value: "0.1.0",
-    help: "First presentable release candidate.",
+    value: "0.1.1",
+    help: "Launch-ready registry and docs polish.",
   },
   {
     label: "Core file",

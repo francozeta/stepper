@@ -1,6 +1,6 @@
 {
   "name": "stepper",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "packageManager": "pnpm@9.15.3",
   "scripts": {
@@ -11,7 +11,8 @@
     "registry:build": "node scripts/build-stepper-registry.mjs",
     "registry:check": "node scripts/build-stepper-registry.mjs --check",
     "test": "vitest run",
-    "check": "pnpm registry:check && pnpm lint && pnpm test && pnpm build"
+    "typecheck": "tsc --noEmit",
+    "check": "pnpm registry:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",

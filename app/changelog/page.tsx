@@ -13,7 +13,7 @@ import {
 import { releaseItems, v2Roadmap } from "@/lib/docs";
 
 export const metadata: Metadata = {
-  title: "Release 0.1.0",
+  title: "Release 0.1.1",
 };
 
 export default function ChangelogPage() {
@@ -21,17 +21,17 @@ export default function ChangelogPage() {
     <>
       <PageHeader
         eyebrow="guides"
-        title="Release 0.1.0"
-        description="The first release candidate establishes the Stepper primitive, local demos, and docs-ready project structure."
+        title="Release 0.1.1"
+        description="The launch-ready pass aligns the registry, docs examples, validation pipeline, and release metadata."
         badge="published"
       />
 
       <Section title="Added">
         <Card>
           <CardHeader>
-            <CardTitle>Stepper 0.1.0</CardTitle>
+            <CardTitle>Stepper 0.1.1</CardTitle>
             <CardDescription>
-              Published as a GitHub release and tagged with v0.1.0.
+              Published as a GitHub release and tagged with v0.1.1.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -51,7 +51,7 @@ export default function ChangelogPage() {
 
       <Section title="Release link">
         <Button asChild variant="outline" className="w-fit">
-          <a href="https://github.com/francozeta/stepper/releases/tag/v0.1.0">
+          <a href="https://github.com/francozeta/stepper/releases/tag/v0.1.1">
             Open GitHub release
           </a>
         </Button>

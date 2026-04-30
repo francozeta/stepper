@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 
-import { CodeBlock, PageHeader, Section } from "@/components/docs-content";
+import { PageHeader } from "@/components/docs-content";
+import { DocsExample } from "@/components/docs-example";
+import {
+  StepperMobilePatternExample,
+  StepperRoutePatternExample,
+} from "@/components/stepper-examples";
 import {
   mobileDrawerPatternSnippet,
   routeBasedPatternSnippet,
@@ -19,25 +24,21 @@ export default function PatternsPage() {
         description="Patterns show how to compose Stepper with routing and responsive UI without adding more responsibilities to the core primitive."
       />
 
-      <Section
+      <DocsExample
         title="Route-based stepper"
         description="Use StepperTrigger asChild with Next.js Link when routes, layouts, or server data own the current step."
-      >
-        <CodeBlock
-          code={routeBasedPatternSnippet}
-          filename="route-based-stepper.tsx"
-        />
-      </Section>
+        code={routeBasedPatternSnippet}
+        filename="route-based-stepper.tsx"
+        preview={<StepperRoutePatternExample />}
+      />
 
-      <Section
+      <DocsExample
         title="Mobile drawer pattern"
         description="On small screens, keep the Stepper primitive unchanged and move the step list into Sheet or Drawer composition."
-      >
-        <CodeBlock
-          code={mobileDrawerPatternSnippet}
-          filename="mobile-drawer-pattern.tsx"
-        />
-      </Section>
+        code={mobileDrawerPatternSnippet}
+        filename="mobile-drawer-pattern.tsx"
+        preview={<StepperMobilePatternExample />}
+      />
     </>
   );
 }

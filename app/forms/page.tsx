@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 
-import { CodeBlock, InfoGrid, PageHeader, Section } from "@/components/docs-content";
+import { InfoGrid, PageHeader, Section } from "@/components/docs-content";
+import { DocsExample } from "@/components/docs-example";
+import { StepperExample } from "@/components/stepper-examples";
 import { formWizardGuideSnippet } from "@/lib/docs";
 
 export const metadata: Metadata = {
@@ -66,15 +68,13 @@ export default function FormsPage() {
         <InfoGrid items={validationFlow} />
       </Section>
 
-      <Section
-        title="Full example"
-        description="This is the shape used by the product demo: validate the active step, mark it completed, then unlock the next step."
-      >
-        <CodeBlock
-          code={formWizardGuideSnippet}
-          filename="form-wizard.tsx"
-        />
-      </Section>
+      <DocsExample
+        title="Form wizard"
+        description="A product-style setup flow where react-hook-form owns validation and Stepper reflects the current UI state."
+        code={formWizardGuideSnippet}
+        filename="form-wizard.tsx"
+        preview={<StepperExample />}
+      />
     </>
   );
 }
