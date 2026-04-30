@@ -31,7 +31,7 @@ export default function ChangelogPage() {
           <CardHeader>
             <CardTitle>Stepper 0.1.1</CardTitle>
             <CardDescription>
-              Published as a GitHub release and tagged with v0.1.1.
+              Tagged with v0.1.1 and deployed to Vercel production.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -49,10 +49,10 @@ export default function ChangelogPage() {
         </Card>
       </Section>
 
-      <Section title="Release link">
+      <Section title="Tag link">
         <Button asChild variant="outline" className="w-fit">
-          <a href="https://github.com/francozeta/stepper/releases/tag/v0.1.1">
-            Open GitHub release
+          <a href="https://github.com/francozeta/stepper/tree/v0.1.1">
+            Open GitHub tag
           </a>
         </Button>
       </Section>

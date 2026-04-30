@@ -51,7 +51,7 @@ const docsToc: Record<string, DocsTocItem[]> = {
   ],
   "/changelog": [
     { title: "Added", href: "#added" },
-    { title: "Release link", href: "#release-link" },
+    { title: "Tag link", href: "#tag-link" },
     { title: "Next direction", href: "#next-direction" },
   ],
 };
