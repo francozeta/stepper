@@ -11,6 +11,7 @@ Launch-ready docs and registry polish for the first public pass.
 - Promoted Patterns to live Preview / Code examples for route-based and mobile drawer composition.
 - Added an accessible description to the mobile Sheet pattern.
 - Kept the registry artifact generated from modular source and verified by `pnpm registry:check`.
+- Added a publishable npm package wrapper at `packages/stepper` for `@francozeta/stepper`.
 
 ## 0.1.0
 

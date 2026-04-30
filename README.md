@@ -15,6 +15,7 @@ Stepper does not own your form state. It coordinates the UI around it. Keep vali
 - `components/ui/stepper.tsx` is the public import surface for the reusable Stepper primitive.
 - `components/ui/stepper/*` contains the maintainable source split by responsibility.
 - `registry/default/ui/stepper.tsx` is the generated single-file copy-paste artifact.
+- `packages/stepper` contains the npm package wrapper for `@francozeta/stepper`.
 - `components/stepper-examples.tsx` contains the product-style demos used by the local preview.
 
 ## Registry Output
@@ -26,6 +27,18 @@ pnpm registry:build
 ```
 
 Use `pnpm registry:check` to verify the generated file is in sync with `components/ui/stepper/*`. The normal `pnpm check` command runs this verification before lint, tests, and build.
+
+## NPM Package
+
+The npm package is built from the same generated source, but replaces the local `cn()` import with package-local `clsx` and `tailwind-merge` utilities:
+
+```bash
+pnpm package:build
+pnpm package:pack
+pnpm package:publish
+```
+
+The package name is `@francozeta/stepper`. The docs app remains private; only `packages/stepper` is meant to be published.
 
 ## Features
 

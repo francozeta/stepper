@@ -90,6 +90,20 @@ async function buildStepperSource() {
   ].join("\n")}`;
 }
 
+function buildPackageSource(registrySource) {
+  return registrySource.replace(
+    'import { cn } from "@/lib/utils";',
+    [
+      'import { clsx, type ClassValue } from "clsx";',
+      'import { twMerge } from "tailwind-merge";',
+      "",
+      "function cn(...inputs: ClassValue[]) {",
+      "  return twMerge(clsx(inputs));",
+      "}",
+    ].join("\n")
+  );
+}
+
 function buildRegistryItem() {
   return `${JSON.stringify(
     {
@@ -137,16 +151,28 @@ async function writeOrCheck(filePath, content) {
 }
 
 try {
+  const registrySource = await buildStepperSource();
+  const registryItem = buildRegistryItem();
+
+  await writeOrCheck("registry/default/ui/stepper.tsx", registrySource);
+  await writeOrCheck("registry/default/ui/stepper.json", registryItem);
   await writeOrCheck(
-    "registry/default/ui/stepper.tsx",
-    await buildStepperSource()
+    "packages/stepper/src/index.tsx",
+    buildPackageSource(registrySource)
   );
-  await writeOrCheck("registry/default/ui/stepper.json", buildRegistryItem());
+  await writeOrCheck(
+    "packages/stepper/registry/default/ui/stepper.tsx",
+    registrySource
+  );
+  await writeOrCheck(
+    "packages/stepper/registry/default/ui/stepper.json",
+    registryItem
+  );
 
   console.log(
     checkMode
-      ? "Registry output is up to date."
-      : "Generated registry/default/ui/stepper.tsx and stepper.json."
+      ? "Registry and package output are up to date."
+      : "Generated registry and package Stepper artifacts."
   );
 } catch (error) {
   console.error(error instanceof Error ? error.message : error);

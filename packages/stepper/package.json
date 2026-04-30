@@ -1,0 +1,54 @@
+{
+  "name": "@francozeta/stepper",
+  "version": "0.1.1",
+  "description": "A shadcn/ui-native Stepper primitive for real product flows.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./registry": "./registry/default/ui/stepper.tsx",
+    "./registry.json": "./registry/default/ui/stepper.json"
+  },
+  "files": [
+    "dist",
+    "registry",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "keywords": [
+    "stepper",
+    "react",
+    "nextjs",
+    "tailwindcss",
+    "shadcn",
+    "wizard",
+    "onboarding"
+  ],
+  "homepage": "https://stepper-hazel-sigma.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/francozeta/stepper.git"
+  },
+  "bugs": {
+    "url": "https://github.com/francozeta/stepper/issues"
+  },
+  "peerDependencies": {
+    "react": ">=18.2.0 || >=19.0.0"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "radix-ui": "^1.4.3",
+    "tailwind-merge": "^3.5.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
