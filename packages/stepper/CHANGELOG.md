@@ -1,5 +1,11 @@
 # @francozeta/stepper Changelog
 
+## [0.3.2](https://github.com/francozeta/stepper/compare/v0.3.1...v0.3.2) (2026-05-01)
+
+### Bug Fixes
+
+* publish flat shadcn registry urls ([d925718](https://github.com/francozeta/stepper/commit/d925718d779e8d2011db6fd300caa7f0a1a2e598))
+
 ## [0.3.1](https://github.com/francozeta/stepper/compare/v0.3.0...v0.3.1) (2026-05-01)
 
 ## [0.3.0](https://github.com/francozeta/stepper/compare/v0.2.1...v0.3.0) (2026-05-01)
