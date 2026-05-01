@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.0](https://github.com/francozeta/stepper/compare/v0.3.2...v0.4.0) (2026-05-01)
+
+### Features
+
+* **stepper:** add Stepper component and demo ([11b96a6](https://github.com/francozeta/stepper/commit/11b96a657a5f858f702aeeb1016971f376ac89f9))
+
 ## [0.3.2](https://github.com/francozeta/stepper/compare/v0.3.1...v0.3.2) (2026-05-01)
 
 ### Bug Fixes
