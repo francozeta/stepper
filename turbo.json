@@ -22,7 +22,7 @@
         "registry/default/ui/**",
         "packages/stepper/src/index.tsx",
         "packages/stepper/registry/default/ui/**",
-        "public/r/**"
+        "public/*.json"
       ]
     },
     "registry:check": {},

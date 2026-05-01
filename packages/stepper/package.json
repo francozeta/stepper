@@ -35,7 +35,7 @@
     "wizard",
     "onboarding"
   ],
-  "homepage": "https://stepper-hazel-sigma.vercel.app",
+  "homepage": "https://francozeta-stepper.vercel.app",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/francozeta/stepper.git"

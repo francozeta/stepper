@@ -126,4 +126,4 @@ The primitive exposes `data-slot`, `data-state`, and `data-position` attributes 
 
 ## Docs
 
-https://stepper-hazel-sigma.vercel.app
+https://francozeta-stepper.vercel.app

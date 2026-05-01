@@ -14,7 +14,7 @@ const nextConfig = {
               value: "(.*)application/vnd\\.shadcn\\.v1\\+json(.*)",
             },
           ],
-          destination: "/r/stepper.json",
+          destination: "/stepper.json",
         },
         {
           source: "/",
@@ -25,7 +25,11 @@ const nextConfig = {
               value: "shadcn",
             },
           ],
-          destination: "/r/stepper.json",
+          destination: "/stepper.json",
+        },
+        {
+          source: "/r/:path*",
+          destination: "/:path*",
         },
       ],
     };

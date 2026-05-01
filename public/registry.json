@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
   "name": "stepper",
-  "homepage": "https://stepper-hazel-sigma.vercel.app",
+  "homepage": "https://francozeta-stepper.vercel.app",
   "items": [
     {
       "name": "stepper",

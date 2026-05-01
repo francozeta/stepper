@@ -29,7 +29,7 @@ describe("project infrastructure", () => {
     expect(packageJson.devDependencies).toHaveProperty("turbo");
     expect(turbo.tasks.build.dependsOn).toContain("^build");
     expect(turbo.tasks.dev.persistent).toBe(true);
-    expect(turbo.tasks["registry:build"].outputs).toContain("public/r/**");
+    expect(turbo.tasks["registry:build"].outputs).toContain("public/*.json");
   });
 
   it("builds a public shadcn registry from the root registry manifest", async () => {
@@ -40,7 +40,7 @@ describe("project infrastructure", () => {
     expect(packageJson.scripts["registry:check"]).toContain("shadcn build");
     expect(registry).toMatchObject({
       name: "stepper",
-      homepage: "https://stepper-hazel-sigma.vercel.app",
+      homepage: "https://francozeta-stepper.vercel.app",
     });
     expect(registry.items).toEqual(
       expect.arrayContaining([
@@ -73,7 +73,8 @@ describe("project infrastructure", () => {
     ]);
     expect(sourceConfig).toContain('dir: "content/docs"');
     expect(nextConfig).toContain('from "fumadocs-mdx/next"');
-    expect(nextConfig).toContain('destination: "/r/stepper.json"');
+    expect(nextConfig).toContain('destination: "/stepper.json"');
+    expect(nextConfig).toContain('source: "/r/:path*"');
     expect(eslintConfig).toContain('".source/**"');
   });
 });
