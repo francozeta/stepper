@@ -38,28 +38,34 @@ function PageHeader({
   action,
 }: PageHeaderProps) {
   return (
-    <header className="flex max-w-3xl flex-col gap-4">
-      {eyebrow ? (
-        <p className="font-mono text-xs font-medium text-muted-foreground">
-          {eyebrow}
-        </p>
-      ) : null}
-      <div className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-            {title}
-          </h1>
-          {badge ? (
-            <Badge variant="secondary" className="font-mono">
-              {badge}
-            </Badge>
-          ) : null}
+    <header className="flex max-w-3xl flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div className="flex min-w-0 flex-col gap-4">
+        {eyebrow ? (
+          <p className="font-mono text-xs font-medium text-muted-foreground">
+            {eyebrow}
+          </p>
+        ) : null}
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+              {title}
+            </h1>
+            {badge ? (
+              <Badge variant="secondary" className="font-mono">
+                {badge}
+              </Badge>
+            ) : null}
+          </div>
+          <p className="max-w-2xl text-pretty text-sm leading-6 text-muted-foreground sm:text-base">
+            {description}
+          </p>
         </div>
-        <p className="max-w-2xl text-pretty text-sm leading-6 text-muted-foreground sm:text-base">
-          {description}
-        </p>
-        {action ? <div className="flex flex-wrap gap-2">{action}</div> : null}
       </div>
+      {action ? (
+        <div className="flex shrink-0 flex-wrap gap-2 sm:justify-end">
+          {action}
+        </div>
+      ) : null}
     </header>
   );
 }

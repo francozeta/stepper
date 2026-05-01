@@ -16,6 +16,25 @@
           "target": "components/ui/stepper.tsx"
         }
       ]
+    },
+    {
+      "name": "stepper-demo",
+      "type": "registry:block",
+      "title": "Stepper Demo",
+      "description": "A v0-friendly Stepper demo with a default export and the Stepper source primitive.",
+      "dependencies": ["@radix-ui/react-slot"],
+      "files": [
+        {
+          "path": "registry/default/ui/stepper.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/stepper.tsx"
+        },
+        {
+          "path": "registry/default/examples/stepper-demo.tsx",
+          "type": "registry:component",
+          "target": "components/stepper-demo.tsx"
+        }
+      ]
     }
   ]
 }

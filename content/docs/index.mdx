@@ -16,15 +16,25 @@ import { Button } from "@/components/ui/button";
 import {
   packageStylesImportSnippet,
   packageUsageSnippet,
+  registryInstallSnippet,
   workspaceExampleCode,
   whyStepper,
 } from "@/lib/docs";
 
 <Section
   title="Install"
-  description="Install the package, import its stylesheet once, then compose the primitive with your own UI."
+  description="Use the shadcn registry when you want source ownership, or install the package when you want semver dependency updates."
 >
-  <InstallCommand />
+  <div className="grid gap-4 md:grid-cols-2">
+    <CodeBlock
+      code={registryInstallSnippet}
+      filename="registry"
+      lang="bash"
+      showLineNumbers={false}
+      compact
+    />
+    <InstallCommand />
+  </div>
   <div className="grid gap-4 md:grid-cols-2">
     <CodeBlock
       code={packageStylesImportSnippet}

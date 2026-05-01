@@ -159,6 +159,8 @@ const usageSnippet = `import {
   useStepper,
 } from "@/components/ui/stepper";`;
 
+const registryInstallSnippet = `pnpm dlx shadcn@latest add https://francozeta-stepper.vercel.app/stepper.json`;
+
 const pnpmInstallSnippet = `pnpm add @francozeta/stepper`;
 
 const npmInstallSnippet = `npm install @francozeta/stepper`;
@@ -1281,6 +1283,7 @@ export {
   packageVersion,
   packageStylesImportSnippet,
   packageUsageSnippet,
+  registryInstallSnippet,
   packageNotes,
   pnpmInstallSnippet,
   quickFacts,

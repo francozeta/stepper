@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { DocsShell } from "@/components/docs-shell";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
+import { siteConfig } from "@/lib/site";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
 
@@ -17,12 +18,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.url),
   title: {
     default: "Stepper",
     template: "%s - Stepper",
   },
-  description:
-    "A lightweight Stepper component for React, Next.js, Tailwind CSS, and shadcn/ui-style projects.",
+  description: siteConfig.description,
+  alternates: {
+    types: {
+      "application/rss+xml": "/rss.xml",
+    },
+  },
 };
 
 export default function RootLayout({

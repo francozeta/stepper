@@ -128,6 +128,34 @@ function buildRegistryItem() {
   )}\n`;
 }
 
+function buildStepperDemoItem() {
+  return `${JSON.stringify(
+    {
+      $schema: "https://ui.shadcn.com/schema/registry-item.json",
+      name: "stepper-demo",
+      type: "registry:block",
+      title: "Stepper Demo",
+      description:
+        "A v0-friendly Stepper demo with a default export and the Stepper source primitive.",
+      dependencies: ["@radix-ui/react-slot"],
+      files: [
+        {
+          path: "registry/default/ui/stepper.tsx",
+          type: "registry:ui",
+          target: "components/ui/stepper.tsx",
+        },
+        {
+          path: "registry/default/examples/stepper-demo.tsx",
+          type: "registry:component",
+          target: "components/stepper-demo.tsx",
+        },
+      ],
+    },
+    null,
+    2
+  )}\n`;
+}
+
 async function writeOrCheck(filePath, content) {
   const absolutePath = path.join(root, filePath);
 
@@ -154,9 +182,14 @@ async function writeOrCheck(filePath, content) {
 try {
   const registrySource = await buildStepperSource();
   const registryItem = buildRegistryItem();
+  const stepperDemoItem = buildStepperDemoItem();
 
   await writeOrCheck("registry/default/ui/stepper.tsx", registrySource);
   await writeOrCheck("registry/default/ui/stepper.json", registryItem);
+  await writeOrCheck(
+    "registry/default/examples/stepper-demo.json",
+    stepperDemoItem
+  );
   await writeOrCheck(
     "packages/stepper/src/index.tsx",
     buildPackageSource(registrySource)

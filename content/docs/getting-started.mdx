@@ -1,6 +1,6 @@
 ---
 title: "Getting Started"
-description: "Copy the Stepper primitive into a shadcn/ui-style project and compose it with your own labels, icons, and content."
+description: "Install Stepper through the shadcn registry when you want source ownership, or through the package when you want semver updates."
 eyebrow: "basics"
 copyImport: "import { Stepper } from \"@/components/ui/stepper\";"
 copyLabel: "Copy import"
@@ -10,29 +10,55 @@ copyToast: "Import copied"
 import { CodeBlock, FileTree, Section } from "@/components/docs-content";
 import { InstallCommand } from "@/components/install-command";
 import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
   controlledSnippet,
   gettingStartedSnippet,
   packageStylesImportSnippet,
+  registryInstallSnippet,
 } from "@/lib/docs";
 
 <Section
-  title="Install package"
-  description="Use this path when you want Stepper as a normal npm dependency. The package ships compiled CSS, so no Tailwind source scan is required."
+  title="Choose an install path"
+  description="Both paths are supported. The registry feels native in shadcn/ui projects; the package is better when you want a normal dependency update flow."
 >
-  <InstallCommand />
-  <CodeBlock
-    code={packageStylesImportSnippet}
-    filename="app/globals.css"
-    lang="css"
-    showLineNumbers={false}
-    compact
-  />
+  <div className="grid gap-4 md:grid-cols-2">
+    <Card>
+      <CardHeader>
+        <CardTitle>shadcn registry</CardTitle>
+        <CardDescription>
+          Best when you want Stepper copied into components/ui/stepper.tsx so
+          your app owns the source and can customize it freely.
+        </CardDescription>
+      </CardHeader>
+    </Card>
+    <Card>
+      <CardHeader>
+        <CardTitle>npm package</CardTitle>
+        <CardDescription>
+          Best when you prefer @francozeta/stepper as a versioned dependency
+          with package updates and a compiled stylesheet.
+        </CardDescription>
+      </CardHeader>
+    </Card>
+  </div>
 </Section>
 
 <Section
-  title="Copy the component"
-  description="Use the registry or copy-paste source path when you want to own the component file."
+  title="Install from the registry"
+  description="This is the recommended path for shadcn/ui-style apps. It installs the component as source code, so updates are deliberate: rerun the command, review the diff, then keep your local changes."
 >
+  <CodeBlock
+    code={registryInstallSnippet}
+    filename="terminal"
+    lang="bash"
+    showLineNumbers={false}
+    compact
+  />
   <FileTree
     items={[
       {
@@ -45,6 +71,20 @@ import {
         ],
       },
     ]}
+  />
+</Section>
+
+<Section
+  title="Install the package"
+  description="Use this path when you want Stepper as a normal npm dependency. The package ships compiled CSS, so no Tailwind source scan is required."
+>
+  <InstallCommand />
+  <CodeBlock
+    code={packageStylesImportSnippet}
+    filename="app/globals.css"
+    lang="css"
+    showLineNumbers={false}
+    compact
   />
 </Section>
 

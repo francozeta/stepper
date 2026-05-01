@@ -54,6 +54,16 @@ describe("project infrastructure", () => {
             }),
           ]),
         }),
+        expect.objectContaining({
+          name: "stepper-demo",
+          type: "registry:block",
+          files: expect.arrayContaining([
+            expect.objectContaining({
+              path: "registry/default/examples/stepper-demo.tsx",
+              target: "components/stepper-demo.tsx",
+            }),
+          ]),
+        }),
       ])
     );
   });

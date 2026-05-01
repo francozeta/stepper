@@ -11,6 +11,7 @@ export const docs = defineDocs({
       copyLabel: z.string().optional(),
       copyToast: z.string().optional(),
       eyebrow: z.string().optional(),
+      rss: z.boolean().optional(),
     }),
   },
 });
