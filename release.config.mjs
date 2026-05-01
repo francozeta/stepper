@@ -48,6 +48,7 @@ const releaseConfig = {
         pkgRoot: packageRoot,
       },
     ],
+    "./scripts/sync-release-version.mjs",
     [
       "@semantic-release/github",
       {
@@ -61,6 +62,7 @@ const releaseConfig = {
       {
         assets: [
           "CHANGELOG.md",
+          "package.json",
           `${packageRoot}/CHANGELOG.md`,
           `${packageRoot}/package.json`,
         ],
