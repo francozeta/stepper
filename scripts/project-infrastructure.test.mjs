@@ -17,10 +17,13 @@ async function readJson(filePath) {
 
 describe("project infrastructure", () => {
   it("declares the package workspace and Turbo task graph", async () => {
+    const vercelIgnore = await readText(".vercelignore");
     const workspace = await readText("pnpm-workspace.yaml");
     const turbo = await readJson("turbo.json");
     const packageJson = await readJson("package.json");
 
+    expect(vercelIgnore).toContain("node_modules");
+    expect(vercelIgnore).toContain(".next");
     expect(workspace).toContain('"."');
     expect(workspace).toContain('"packages/*"');
     expect(packageJson.devDependencies).toHaveProperty("turbo");
