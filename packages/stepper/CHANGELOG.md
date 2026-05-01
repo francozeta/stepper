@@ -1,5 +1,11 @@
 # @francozeta/stepper Changelog
 
+## [0.3.0](https://github.com/francozeta/stepper/compare/v0.2.1...v0.3.0) (2026-05-01)
+
+### Features
+
+* add MDX docs and shadcn registry infrastructure ([717fb76](https://github.com/francozeta/stepper/commit/717fb768adbe7a2b8585389d56ca34b1d5ea5c36))
+
 ## [0.2.1](https://github.com/francozeta/stepper/compare/v0.2.0...v0.2.1) (2026-05-01)
 
 ### Bug Fixes
