@@ -10,6 +10,8 @@ import {
   Rocket,
 } from "lucide-react";
 
+import stepperPackageJson from "@/packages/stepper/package.json";
+
 type DocsNavItem = {
   title: string;
   href: string;
@@ -20,6 +22,8 @@ type DocsNavGroup = {
   title: string;
   items: DocsNavItem[];
 };
+
+const packageVersion = stepperPackageJson.version;
 
 const docsNav: DocsNavGroup[] = [
   {
@@ -71,7 +75,7 @@ const docsNav: DocsNavGroup[] = [
         icon: Palette,
       },
       {
-        title: "Release 0.1.5",
+        title: "Changelog",
         href: "/changelog",
         icon: Rocket,
       },
@@ -90,11 +94,11 @@ const quickFacts = [
 ];
 
 const releaseItems = [
-  "The npm package now exports a compiled styles.css file for direct package usage.",
-  "Consumers can import @francozeta/stepper/styles.css instead of adding @source rules.",
-  "Package CSS is built from the Stepper source only and excludes docs/app utilities.",
-  "shadcn semantic tokens are still respected, with package-local fallbacks for vanilla apps.",
-  "Registry output remains generated from modular source for copy-paste distribution.",
+  "Conventional commits decide whether the next release is patch, minor, or major.",
+  "semantic-release updates changelog files and packages/stepper/package.json.",
+  "GitHub Actions creates the tag, GitHub Release, and npm publish from main.",
+  "The docs read the package version from packages/stepper/package.json.",
+  "The registry output remains generated before release verification.",
 ];
 
 const gettingStartedSnippet = `import {
@@ -1045,8 +1049,8 @@ const useStepperRows = [
 const packageNotes = [
   {
     label: "Version",
-    value: "0.1.5",
-    help: "Compiled package CSS for direct npm usage.",
+    value: packageVersion,
+    help: "Read from packages/stepper/package.json.",
   },
   {
     label: "Core file",
@@ -1134,6 +1138,7 @@ export {
   mobileDrawerPatternSnippet,
   navigationProps,
   npmInstallSnippet,
+  packageVersion,
   packageStylesImportSnippet,
   packageUsageSnippet,
   packageNotes,

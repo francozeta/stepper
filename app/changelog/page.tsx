@@ -10,10 +10,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { releaseItems, v2Roadmap } from "@/lib/docs";
+import { packageVersion, releaseItems, v2Roadmap } from "@/lib/docs";
 
 export const metadata: Metadata = {
-  title: "Release 0.1.5",
+  title: "Changelog",
 };
 
 export default function ChangelogPage() {
@@ -21,17 +21,17 @@ export default function ChangelogPage() {
     <>
       <PageHeader
         eyebrow="guides"
-        title="Release 0.1.5"
-        description="This pass removes the @source requirement for npm consumers by shipping compiled package CSS."
+        title="Changelog"
+        description="Release notes, tags, GitHub Releases, and npm publish are handled by semantic-release from main."
         badge="ready"
       />
 
       <Section title="Changed">
         <Card>
           <CardHeader>
-            <CardTitle>Stepper 0.1.5</CardTitle>
+            <CardTitle>Stepper {packageVersion}</CardTitle>
             <CardDescription>
-              Prepared for @francozeta/stepper v0.1.5.
+              Current package version from packages/stepper/package.json.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -51,8 +51,8 @@ export default function ChangelogPage() {
 
       <Section title="Tag link">
         <Button asChild variant="outline" className="w-fit">
-          <a href="https://github.com/francozeta/stepper/tree/v0.1.5">
-            Open GitHub tag
+          <a href={`https://github.com/francozeta/stepper/tree/v${packageVersion}`}>
+            Open current GitHub tag
           </a>
         </Button>
       </Section>

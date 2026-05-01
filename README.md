@@ -35,10 +35,17 @@ The npm package is built from the same generated source, but replaces the local 
 ```bash
 pnpm package:build
 pnpm package:pack
-pnpm package:publish
 ```
 
 The package name is `@francozeta/stepper`. The docs app remains private; only `packages/stepper` is meant to be published.
+
+Publishing is automated with semantic-release from `main`. Conventional commits determine the next version, update `CHANGELOG.md`, tag the release, create the GitHub Release, and publish `packages/stepper` to npm:
+
+```bash
+pnpm release:dry-run
+```
+
+Local dry runs still need release credentials because the GitHub and npm plugins verify auth. The GitHub workflow expects either npm trusted publishing to be configured for this repository, or an `NPM_TOKEN` repository secret. `GITHUB_TOKEN` is provided by GitHub Actions.
 
 Direct npm consumers only need the package stylesheet:
 
