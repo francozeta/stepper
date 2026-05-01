@@ -65,7 +65,7 @@ const docsNav: DocsNavGroup[] = [
         icon: FileCheck,
       },
       {
-        title: "Patterns",
+        title: "Recipes",
         href: "/patterns",
         icon: Route,
       },
@@ -456,6 +456,144 @@ export function MobileStepperPattern() {
         Content for {step}.
       </div>
     </div>
+  );
+}`;
+
+const segmentedRecipeSnippet = `"use client";
+
+import * as React from "react";
+
+import {
+  Stepper,
+  StepperContent,
+  StepperItem,
+  StepperList,
+  StepperTrigger,
+} from "@/components/ui/stepper";
+
+const steps = ["business", "product", "review"] as const;
+type Step = (typeof steps)[number];
+
+export function SegmentedStepper() {
+  const [value, setValue] = React.useState<Step>("product");
+  const currentIndex = steps.indexOf(value);
+
+  return (
+    <Stepper value={value} onValueChange={(next) => setValue(next as Step)}>
+      <StepperList className="gap-2">
+        {steps.map((step, index) => (
+          <StepperItem
+            key={step}
+            value={step}
+            completed={index < currentIndex}
+            className="min-w-0 flex-1"
+          >
+            <StepperTrigger className="w-full flex-col items-stretch gap-3 p-0">
+              <span className="h-0.5 rounded-full bg-muted-foreground/25 group-data-[position=previous]/stepper-item:bg-foreground group-data-[state=active]/stepper-item:bg-foreground" />
+              <span className="sr-only">{step}</span>
+            </StepperTrigger>
+          </StepperItem>
+        ))}
+      </StepperList>
+
+      <StepperContent value="business">Business details</StepperContent>
+      <StepperContent value="product">Product details</StepperContent>
+      <StepperContent value="review">Review setup</StepperContent>
+    </Stepper>
+  );
+}`;
+
+const circleProgressRecipeSnippet = `"use client";
+
+import * as React from "react";
+
+import {
+  Stepper,
+  StepperContent,
+  StepperItem,
+  StepperList,
+} from "@/components/ui/stepper";
+
+const steps = ["business", "product", "review"] as const;
+type Step = (typeof steps)[number];
+
+export function CircleProgressStepper() {
+  const [value, setValue] = React.useState<Step>("product");
+  const currentIndex = steps.indexOf(value);
+  const progress = ((currentIndex + 1) / steps.length) * 100;
+
+  return (
+    <Stepper value={value} onValueChange={(next) => setValue(next as Step)}>
+      <StepperList className="sr-only">
+        {steps.map((step, index) => (
+          <StepperItem key={step} value={step} completed={index < currentIndex}>
+            {step}
+          </StepperItem>
+        ))}
+      </StepperList>
+
+      <div className="flex items-center gap-3">
+        <span
+          className="grid size-10 place-items-center rounded-full"
+          style={{
+            background: \`conic-gradient(var(--foreground) \${progress}%, var(--muted) 0)\`,
+          }}
+        >
+          <span className="grid size-8 place-items-center rounded-full bg-background text-xs font-semibold">
+            {currentIndex + 1}
+          </span>
+        </span>
+        <p className="text-sm font-medium">Step {currentIndex + 1} of {steps.length}</p>
+      </div>
+
+      <StepperContent value={value} forceMount>
+        Content for {value}.
+      </StepperContent>
+    </Stepper>
+  );
+}`;
+
+const controlsOnlyRecipeSnippet = `"use client";
+
+import * as React from "react";
+
+import { Button } from "@/components/ui/button";
+import {
+  Stepper,
+  StepperContent,
+  StepperItem,
+  StepperList,
+} from "@/components/ui/stepper";
+
+const steps = ["username", "details", "done"] as const;
+type Step = (typeof steps)[number];
+
+export function ControlsOnlyStepper() {
+  const [value, setValue] = React.useState<Step>("username");
+  const currentIndex = steps.indexOf(value);
+
+  return (
+    <Stepper value={value} onValueChange={(next) => setValue(next as Step)}>
+      <StepperList className="sr-only">
+        {steps.map((step, index) => (
+          <StepperItem key={step} value={step} completed={index < currentIndex}>
+            {step}
+          </StepperItem>
+        ))}
+      </StepperList>
+
+      <StepperContent value={value} forceMount>
+        Content for {value}.
+      </StepperContent>
+
+      <Button
+        type="button"
+        onClick={() => setValue(steps[currentIndex + 1] ?? value)}
+        disabled={currentIndex === steps.length - 1}
+      >
+        Next
+      </Button>
+    </Stepper>
   );
 }`;
 
@@ -1125,10 +1263,12 @@ const v2Roadmap = [
 export {
   apiComponents,
   checkoutExampleCode,
+  circleProgressRecipeSnippet,
   compositionCode,
   contentProps,
   controlledExampleCode,
   controlledSnippet,
+  controlsOnlyRecipeSnippet,
   docsNav,
   formWizardGuideSnippet,
   gettingStartedSnippet,
@@ -1147,6 +1287,7 @@ export {
   releaseItems,
   rootProps,
   routeBasedPatternSnippet,
+  segmentedRecipeSnippet,
   stateSelectorsCode,
   statusExampleCode,
   themeTokensSnippet,

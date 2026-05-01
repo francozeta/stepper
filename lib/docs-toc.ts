@@ -5,10 +5,9 @@ type DocsTocItem = {
 
 const docsToc: Record<string, DocsTocItem[]> = {
   "/": [
+    { title: "Install", href: "#install" },
     { title: "Preview", href: "#preview" },
     { title: "Create workspace", href: "#create-workspace" },
-    { title: "Install", href: "#install" },
-    { title: "Usage", href: "#usage" },
     { title: "Why another Stepper?", href: "#why-another-stepper" },
   ],
   "/getting-started": [
@@ -23,6 +22,9 @@ const docsToc: Record<string, DocsTocItem[]> = {
     { title: "Form wizard", href: "#form-wizard" },
   ],
   "/patterns": [
+    { title: "Segmented line", href: "#segmented-line" },
+    { title: "Circle progress", href: "#circle-progress" },
+    { title: "Controls only", href: "#controls-only" },
     { title: "Route-based stepper", href: "#route-based-stepper" },
     { title: "Mobile drawer pattern", href: "#mobile-drawer-pattern" },
   ],

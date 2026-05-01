@@ -189,11 +189,11 @@ body {
 
 .docs-code pre {
   display: block;
-  line-height: 1.35;
+  line-height: 1.42;
   margin: 0;
   min-width: max-content;
   overflow: visible !important;
-  padding: 0.75rem 3.5rem 1rem 0;
+  padding: 0.875rem 3.5rem 1rem 0;
   background: transparent !important;
   white-space: normal;
 }
@@ -204,18 +204,18 @@ body {
   font-family: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo,
     Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 0.8125rem;
-  line-height: 1.35;
+  line-height: 1.42;
 }
 
 .docs-code .line {
   position: relative;
   display: block;
-  min-height: 1.35em;
+  min-height: 1.42em;
   padding-left: 4rem;
   padding-right: 1rem;
   padding-bottom: 0;
   padding-top: 0;
-  line-height: 1.8;
+  line-height: 1.42;
   margin: 0;
   white-space: pre;
 }
@@ -233,6 +233,22 @@ body {
   counter-increment: docs-code-line;
   text-align: right;
   user-select: none;
+}
+
+.docs-code[data-line-numbers="false"] pre {
+  padding-left: 1rem;
+}
+
+.docs-code[data-line-numbers="false"] .line {
+  padding-left: 0;
+}
+
+.docs-code[data-line-numbers="false"] .line::before {
+  content: none;
+}
+
+.docs-code[data-compact="true"] pre {
+  padding-block: 0.875rem;
 }
 
 .dark {

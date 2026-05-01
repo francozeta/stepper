@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
 
 import { CopyButton } from "@/components/copy-button";
-import { CodeBlock, PageHeader, Section } from "@/components/docs-content";
+import {
+  CodeBlock,
+  FileTree,
+  PageHeader,
+  Section,
+} from "@/components/docs-content";
+import { InstallCommand } from "@/components/install-command";
 import {
   controlledSnippet,
   gettingStartedSnippet,
-  npmInstallSnippet,
   packageStylesImportSnippet,
-  pnpmInstallSnippet,
 } from "@/lib/docs";
 
 export const metadata: Metadata = {
@@ -34,14 +38,13 @@ export default function GettingStartedPage() {
         title="Install package"
         description="Use this path when you want Stepper as a normal npm dependency. The package ships compiled CSS, so no Tailwind source scan is required."
       >
-        <div className="grid gap-4 md:grid-cols-2">
-          <CodeBlock code={pnpmInstallSnippet} filename="pnpm" lang="bash" />
-          <CodeBlock code={npmInstallSnippet} filename="npm" lang="bash" />
-        </div>
+        <InstallCommand />
         <CodeBlock
           code={packageStylesImportSnippet}
           filename="app/globals.css"
           lang="css"
+          showLineNumbers={false}
+          compact
         />
       </Section>
 
@@ -49,9 +52,19 @@ export default function GettingStartedPage() {
         title="Copy the component"
         description="Use the registry or copy-paste source path when you want to own the component file."
       >
-        <CodeBlock filename="project tree" lang="text">{`components/
-  ui/
-    stepper.tsx`}</CodeBlock>
+        <FileTree
+          items={[
+            {
+              name: "components",
+              children: [
+                {
+                  name: "ui",
+                  children: [{ name: "stepper.tsx" }],
+                },
+              ],
+            },
+          ]}
+        />
       </Section>
 
       <Section

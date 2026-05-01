@@ -1222,12 +1222,248 @@ function StepperMobilePatternExample() {
   );
 }
 
+const recipeSteps = [
+  { value: "business", title: "Business", description: "Who you sell as" },
+  { value: "product", title: "Product", description: "What you sell" },
+  { value: "review", title: "Review", description: "Confirm setup" },
+] as const;
+
+type RecipeStep = (typeof recipeSteps)[number]["value"];
+
+function StepperSegmentedRecipeExample() {
+  const [value, setValue] = React.useState<RecipeStep>("product");
+  const currentIndex = recipeSteps.findIndex((step) => step.value === value);
+
+  return (
+    <Stepper
+      value={value}
+      onValueChange={(nextValue) => setValue(nextValue as RecipeStep)}
+      className="mx-auto max-w-xl gap-6 bg-transparent"
+    >
+      <div className="flex items-center justify-between">
+        <Button type="button" variant="ghost" size="icon-sm" aria-label="Back">
+          <ArrowLeft />
+        </Button>
+        <span className="flex size-8 items-center justify-center rounded-full border border-border bg-background text-xs font-semibold">
+          S
+        </span>
+        <span className="size-7" aria-hidden="true" />
+      </div>
+
+      <StepperList
+        aria-label="Segmented setup steps"
+        className="w-full gap-2 !overflow-visible !pb-0"
+      >
+        {recipeSteps.map((step, index) => (
+          <StepperItem
+            key={step.value}
+            value={step.value}
+            completed={index < currentIndex}
+            className="!min-w-0 flex-1"
+          >
+            <StepperTrigger className="h-auto w-full flex-col items-stretch gap-3 rounded-none p-0 text-left hover:bg-transparent data-[state=active]:text-foreground">
+              <span className="h-0.5 w-full rounded-full bg-muted-foreground/25 transition-colors group-data-[position=previous]/stepper-item:bg-foreground group-data-[state=active]/stepper-item:bg-foreground" />
+              <span className="sr-only">{step.title}</span>
+            </StepperTrigger>
+          </StepperItem>
+        ))}
+      </StepperList>
+
+      <StepperContent
+        value="business"
+        className="border-0 bg-transparent p-0 shadow-none"
+      >
+        <RecipePanel
+          title="Business details"
+          description="Choose whether this workspace belongs to an individual or a company."
+        />
+      </StepperContent>
+      <StepperContent
+        value="product"
+        className="border-0 bg-transparent p-0 shadow-none"
+      >
+        <RecipePanel
+          title="Product details"
+          description="Collect just enough context to tailor the setup flow."
+        />
+      </StepperContent>
+      <StepperContent
+        value="review"
+        className="border-0 bg-transparent p-0 shadow-none"
+      >
+        <RecipePanel
+          title="Review setup"
+          description="Confirm the values before the product flow continues."
+        />
+      </StepperContent>
+    </Stepper>
+  );
+}
+
+function StepperCircleProgressRecipeExample() {
+  const [value, setValue] = React.useState<RecipeStep>("product");
+  const currentIndex = recipeSteps.findIndex((step) => step.value === value);
+  const progress = ((currentIndex + 1) / recipeSteps.length) * 100;
+  const currentStep = recipeSteps[currentIndex] ?? recipeSteps[0];
+
+  return (
+    <Stepper
+      value={value}
+      onValueChange={(nextValue) => setValue(nextValue as RecipeStep)}
+      className="mx-auto max-w-md gap-5"
+    >
+      <RecipeHiddenStepList currentIndex={currentIndex} />
+
+      <div className="flex items-center gap-3">
+        <span
+          className="grid size-10 shrink-0 place-items-center rounded-full"
+          style={{
+            background: `conic-gradient(var(--foreground) ${progress}%, color-mix(in oklab, var(--muted-foreground) 20%, transparent) 0)`,
+          }}
+        >
+          <span className="grid size-8 place-items-center rounded-full bg-card text-xs font-semibold text-foreground">
+            {currentIndex + 1}
+          </span>
+        </span>
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-foreground">
+            {currentStep.title}
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Step {currentIndex + 1} of {recipeSteps.length}
+          </p>
+        </div>
+      </div>
+
+      {recipeSteps.map((step) => (
+        <StepperContent
+          key={step.value}
+          value={step.value}
+          className="border-border/70 bg-background p-4 shadow-none"
+        >
+          <RecipePanel title={step.title} description={step.description} />
+        </StepperContent>
+      ))}
+
+      <StepperActions note="Use this compact recipe when the full step list would take too much space." />
+    </Stepper>
+  );
+}
+
+function StepperControlsOnlyRecipeExample() {
+  const [value, setValue] = React.useState<RecipeStep>("business");
+  const currentIndex = recipeSteps.findIndex((step) => step.value === value);
+  const currentStep = recipeSteps[currentIndex] ?? recipeSteps[0];
+  const canGoPrevious = currentIndex > 0;
+  const canGoNext = currentIndex < recipeSteps.length - 1;
+
+  function goToIndex(nextIndex: number) {
+    const nextStep = recipeSteps[nextIndex];
+
+    if (nextStep) {
+      setValue(nextStep.value);
+    }
+  }
+
+  return (
+    <Stepper
+      value={value}
+      onValueChange={(nextValue) => setValue(nextValue as RecipeStep)}
+      className="mx-auto max-w-md gap-5 rounded-xl bg-background p-5 ring-1 ring-border/80"
+    >
+      <RecipeHiddenStepList currentIndex={currentIndex} />
+
+      <StepperContent
+        value={value}
+        forceMount
+        className="border-0 bg-transparent p-0 shadow-none"
+      >
+        <RecipePanel
+          title={currentStep.title}
+          description="The user only sees the active panel and actions. The list still exists for step registration and accessibility."
+        />
+      </StepperContent>
+
+      <div className="flex items-center justify-between gap-3">
+        <Button
+          type="button"
+          variant="outline"
+          disabled={!canGoPrevious}
+          onClick={() => goToIndex(currentIndex - 1)}
+        >
+          <ArrowLeft data-icon="inline-start" />
+          Back
+        </Button>
+        <Button
+          type="button"
+          disabled={!canGoNext}
+          onClick={() => goToIndex(currentIndex + 1)}
+        >
+          {canGoNext ? "Next" : "Done"}
+          {canGoNext ? <ArrowRight data-icon="inline-end" /> : <Check />}
+        </Button>
+      </div>
+    </Stepper>
+  );
+}
+
+function RecipeHiddenStepList({ currentIndex }: { currentIndex: number }) {
+  return (
+    <StepperList aria-label="Hidden recipe steps" className="sr-only">
+      {recipeSteps.map((step, index) => (
+        <StepperItem
+          key={step.value}
+          value={step.value}
+          completed={index < currentIndex}
+        >
+          {step.title}
+        </StepperItem>
+      ))}
+    </StepperList>
+  );
+}
+
+function RecipePanel({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="space-y-4">
+      <div className="space-y-1.5">
+        <h3 className="text-balance text-xl font-semibold tracking-tight text-foreground">
+          {title}
+        </h3>
+        <p className="text-pretty text-sm leading-6 text-muted-foreground">
+          {description}
+        </p>
+      </div>
+      <div className="grid gap-2 sm:grid-cols-2">
+        <Button type="button" variant="outline" className="justify-start">
+          Software / SaaS
+        </Button>
+        <Button type="button" variant="outline" className="justify-start">
+          Digital product
+        </Button>
+      </div>
+      <div className="rounded-lg border border-border bg-muted/25 px-3 py-2 text-sm text-muted-foreground">
+        Keep the flow focused. Persist form state outside the primitive.
+      </div>
+    </div>
+  );
+}
+
 export {
   StepperCheckoutExample,
   StepperControlledExample,
+  StepperCircleProgressRecipeExample,
+  StepperControlsOnlyRecipeExample,
   StepperExample,
   StepperMobilePatternExample,
   StepperRoutePatternExample,
+  StepperSegmentedRecipeExample,
   StepperStatusExample,
   StepperVerticalExample,
 };

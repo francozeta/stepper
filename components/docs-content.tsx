@@ -1,4 +1,22 @@
 import { codeToHtml } from "shiki";
+import {
+  SiCss,
+  SiJavascript,
+  SiNextdotjs,
+  SiNpm,
+  SiPnpm,
+  SiReact,
+  SiTailwindcss,
+  SiTypescript,
+} from "react-icons/si";
+import {
+  VscFile,
+  VscFileCode,
+  VscFolderOpened,
+  VscJson,
+  VscMarkdown,
+  VscTerminalPowershell,
+} from "react-icons/vsc";
 
 import { CopyButton } from "@/components/copy-button";
 import { Badge } from "@/components/ui/badge";
@@ -88,6 +106,8 @@ type CodeBlockProps = {
   lang?: string;
   className?: string;
   showCopy?: boolean;
+  showLineNumbers?: boolean;
+  compact?: boolean;
 };
 
 async function CodeBlock({
@@ -97,6 +117,8 @@ async function CodeBlock({
   lang = "tsx",
   className,
   showCopy = true,
+  showLineNumbers = true,
+  compact = false,
 }: CodeBlockProps) {
   const source = (code ?? children ?? "").trim();
   const html = await codeToHtml(source, {
@@ -113,8 +135,11 @@ async function CodeBlock({
       )}
     >
       {filename ? (
-        <div className="pointer-events-none absolute left-4 top-3 z-10 max-w-[calc(100%-4rem)] truncate font-mono text-xs text-muted-foreground">
-          {filename ?? lang}
+        <div className="flex min-h-10 items-center gap-2 border-b border-border/70 px-4 pr-12">
+          <CodeFileIcon filename={filename} lang={lang} />
+          <div className="min-w-0 truncate font-mono text-xs text-muted-foreground">
+            {filename ?? lang}
+          </div>
         </div>
       ) : null}
 
@@ -124,26 +149,140 @@ async function CodeBlock({
           label="Copy code"
           iconOnly
           toastMessage={filename ? `${filename} copied` : "Code copied"}
-          className="absolute right-3 top-2.5 z-10 bg-card/80 backdrop-blur"
+          className={cn(
+            "absolute right-3 z-10 bg-card/80 backdrop-blur",
+            filename ? "top-1" : "top-2.5"
+          )}
         />
       ) : null}
 
-      <div
-        className={cn(
-          "docs-code-scroll max-h-[420px] overflow-auto",
-          filename ? "pt-8" : "pt-2"
-        )}
-      >
+      <div className="docs-code-scroll max-h-[420px] overflow-auto">
         {showCopy ? (
           <span className="sr-only">Copy code is available in the top right.</span>
         ) : null}
         <div
           className="docs-code min-w-max"
+          data-line-numbers={showLineNumbers ? "true" : "false"}
+          data-compact={compact ? "true" : undefined}
           dangerouslySetInnerHTML={{ __html: html }}
         />
       </div>
     </div>
   );
+}
+
+function CodeFileIcon({
+  filename,
+  lang,
+}: {
+  filename?: string;
+  lang?: string;
+}) {
+  const name = `${filename ?? ""} ${lang ?? ""}`.toLowerCase();
+  const className = "size-3.5 shrink-0 text-muted-foreground";
+  const Icon =
+    name.includes("pnpm")
+      ? SiPnpm
+      : name.includes("npm")
+        ? SiNpm
+        : name.includes("powershell") || name.includes("ps1")
+          ? VscTerminalPowershell
+          : name.endsWith(".tsx") || name.includes("tsx")
+            ? SiReact
+            : name.endsWith(".ts") || name.includes("typescript")
+              ? SiTypescript
+              : name.endsWith(".js") || name.includes("javascript")
+                ? SiJavascript
+                : name.endsWith(".css") || name.includes("css")
+                  ? SiCss
+                  : name.includes("tailwind")
+                    ? SiTailwindcss
+                    : name.includes("next")
+                      ? SiNextdotjs
+                      : name.endsWith(".json") || name.includes("json")
+                        ? VscJson
+                        : name.endsWith(".md") || name.includes("markdown")
+                          ? VscMarkdown
+                          : VscFileCode;
+
+  return <Icon className={className} aria-hidden="true" />;
+}
+
+type FileTreeItem = {
+  name: string;
+  children?: FileTreeItem[];
+};
+
+function FileTree({
+  items,
+  className,
+}: {
+  items: FileTreeItem[];
+  className?: string;
+}) {
+  return (
+    <div
+      data-slot="docs-file-tree"
+      className={cn(
+        "rounded-xl bg-card p-4 font-mono text-sm ring-1 ring-border/80",
+        className
+      )}
+    >
+      <FileTreeItems items={items} />
+    </div>
+  );
+}
+
+function FileTreeItems({
+  items,
+  level = 0,
+}: {
+  items: FileTreeItem[];
+  level?: number;
+}) {
+  return (
+    <ul className="space-y-1.5">
+      {items.map((item) => {
+        const hasChildren = Boolean(item.children?.length);
+        const Icon = hasChildren ? VscFolderOpened : getTreeFileIcon(item.name);
+
+        return (
+          <li key={`${level}-${item.name}`}>
+            <div
+              className="flex min-h-7 items-center gap-2 text-foreground"
+              style={{ paddingLeft: `${level * 1.25}rem` }}
+            >
+              <Icon className="size-4 shrink-0 text-muted-foreground" />
+              <span>{item.name}</span>
+            </div>
+            {item.children ? (
+              <div className="ml-2 border-l border-border/70 pl-1">
+                <FileTreeItems items={item.children} level={level + 1} />
+              </div>
+            ) : null}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+function getTreeFileIcon(name: string) {
+  const lowerName = name.toLowerCase();
+
+  if (lowerName.endsWith(".json")) {
+    return VscJson;
+  }
+
+  if (lowerName.endsWith(".md") || lowerName.endsWith(".mdx")) {
+    return VscMarkdown;
+  }
+
+  if (lowerName.endsWith(".ts") || lowerName.endsWith(".tsx")) {
+    return VscFileCode;
+  }
+
+  return VscFile;
 }
 
 function InfoGrid({
@@ -182,4 +321,5 @@ function toAnchorId(value: string) {
     .replace(/(^-|-$)/g, "");
 }
 
-export { CodeBlock, InfoGrid, PageHeader, Section };
+export { CodeBlock, FileTree, InfoGrid, PageHeader, Section };
+export type { FileTreeItem };

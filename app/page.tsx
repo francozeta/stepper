@@ -9,13 +9,12 @@ import {
   Section,
 } from "@/components/docs-content";
 import { StepperExample } from "@/components/stepper-examples";
+import { InstallCommand } from "@/components/install-command";
 import { Button } from "@/components/ui/button";
 import {
-  npmInstallSnippet,
   packageStylesImportSnippet,
   packageUsageSnippet,
   packageVersion,
-  pnpmInstallSnippet,
   workspaceExampleCode,
   whyStepper,
 } from "@/lib/docs";
@@ -29,6 +28,29 @@ export default function Home() {
         description="A lightweight primitive for guided multi-step flows in React, Next.js, Tailwind CSS, and shadcn/ui-style projects."
         badge={`v${packageVersion}`}
       />
+
+      <Section
+        title="Install"
+        description="Install the package, import its stylesheet once, then compose the primitive with your own UI."
+      >
+        <InstallCommand />
+        <div className="grid gap-4 md:grid-cols-2">
+          <CodeBlock
+            code={packageStylesImportSnippet}
+            filename="app/globals.css"
+            lang="css"
+            showLineNumbers={false}
+            compact
+          />
+          <CodeBlock
+            code={packageUsageSnippet}
+            filename="app/page.tsx"
+            lang="tsx"
+            showLineNumbers={false}
+            compact
+          />
+        </div>
+      </Section>
 
       <Section
         title="Preview"
@@ -45,32 +67,6 @@ export default function Home() {
       </Section>
 
       <Section
-        title="Install"
-        description="Use the npm package for normal dependency management, or copy the registry file when you want full source ownership."
-      >
-        <div className="grid gap-4 md:grid-cols-2">
-          <CodeBlock code={pnpmInstallSnippet} filename="pnpm" lang="bash" />
-          <CodeBlock code={npmInstallSnippet} filename="npm" lang="bash" />
-        </div>
-        <CodeBlock
-          code={packageStylesImportSnippet}
-          filename="app/globals.css"
-          lang="css"
-        />
-      </Section>
-
-      <Section
-        title="Usage"
-        description="Import the pieces you need, then connect validation and routing in your app layer."
-      >
-        <CodeBlock code={packageUsageSnippet} filename="import.tsx" />
-        <p className="max-w-2xl text-pretty text-sm leading-6 text-muted-foreground">
-          Direct npm usage works with the package stylesheet. The registry path
-          is still available when you want full source ownership.
-        </p>
-      </Section>
-
-      <Section
         title="Why another Stepper?"
         description="Most stepper libraries focus on workflow state. This primitive focuses on shadcn-style composition, UI states, and copy-paste ownership."
       >
@@ -78,8 +74,8 @@ export default function Home() {
       </Section>
 
       <Button asChild size="lg" className="w-fit">
-        <Link href="/getting-started">
-          Getting Started
+        <Link href="/patterns">
+          View recipes
           <ArrowRight data-icon="inline-end" />
         </Link>
       </Button>
