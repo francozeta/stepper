@@ -1,6 +1,6 @@
 {
   "name": "@francozeta/stepper",
-  "version": "0.1.6",
+  "version": "0.2.0",
   "description": "A shadcn/ui-native Stepper primitive for real product flows.",
   "license": "MIT",
   "type": "module",

@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.0](https://github.com/francozeta/stepper/compare/v0.1.6...v0.2.0) (2026-05-01)
+
+### Features
+
+* enhance documentation and examples with new install command and recipe patterns ([42975dd](https://github.com/francozeta/stepper/commit/42975dd4e05f7567ad4015c408d49112e11696a4))
+
 ## [0.1.6](https://github.com/francozeta/stepper/compare/v0.1.5...v0.1.6) (2026-05-01)
 
 ### Bug Fixes
