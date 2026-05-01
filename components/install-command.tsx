@@ -58,7 +58,7 @@ function InstallCommand({ className }: InstallCommandProps) {
         setValue(nextValue as (typeof packageManagers)[number]["id"])
       }
       className={cn(
-        "overflow-hidden rounded-xl bg-card ring-1 ring-border/80",
+        "w-full min-w-0 overflow-hidden rounded-xl bg-card ring-1 ring-border/80",
         className
       )}
     >
@@ -66,7 +66,7 @@ function InstallCommand({ className }: InstallCommandProps) {
         <span className="flex size-6 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground">
           <VscTerminalPowershell className="size-3.5" />
         </span>
-        <TabsList variant="line" className="h-8 gap-1 bg-transparent p-0">
+        <TabsList className="h-8 gap-1 bg-transparent p-0">
           {packageManagers.map((manager) => {
             const Icon = manager.icon;
 
@@ -85,7 +85,6 @@ function InstallCommand({ className }: InstallCommandProps) {
         <CopyButton
           value={activeCommand}
           label="Copy command"
-          toastMessage="Install command copied"
           iconOnly
           className="ml-auto"
         />

@@ -37,7 +37,7 @@ function DocsExample({
     <section
       id={toAnchorId(title)}
       data-slot="docs-example"
-      className={cn("flex scroll-mt-24 flex-col gap-4", className)}
+      className={cn("flex min-w-0 scroll-mt-24 flex-col gap-4", className)}
     >
       <div className="flex flex-col gap-2">
         <div className="flex flex-wrap items-center gap-2">
@@ -55,7 +55,7 @@ function DocsExample({
         </p>
       </div>
 
-      <Tabs defaultValue="preview" className="gap-3">
+      <Tabs defaultValue="preview" className="min-w-0 gap-3">
         <TabsList variant="line" className="h-8 bg-transparent p-0">
           <TabsTrigger value="preview" className="px-0">
             Preview
@@ -65,17 +65,17 @@ function DocsExample({
             Code
           </TabsTrigger>
         </TabsList>
-        <TabsContent value="preview" className="m-0">
+        <TabsContent value="preview" className="m-0 min-w-0">
           <div
             className={cn(
-              "rounded-xl bg-card p-4 ring-1 ring-border/80 sm:p-5",
+              "min-w-0 overflow-x-auto rounded-xl bg-card p-4 ring-1 ring-border/80 sm:p-5",
               previewClassName
             )}
           >
             {preview}
           </div>
         </TabsContent>
-        <TabsContent value="code" className="m-0">
+        <TabsContent value="code" className="m-0 min-w-0">
           <CodeBlock code={code} filename={filename} lang={lang} />
         </TabsContent>
       </Tabs>

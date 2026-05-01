@@ -44,7 +44,7 @@ function getCopyImportAction(data: DocFrontmatter) {
     <CopyButton
       value={data.copyImport}
       label={data.copyLabel ?? "Copy"}
-      toastMessage={data.copyToast ?? "Copied"}
+      copiedLabel={data.copyToast ?? "Copied"}
     />
   ) : null;
 }

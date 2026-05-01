@@ -10,24 +10,13 @@ import {
   StepperControlsOnlyRecipeExample,
   StepperMobilePatternExample,
   StepperRoutePatternExample,
-  StepperSegmentedRecipeExample,
 } from "@/components/stepper-examples";
 import {
   circleProgressRecipeSnippet,
   controlsOnlyRecipeSnippet,
   mobileDrawerPatternSnippet,
   routeBasedPatternSnippet,
-  segmentedRecipeSnippet,
 } from "@/lib/docs";
-
-<DocsExample
-  title="Segmented line"
-  description="A minimal product onboarding style with line segments instead of circles or icons."
-  badge="Recipe"
-  code={segmentedRecipeSnippet}
-  filename="segmented-stepper.tsx"
-  preview={<StepperSegmentedRecipeExample />}
-/>
 
 <DocsExample
   title="Circle progress"
@@ -49,7 +38,7 @@ import {
 
 <DocsExample
   title="Route-based stepper"
-  description="Use StepperTrigger asChild with Next.js Link when routes, layouts, or server data own the current step."
+  description="Use StepperTrigger asChild with Next.js Link when the URL owns the current step. Keep it a stepper: progress and route state, not tab semantics."
   badge="Pattern"
   code={routeBasedPatternSnippet}
   filename="route-based-stepper.tsx"

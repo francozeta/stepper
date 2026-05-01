@@ -337,7 +337,10 @@ export function FormWizard() {
   );
 }`;
 
-const routeBasedPatternSnippet = `import Link from "next/link";
+const routeBasedPatternSnippet = `"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import {
   Stepper,
@@ -349,31 +352,74 @@ import {
   StepperTrigger,
 } from "@/components/ui/stepper";
 
-export function SetupRoutes({ currentStep }: { currentStep: string }) {
-  return (
-    <Stepper value={currentStep} onValueChange={() => {}}>
-      <StepperList>
-        <StepperItem value="workspace" completed>
-          <StepperTrigger asChild>
-            <Link href="/setup/workspace">
-              <StepperIndicator />
-              <StepperLabel>Workspace</StepperLabel>
-            </Link>
-          </StepperTrigger>
-          <StepperSeparator />
-        </StepperItem>
+const setupSteps = [
+  { value: "workspace", label: "Workspace", href: "/setup/workspace" },
+  { value: "members", label: "Members", href: "/setup/members" },
+  { value: "review", label: "Review", href: "/setup/review" },
+] as const;
 
-        <StepperItem value="members">
-          <StepperTrigger asChild>
-            <Link href="/setup/members">
-              <StepperIndicator />
-              <StepperLabel>Members</StepperLabel>
-            </Link>
-          </StepperTrigger>
-        </StepperItem>
+type SetupStepValue = (typeof setupSteps)[number]["value"];
+
+export function SetupRoutes({
+  completedSteps,
+}: {
+  completedSteps: SetupStepValue[];
+}) {
+  const pathname = usePathname();
+  const currentStep = getStepFromPathname(pathname);
+
+  return (
+    <Stepper value={currentStep}>
+      <StepperList>
+        {setupSteps.map((step, index) => {
+          const completed = completedSteps.includes(step.value);
+          const disabled = !canVisitStep(step.value, completedSteps);
+
+          return (
+            <StepperItem
+              key={step.value}
+              value={step.value}
+              completed={completed}
+              disabled={disabled}
+            >
+              <StepperTrigger asChild>
+                <Link
+                  href={step.href}
+                  prefetch={false}
+                  onNavigate={(event) => {
+                    if (disabled) {
+                      event.preventDefault();
+                    }
+                  }}
+                >
+                  <StepperIndicator />
+                  <StepperLabel>{step.label}</StepperLabel>
+                </Link>
+              </StepperTrigger>
+              {index < setupSteps.length - 1 ? <StepperSeparator /> : null}
+            </StepperItem>
+          );
+        })}
       </StepperList>
     </Stepper>
   );
+}
+
+function getStepFromPathname(pathname: string): SetupStepValue {
+  const normalizedPath = pathname.replace(/\\/$/, "");
+  const match = setupSteps.find((step) => step.href === normalizedPath);
+
+  return match?.value ?? "workspace";
+}
+
+function canVisitStep(
+  value: SetupStepValue,
+  completedSteps: SetupStepValue[]
+) {
+  if (value === "workspace") return true;
+  if (value === "members") return completedSteps.includes("workspace");
+
+  return completedSteps.includes("workspace") && completedSteps.includes("members");
 }`;
 
 const mobileDrawerPatternSnippet = `"use client";
@@ -458,50 +504,6 @@ export function MobileStepperPattern() {
         Content for {step}.
       </div>
     </div>
-  );
-}`;
-
-const segmentedRecipeSnippet = `"use client";
-
-import * as React from "react";
-
-import {
-  Stepper,
-  StepperContent,
-  StepperItem,
-  StepperList,
-  StepperTrigger,
-} from "@/components/ui/stepper";
-
-const steps = ["business", "product", "review"] as const;
-type Step = (typeof steps)[number];
-
-export function SegmentedStepper() {
-  const [value, setValue] = React.useState<Step>("product");
-  const currentIndex = steps.indexOf(value);
-
-  return (
-    <Stepper value={value} onValueChange={(next) => setValue(next as Step)}>
-      <StepperList className="gap-2">
-        {steps.map((step, index) => (
-          <StepperItem
-            key={step}
-            value={step}
-            completed={index < currentIndex}
-            className="min-w-0 flex-1"
-          >
-            <StepperTrigger className="w-full flex-col items-stretch gap-3 p-0">
-              <span className="h-0.5 rounded-full bg-muted-foreground/25 group-data-[position=previous]/stepper-item:bg-foreground group-data-[state=active]/stepper-item:bg-foreground" />
-              <span className="sr-only">{step}</span>
-            </StepperTrigger>
-          </StepperItem>
-        ))}
-      </StepperList>
-
-      <StepperContent value="business">Business details</StepperContent>
-      <StepperContent value="product">Product details</StepperContent>
-      <StepperContent value="review">Review setup</StepperContent>
-    </Stepper>
   );
 }`;
 
@@ -1290,7 +1292,6 @@ export {
   releaseItems,
   rootProps,
   routeBasedPatternSnippet,
-  segmentedRecipeSnippet,
   stateSelectorsCode,
   statusExampleCode,
   themeTokensSnippet,

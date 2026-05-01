@@ -2,8 +2,8 @@
 
 import * as React from "react";
 import copyToClipboard from "copy-to-clipboard";
+import { AnimatePresence, motion } from "framer-motion";
 import { Check, Copy } from "lucide-react";
-import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -13,11 +13,13 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
+type CopyStatus = "idle" | "copied" | "blocked";
+
 type CopyButtonProps = Omit<React.ComponentProps<typeof Button>, "value"> & {
-  value: string;
+  value: string | (() => string | Promise<string>);
   label?: string;
   copiedLabel?: string;
-  toastMessage?: string;
+  blockedLabel?: string;
   iconOnly?: boolean;
 };
 
@@ -25,7 +27,7 @@ function CopyButton({
   value,
   label = "Copy",
   copiedLabel = "Copied",
-  toastMessage = "Copied to clipboard",
+  blockedLabel = "Copy blocked",
   iconOnly = false,
   className,
   children,
@@ -34,8 +36,14 @@ function CopyButton({
   variant,
   ...props
 }: CopyButtonProps) {
-  const [copied, setCopied] = React.useState(false);
+  const [status, setStatus] = React.useState<CopyStatus>("idle");
   const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const currentLabel =
+    status === "copied"
+      ? copiedLabel
+      : status === "blocked"
+        ? blockedLabel
+        : label;
 
   React.useEffect(() => {
     return () => {
@@ -52,23 +60,31 @@ function CopyButton({
       return;
     }
 
-    const didCopy = await writeClipboardText(value);
+    const text = await resolveCopyValue(value);
 
-    if (!didCopy) {
-      toast.info("Copy blocked", {
-        description: "Copy it manually from the code block.",
-      });
+    if (!text) {
+      setTemporaryStatus("blocked");
       return;
     }
 
-    setCopied(true);
-    toast.success(toastMessage);
+    const didCopy = await writeClipboardText(text);
+
+    if (!didCopy) {
+      setTemporaryStatus("blocked");
+      return;
+    }
+
+    setTemporaryStatus("copied");
+  }
+
+  function setTemporaryStatus(nextStatus: CopyStatus) {
+    setStatus(nextStatus);
 
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
 
-    timeoutRef.current = setTimeout(() => setCopied(false), 1500);
+    timeoutRef.current = setTimeout(() => setStatus("idle"), 1500);
   }
 
   return (
@@ -78,7 +94,7 @@ function CopyButton({
           type="button"
           variant={variant ?? (iconOnly ? "ghost" : "outline")}
           size={size ?? (iconOnly ? "icon" : "sm")}
-          aria-label={copied ? copiedLabel : label}
+          aria-label={currentLabel}
           className={cn(
             "gap-1.5",
             iconOnly &&
@@ -88,21 +104,49 @@ function CopyButton({
           onClick={handleCopy}
           {...props}
         >
-          {copied ? (
-            <Check data-icon="inline-start" />
-          ) : (
-            <Copy data-icon="inline-start" />
-          )}
+          <AnimatedCopyIcon status={status} />
           {!iconOnly && (children ?? (
-            <span className="hidden sm:inline">{copied ? copiedLabel : label}</span>
+            <span className="hidden sm:inline">{currentLabel}</span>
           ))}
         </Button>
       </TooltipTrigger>
-      <TooltipContent sideOffset={6}>
-        {copied ? copiedLabel : label}
-      </TooltipContent>
+      <TooltipContent sideOffset={6}>{currentLabel}</TooltipContent>
     </Tooltip>
   );
+}
+
+function AnimatedCopyIcon({ status }: { status: CopyStatus }) {
+  const Icon = status === "copied" ? Check : Copy;
+
+  return (
+    <span
+      data-icon="inline-start"
+      className="relative inline-flex size-4 shrink-0 items-center justify-center"
+    >
+      <AnimatePresence initial={false} mode="popLayout">
+        <motion.span
+          key={status}
+          className="absolute inset-0 flex items-center justify-center"
+          initial={{ opacity: 0, scale: 0.25, filter: "blur(4px)" }}
+          animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+          exit={{ opacity: 0, scale: 0.25, filter: "blur(4px)" }}
+          transition={{ type: "spring", duration: 0.3, bounce: 0 }}
+        >
+          <Icon className="size-4" aria-hidden="true" />
+        </motion.span>
+      </AnimatePresence>
+    </span>
+  );
+}
+
+async function resolveCopyValue(
+  value: CopyButtonProps["value"]
+): Promise<string | null> {
+  try {
+    return typeof value === "function" ? await value() : value;
+  } catch {
+    return null;
+  }
 }
 
 async function writeClipboardText(value: string) {

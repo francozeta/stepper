@@ -1,17 +1,11 @@
 "use client";
 
-import * as React from "react";
-import copyToClipboard from "copy-to-clipboard";
 import {
-  Bot,
   ChevronDown,
-  Copy,
   ExternalLink,
-  FileText,
-  Sparkles,
 } from "lucide-react";
-import { toast } from "sonner";
 
+import { CopyButton } from "@/components/copy-button";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import {
@@ -22,6 +16,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { absoluteUrl, siteConfig } from "@/lib/site";
+import { SiV0 } from "react-icons/si";
+import { FaMarkdown } from "react-icons/fa";
+import { BsClaude, BsOpenai } from "react-icons/bs";
 
 type DocsPageActionsProps = {
   slug?: string[];
@@ -37,25 +34,15 @@ function DocsPageActions({ slug = [], title }: DocsPageActionsProps) {
   const chatGptUrl = `https://chatgpt.com/?q=${encodeURIComponent(prompt)}`;
   const claudeUrl = `https://claude.ai/new?q=${encodeURIComponent(prompt)}`;
 
-  async function copyPage() {
-    const didCopy = await writeClipboardText(window.location.href || pageUrl);
-
-    if (!didCopy) {
-      toast.info("Copy blocked", {
-        description: "Copy the page URL from the address bar.",
-      });
-      return;
-    }
-
-    toast.success("Page link copied");
-  }
-
   return (
     <ButtonGroup>
-      <Button type="button" variant="outline" size="sm" onClick={copyPage}>
-        <Copy data-icon="inline-start" />
-        Copy Page
-      </Button>
+      <CopyButton
+        value={() => window.location.href || pageUrl}
+        label="Copy Page"
+        copiedLabel="Copied"
+        variant="outline"
+        size="sm"
+      />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
@@ -67,36 +54,32 @@ function DocsPageActions({ slug = [], title }: DocsPageActionsProps) {
             <ChevronDown />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-52">
+        <DropdownMenuContent align="end" className="w-auto">
           <DropdownMenuItem asChild>
             <a href={markdownPath} target="_blank" rel="noreferrer">
-              <FileText />
+              <FaMarkdown className="size-4 text-muted-foreground" />
               View as Markdown
-              <ExternalLink className="ml-auto opacity-60" />
             </a>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
             <a href={v0Url} target="_blank" rel="noreferrer">
               <span className="flex size-4 items-center justify-center font-mono text-[0.65rem] font-semibold">
-                v0
+                <SiV0 className="size-4 text-muted-foreground" />
               </span>
               Open in v0
-              <ExternalLink className="ml-auto opacity-60" />
             </a>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <a href={chatGptUrl} target="_blank" rel="noreferrer">
-              <Bot />
+              <BsOpenai className="size-4 text-muted-foreground" />
               Open in ChatGPT
-              <ExternalLink className="ml-auto opacity-60" />
             </a>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <a href={claudeUrl} target="_blank" rel="noreferrer">
-              <Sparkles />
+              <BsClaude className="size-4 text-muted-foreground" />
               Open in Claude
-              <ExternalLink className="ml-auto opacity-60" />
             </a>
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -113,21 +96,6 @@ function getOpenInV0Url() {
   const registryUrl = absoluteUrl(siteConfig.registryDemoItem);
 
   return `https://v0.dev/chat/api/open?url=${encodeURIComponent(registryUrl)}`;
-}
-
-async function writeClipboardText(value: string) {
-  if (navigator.clipboard?.writeText) {
-    try {
-      await navigator.clipboard.writeText(value);
-      return true;
-    } catch {
-      // Fall back for embedded browsers that expose clipboard but block writes.
-    }
-  }
-
-  return copyToClipboard(value, {
-    format: "text/plain",
-  });
 }
 
 export { DocsPageActions };

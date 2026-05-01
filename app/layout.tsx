@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { DocsShell } from "@/components/docs-shell";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { Toaster } from "@/components/ui/sonner";
 import { siteConfig } from "@/lib/site";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
@@ -50,7 +49,6 @@ export default function RootLayout({
         >
           <TooltipProvider>
             <DocsShell>{children}</DocsShell>
-            <Toaster richColors position="bottom-right" />
           </TooltipProvider>
         </ThemeProvider>
       </body>

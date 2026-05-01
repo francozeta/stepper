@@ -136,7 +136,7 @@ async function CodeBlock({
     <div
       data-slot="docs-code-block"
       className={cn(
-        "relative overflow-hidden rounded-xl bg-card text-sm ring-1 ring-border/80",
+        "relative w-full min-w-0 overflow-hidden rounded-xl bg-card text-sm ring-1 ring-border/80",
         className
       )}
     >
@@ -154,7 +154,6 @@ async function CodeBlock({
           value={source}
           label="Copy code"
           iconOnly
-          toastMessage={filename ? `${filename} copied` : "Code copied"}
           className={cn(
             "absolute right-3 z-10 bg-card/80 backdrop-blur",
             filename ? "top-1" : "top-2.5"
@@ -162,7 +161,7 @@ async function CodeBlock({
         />
       ) : null}
 
-      <div className="docs-code-scroll max-h-[420px] overflow-auto">
+      <div className="docs-code-scroll max-h-[420px] max-w-full overflow-auto">
         {showCopy ? (
           <span className="sr-only">Copy code is available in the top right.</span>
         ) : null}

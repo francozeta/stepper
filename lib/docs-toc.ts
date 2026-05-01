@@ -22,7 +22,6 @@ const docsToc: Record<string, DocsTocItem[]> = {
     { title: "Form wizard", href: "#form-wizard" },
   ],
   "/patterns": [
-    { title: "Segmented line", href: "#segmented-line" },
     { title: "Circle progress", href: "#circle-progress" },
     { title: "Controls only", href: "#controls-only" },
     { title: "Route-based stepper", href: "#route-based-stepper" },

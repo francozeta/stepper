@@ -1082,49 +1082,51 @@ function StepperRoutePatternExample() {
       value: "workspace",
       title: "Workspace",
       href: "#route-workspace",
-      completed: true,
     },
     {
       value: "members",
       title: "Members",
       href: "#route-members",
-      completed: false,
     },
     {
       value: "review",
       title: "Review",
       href: "#route-review",
-      completed: false,
     },
   ];
+  const currentIndex = steps.findIndex((step) => step.value === value);
 
   return (
     <Stepper value={value} onValueChange={setValue}>
       <StepperList>
-        {steps.map((step, index) => (
-          <StepperItem
-            key={step.value}
-            value={step.value}
-            completed={step.completed}
-          >
-            <StepperTrigger asChild>
-              <a href={step.href}>
-                <StepperIndicator>
-                  {step.completed ? <Check /> : <Route />}
-                </StepperIndicator>
-                <StepperLabel>{step.title}</StepperLabel>
-              </a>
-            </StepperTrigger>
-            {index < steps.length - 1 ? <StepperSeparator /> : null}
-          </StepperItem>
-        ))}
+        {steps.map((step, index) => {
+          const isCompleted = index < currentIndex;
+
+          return (
+            <StepperItem
+              key={step.value}
+              value={step.value}
+              completed={isCompleted}
+            >
+              <StepperTrigger asChild>
+                <a href={step.href}>
+                  <StepperIndicator>
+                    {isCompleted ? <Check /> : <Route />}
+                  </StepperIndicator>
+                  <StepperLabel>{step.title}</StepperLabel>
+                </a>
+              </StepperTrigger>
+              {index < steps.length - 1 ? <StepperSeparator /> : null}
+            </StepperItem>
+          );
+        })}
       </StepperList>
 
       <StepperContent value={value} forceMount>
         <ExampleContent
           eyebrow="Route pattern"
           title={`Current route: /setup/${value}`}
-          description="The preview uses hash links, while the code tab shows the same shape with Next.js Link."
+          description="The preview uses hash links; the code tab derives the active step from the URL so route state stays the source of truth."
           icon={Route}
         />
       </StepperContent>
@@ -1229,76 +1231,6 @@ const recipeSteps = [
 ] as const;
 
 type RecipeStep = (typeof recipeSteps)[number]["value"];
-
-function StepperSegmentedRecipeExample() {
-  const [value, setValue] = React.useState<RecipeStep>("product");
-  const currentIndex = recipeSteps.findIndex((step) => step.value === value);
-
-  return (
-    <Stepper
-      value={value}
-      onValueChange={(nextValue) => setValue(nextValue as RecipeStep)}
-      className="mx-auto max-w-xl gap-6 bg-transparent"
-    >
-      <div className="flex items-center justify-between">
-        <Button type="button" variant="ghost" size="icon-sm" aria-label="Back">
-          <ArrowLeft />
-        </Button>
-        <span className="flex size-8 items-center justify-center rounded-full border border-border bg-background text-xs font-semibold">
-          S
-        </span>
-        <span className="size-7" aria-hidden="true" />
-      </div>
-
-      <StepperList
-        aria-label="Segmented setup steps"
-        className="w-full gap-2 !overflow-visible !pb-0"
-      >
-        {recipeSteps.map((step, index) => (
-          <StepperItem
-            key={step.value}
-            value={step.value}
-            completed={index < currentIndex}
-            className="!min-w-0 flex-1"
-          >
-            <StepperTrigger className="h-auto w-full flex-col items-stretch gap-3 rounded-none p-0 text-left hover:bg-transparent data-[state=active]:text-foreground">
-              <span className="h-0.5 w-full rounded-full bg-muted-foreground/25 transition-colors group-data-[position=previous]/stepper-item:bg-foreground group-data-[state=active]/stepper-item:bg-foreground" />
-              <span className="sr-only">{step.title}</span>
-            </StepperTrigger>
-          </StepperItem>
-        ))}
-      </StepperList>
-
-      <StepperContent
-        value="business"
-        className="border-0 bg-transparent p-0 shadow-none"
-      >
-        <RecipePanel
-          title="Business details"
-          description="Choose whether this workspace belongs to an individual or a company."
-        />
-      </StepperContent>
-      <StepperContent
-        value="product"
-        className="border-0 bg-transparent p-0 shadow-none"
-      >
-        <RecipePanel
-          title="Product details"
-          description="Collect just enough context to tailor the setup flow."
-        />
-      </StepperContent>
-      <StepperContent
-        value="review"
-        className="border-0 bg-transparent p-0 shadow-none"
-      >
-        <RecipePanel
-          title="Review setup"
-          description="Confirm the values before the product flow continues."
-        />
-      </StepperContent>
-    </Stepper>
-  );
-}
 
 function StepperCircleProgressRecipeExample() {
   const [value, setValue] = React.useState<RecipeStep>("product");
@@ -1409,7 +1341,10 @@ function StepperControlsOnlyRecipeExample() {
 
 function RecipeHiddenStepList({ currentIndex }: { currentIndex: number }) {
   return (
-    <StepperList aria-label="Hidden recipe steps" className="sr-only">
+    <StepperList
+      aria-label="Hidden recipe steps"
+      className="sr-only !w-px !gap-0 !overflow-hidden !pb-0 data-[orientation=horizontal]:!w-px data-[orientation=horizontal]:!gap-0 data-[orientation=horizontal]:!overflow-hidden data-[orientation=horizontal]:!pb-0"
+    >
       {recipeSteps.map((step, index) => (
         <StepperItem
           key={step.value}
@@ -1463,7 +1398,6 @@ export {
   StepperExample,
   StepperMobilePatternExample,
   StepperRoutePatternExample,
-  StepperSegmentedRecipeExample,
   StepperStatusExample,
   StepperVerticalExample,
 };
