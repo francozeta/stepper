@@ -1,0 +1,94 @@
+---
+title: "Styling"
+description: "The Stepper uses shadcn/ui theme tokens and data attributes so users can restyle it without changing the logic."
+eyebrow: "guides"
+---
+
+import { CodeBlock, Section } from "@/components/docs-content";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  indicatorCode,
+  packageStylesImportSnippet,
+  stateSelectorsCode,
+  themeTokensSnippet,
+} from "@/lib/docs";
+
+export const tokens = [
+  "background",
+  "foreground",
+  "border",
+  "muted",
+  "muted-foreground",
+  "primary",
+  "primary-foreground",
+  "destructive",
+  "destructive-foreground",
+  "ring",
+];
+
+<Section
+  title="Theme tokens"
+  description="The core avoids one-off color values and leans on semantic Tailwind tokens."
+>
+  <div className="flex flex-wrap gap-2">
+    {tokens.map((token) => (
+      <Badge key={token} variant="outline" className="font-mono">
+        {token}
+      </Badge>
+    ))}
+  </div>
+</Section>
+
+<Section
+  title="NPM package usage"
+  description="Direct npm usage imports compiled package CSS. You do not need @source, Tailwind content config, or node_modules scanning."
+>
+  <CodeBlock
+    code={packageStylesImportSnippet}
+    filename="app/globals.css"
+    lang="css"
+  />
+</Section>
+
+<Section
+  title="Theme token overrides"
+  description="The package CSS includes fallback values. shadcn/ui projects can still override the same semantic tokens globally."
+>
+  <CodeBlock code={themeTokensSnippet} filename="globals.css" lang="css" />
+</Section>
+
+<Section title="State selectors">
+  <CodeBlock
+    code={stateSelectorsCode}
+    filename="state-selectors.css"
+    lang="css"
+  />
+</Section>
+
+<Section
+  title="Customize by composition"
+  description="For V1, icons, labels, and descriptions are composed inside the trigger instead of being encoded as variants."
+>
+  <Card>
+    <CardHeader>
+      <CardTitle>Indicator slot</CardTitle>
+      <CardDescription>
+        Pass custom children to StepperIndicator for lucide icons, numbers, or status marks.
+      </CardDescription>
+    </CardHeader>
+    <CardContent>
+      <CodeBlock
+        code={indicatorCode}
+        filename="custom-indicator.tsx"
+        className="border-0 shadow-none"
+      />
+    </CardContent>
+  </Card>
+</Section>

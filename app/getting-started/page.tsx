@@ -1,85 +1,9 @@
-import type { Metadata } from "next";
+import { createDocMetadata, MdxDocPage } from "@/components/mdx-doc-page";
 
-import { CopyButton } from "@/components/copy-button";
-import {
-  CodeBlock,
-  FileTree,
-  PageHeader,
-  Section,
-} from "@/components/docs-content";
-import { InstallCommand } from "@/components/install-command";
-import {
-  controlledSnippet,
-  gettingStartedSnippet,
-  packageStylesImportSnippet,
-} from "@/lib/docs";
+const slug = ["getting-started"];
 
-export const metadata: Metadata = {
-  title: "Getting Started",
-};
+export const metadata = createDocMetadata(slug);
 
 export default function GettingStartedPage() {
-  return (
-    <>
-      <PageHeader
-        eyebrow="basics"
-        title="Getting Started"
-        description="Copy the Stepper primitive into a shadcn/ui-style project and compose it with your own labels, icons, and content."
-        action={
-          <CopyButton
-            value='import { Stepper } from "@/components/ui/stepper";'
-            label="Copy import"
-            toastMessage="Import copied"
-          />
-        }
-      />
-
-      <Section
-        title="Install package"
-        description="Use this path when you want Stepper as a normal npm dependency. The package ships compiled CSS, so no Tailwind source scan is required."
-      >
-        <InstallCommand />
-        <CodeBlock
-          code={packageStylesImportSnippet}
-          filename="app/globals.css"
-          lang="css"
-          showLineNumbers={false}
-          compact
-        />
-      </Section>
-
-      <Section
-        title="Copy the component"
-        description="Use the registry or copy-paste source path when you want to own the component file."
-      >
-        <FileTree
-          items={[
-            {
-              name: "components",
-              children: [
-                {
-                  name: "ui",
-                  children: [{ name: "stepper.tsx" }],
-                },
-              ],
-            },
-          ]}
-        />
-      </Section>
-
-      <Section
-        title="Use it uncontrolled"
-        description="Use defaultValue when the Stepper can own its active step."
-      >
-        <CodeBlock code={gettingStartedSnippet} filename="checkout-stepper.tsx" />
-      </Section>
-
-      <Section
-        title="Use it controlled"
-        description="Pass value and onValueChange when app state, validation, or routing decides the current step."
-      >
-        <CodeBlock code={controlledSnippet} filename="controlled-usage.tsx" />
-      </Section>
-    </>
-  );
+  return <MdxDocPage slug={slug} />;
 }

@@ -1,0 +1,65 @@
+---
+title: "Changelog"
+description: "Release notes, tags, GitHub Releases, and npm publish are handled by semantic-release from main."
+eyebrow: "guides"
+badge: "ready"
+---
+
+import { Section } from "@/components/docs-content";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { packageVersion, releaseItems, v2Roadmap } from "@/lib/docs";
+
+<Section title="Changed">
+  <Card>
+    <CardHeader>
+      <CardTitle>Stepper {packageVersion}</CardTitle>
+      <CardDescription>
+        Current package version from packages/stepper/package.json.
+      </CardDescription>
+    </CardHeader>
+    <CardContent>
+      <ul className="grid gap-3 text-sm text-muted-foreground sm:grid-cols-2">
+        {releaseItems.map((item) => (
+          <li key={item} className="flex gap-2">
+            <Badge variant="secondary" className="mt-0.5 h-5 px-1.5">
+              +
+            </Badge>
+            <span className="leading-6">{item}</span>
+          </li>
+        ))}
+      </ul>
+    </CardContent>
+  </Card>
+</Section>
+
+<Section title="Tag link">
+  <Button asChild variant="outline" className="w-fit">
+    <a href={`https://github.com/francozeta/stepper/tree/v${packageVersion}`}>
+      Open current GitHub tag
+    </a>
+  </Button>
+</Section>
+
+<Section
+  title="Next direction"
+  description="The next version can become more composable without making V1 heavier."
+>
+  <div className="grid gap-3 md:grid-cols-3">
+    {v2Roadmap.map((item) => (
+      <Card key={item.title} size="sm">
+        <CardHeader>
+          <CardTitle>{item.title}</CardTitle>
+          <CardDescription>{item.description}</CardDescription>
+        </CardHeader>
+      </Card>
+    ))}
+  </div>
+</Section>

@@ -1,0 +1,63 @@
+---
+title: "Getting Started"
+description: "Copy the Stepper primitive into a shadcn/ui-style project and compose it with your own labels, icons, and content."
+eyebrow: "basics"
+copyImport: "import { Stepper } from \"@/components/ui/stepper\";"
+copyLabel: "Copy import"
+copyToast: "Import copied"
+---
+
+import { CodeBlock, FileTree, Section } from "@/components/docs-content";
+import { InstallCommand } from "@/components/install-command";
+import {
+  controlledSnippet,
+  gettingStartedSnippet,
+  packageStylesImportSnippet,
+} from "@/lib/docs";
+
+<Section
+  title="Install package"
+  description="Use this path when you want Stepper as a normal npm dependency. The package ships compiled CSS, so no Tailwind source scan is required."
+>
+  <InstallCommand />
+  <CodeBlock
+    code={packageStylesImportSnippet}
+    filename="app/globals.css"
+    lang="css"
+    showLineNumbers={false}
+    compact
+  />
+</Section>
+
+<Section
+  title="Copy the component"
+  description="Use the registry or copy-paste source path when you want to own the component file."
+>
+  <FileTree
+    items={[
+      {
+        name: "components",
+        children: [
+          {
+            name: "ui",
+            children: [{ name: "stepper.tsx" }],
+          },
+        ],
+      },
+    ]}
+  />
+</Section>
+
+<Section
+  title="Use it uncontrolled"
+  description="Use defaultValue when the Stepper can own its active step."
+>
+  <CodeBlock code={gettingStartedSnippet} filename="checkout-stepper.tsx" />
+</Section>
+
+<Section
+  title="Use it controlled"
+  description="Pass value and onValueChange when app state, validation, or routing decides the current step."
+>
+  <CodeBlock code={controlledSnippet} filename="controlled-usage.tsx" />
+</Section>

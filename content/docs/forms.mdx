@@ -1,0 +1,68 @@
+---
+title: "Using Stepper with react-hook-form"
+description: "The Stepper primitive does not depend on react-hook-form or zod. It coordinates the UI around form state owned by your app."
+eyebrow: "guides"
+---
+
+import { InfoGrid, Section } from "@/components/docs-content";
+import { DocsExample } from "@/components/docs-example";
+import { StepperExample } from "@/components/stepper-examples";
+import { formWizardGuideSnippet } from "@/lib/docs";
+
+export const boundaries = [
+  {
+    label: "Stepper",
+    value: "UI state",
+    help: "Owns active step, disabled steps, completed states, and content panels.",
+  },
+  {
+    label: "react-hook-form",
+    value: "Field state",
+    help: "Owns values, focus, touched state, and validation triggers.",
+  },
+  {
+    label: "zod",
+    value: "Rules",
+    help: "Defines schema constraints without becoming a Stepper dependency.",
+  },
+];
+
+export const validationFlow = [
+  {
+    label: "Validate",
+    value: "trigger(fields)",
+    help: "Validate only the fields that belong to the active step.",
+  },
+  {
+    label: "Reflect",
+    value: "error/completed",
+    help: "Map validation result onto StepperItem state props.",
+  },
+  {
+    label: "Advance",
+    value: "setValue",
+    help: "Move to the next step only after the app layer accepts the data.",
+  },
+];
+
+<Section
+  title="Primitive boundary"
+  description="Stepper does not own your form state. It coordinates the UI around it."
+>
+  <InfoGrid items={boundaries} />
+</Section>
+
+<Section
+  title="Validation flow"
+  description="Keep validation decisions in the form layer, then pass the result back to Stepper props."
+>
+  <InfoGrid items={validationFlow} />
+</Section>
+
+<DocsExample
+  title="Form wizard"
+  description="A product-style setup flow where react-hook-form owns validation and Stepper reflects the current UI state."
+  code={formWizardGuideSnippet}
+  filename="form-wizard.tsx"
+  preview={<StepperExample />}
+/>
