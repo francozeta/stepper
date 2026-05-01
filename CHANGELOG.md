@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.6](https://github.com/francozeta/stepper/compare/v0.1.5...v0.1.6) (2026-05-01)
+
+### Bug Fixes
+
+* sync sidebar release version ([51f5e95](https://github.com/francozeta/stepper/commit/51f5e958108c2a418f5074e58108baaae004b34e))
+
 ## 0.1.5
 
 Package CSS export for direct npm usage.
