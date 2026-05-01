@@ -6,15 +6,15 @@ import { CopyButton } from "@/components/copy-button";
 import { DocsPageActions } from "@/components/docs-page-actions";
 import { PageHeader } from "@/components/docs-content";
 import { Button } from "@/components/ui/button";
-import { packageVersion } from "@/lib/docs";
+import { registryVersion } from "@/lib/docs";
 import { source } from "@/lib/source";
 import { mdxComponents } from "@/mdx-components";
 
 type DocFrontmatter = {
   badge?: string;
+  copyCopiedLabel?: string;
   copyImport?: string;
   copyLabel?: string;
-  copyToast?: string;
   description?: string;
   eyebrow?: string;
   rss?: boolean;
@@ -22,8 +22,8 @@ type DocFrontmatter = {
 };
 
 function resolveBadge(badge?: string) {
-  if (badge === "package-version") {
-    return `v${packageVersion}`;
+  if (badge === "registry-version") {
+    return `Registry v${registryVersion}`;
   }
 
   return badge;
@@ -44,7 +44,7 @@ function getCopyImportAction(data: DocFrontmatter) {
     <CopyButton
       value={data.copyImport}
       label={data.copyLabel ?? "Copy"}
-      copiedLabel={data.copyToast ?? "Copied"}
+      copiedLabel={data.copyCopiedLabel ?? "Copied"}
     />
   ) : null;
 }

@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { packageVersion } from "@/lib/docs";
+import { registryVersion } from "@/lib/docs";
 import { getReleaseAnchor, releases } from "@/lib/releases";
 
 const formatter = new Intl.DateTimeFormat("en", {
@@ -23,7 +23,7 @@ function ChangelogList() {
   return (
     <div className="flex flex-col gap-6">
       {releases.map((release) => {
-        const isCurrent = release.version === packageVersion;
+        const isCurrent = release.version === registryVersion;
 
         return (
           <article

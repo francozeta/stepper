@@ -1,21 +1,18 @@
 ---
 title: "Stepper"
-description: "A lightweight primitive for guided multi-step flows in React, Next.js, Tailwind CSS, and shadcn/ui-style projects."
+description: "A shadcn registry component for guided multi-step flows in React, Next.js, and Tailwind CSS projects."
 eyebrow: "components/ui"
-badge: "package-version"
+badge: "shadcn registry"
 ---
 
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { DocsExample } from "@/components/docs-example";
-import { CodeBlock, InfoGrid, Section } from "@/components/docs-content";
+import { CodeBlock, FileTree, InfoGrid, Section } from "@/components/docs-content";
 import { StepperExample } from "@/components/stepper-examples";
-import { InstallCommand } from "@/components/install-command";
 import { Button } from "@/components/ui/button";
 import {
-  packageStylesImportSnippet,
-  packageUsageSnippet,
   registryInstallSnippet,
   workspaceExampleCode,
   whyStepper,
@@ -23,7 +20,7 @@ import {
 
 <Section
   title="Install"
-  description="Use the shadcn registry when you want source ownership, or install the package when you want semver dependency updates."
+  description="Stepper is distributed through the shadcn registry. The CLI copies the component source into your app, so you own the code and can customize it directly."
 >
   <div className="grid gap-4">
     <CodeBlock
@@ -33,22 +30,18 @@ import {
       showLineNumbers={false}
       compact
     />
-    <InstallCommand />
-  </div>
-  <div className="grid gap-4">
-    <CodeBlock
-      code={packageStylesImportSnippet}
-      filename="app/globals.css"
-      lang="css"
-      showLineNumbers={false}
-      compact
-    />
-    <CodeBlock
-      code={packageUsageSnippet}
-      filename="app/page.tsx"
-      lang="tsx"
-      showLineNumbers={false}
-      compact
+    <FileTree
+      items={[
+        {
+          name: "components",
+          children: [
+            {
+              name: "ui",
+              children: [{ name: "stepper.tsx" }],
+            },
+          ],
+        },
+      ]}
     />
   </div>
 </Section>
@@ -69,7 +62,7 @@ import {
 
 <Section
   title="Why another Stepper?"
-  description="Most stepper libraries focus on workflow state. This primitive focuses on shadcn-style composition, UI states, and copy-paste ownership."
+  description="Most steppers try to own the workflow. This one gives you composable UI primitives, while your app owns routing, validation, form state, persistence, and server actions."
 >
   <InfoGrid items={whyStepper} />
 </Section>

@@ -1,56 +1,23 @@
 ---
 title: "Getting Started"
-description: "Install Stepper through the shadcn registry when you want source ownership, or through the package when you want semver updates."
+description: "Install Stepper through the shadcn registry and copy the component source into your app."
 eyebrow: "basics"
 copyImport: "import { Stepper } from \"@/components/ui/stepper\";"
 copyLabel: "Copy import"
-copyToast: "Import copied"
+copyCopiedLabel: "Import copied"
 ---
 
 import { CodeBlock, FileTree, Section } from "@/components/docs-content";
-import { InstallCommand } from "@/components/install-command";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   controlledSnippet,
   gettingStartedSnippet,
-  packageStylesImportSnippet,
   registryInstallSnippet,
+  usageSnippet,
 } from "@/lib/docs";
 
 <Section
-  title="Choose an install path"
-  description="Both paths are supported. The registry feels native in shadcn/ui projects; the package is better when you want a normal dependency update flow."
->
-  <div className="grid gap-4 md:grid-cols-2">
-    <Card>
-      <CardHeader>
-        <CardTitle>shadcn registry</CardTitle>
-        <CardDescription>
-          Best when you want Stepper copied into components/ui/stepper.tsx so
-          your app owns the source and can customize it freely.
-        </CardDescription>
-      </CardHeader>
-    </Card>
-    <Card>
-      <CardHeader>
-        <CardTitle>npm package</CardTitle>
-        <CardDescription>
-          Best when you prefer @francozeta/stepper as a versioned dependency
-          with package updates and a compiled stylesheet.
-        </CardDescription>
-      </CardHeader>
-    </Card>
-  </div>
-</Section>
-
-<Section
-  title="Install from the registry"
-  description="This is the recommended path for shadcn/ui-style apps. It installs the component as source code, so updates are deliberate: rerun the command, review the diff, then keep your local changes."
+  title="Install"
+  description="Stepper is installed through the shadcn registry. The CLI copies the component source into your project, so you can customize it directly."
 >
   <CodeBlock
     code={registryInstallSnippet}
@@ -59,6 +26,12 @@ import {
     showLineNumbers={false}
     compact
   />
+</Section>
+
+<Section
+  title="What gets added"
+  description="Stepper does not install as a runtime package. After installation, the source belongs to your project."
+>
   <FileTree
     items={[
       {
@@ -72,19 +45,10 @@ import {
       },
     ]}
   />
-</Section>
-
-<Section
-  title="Install the package"
-  description="Use this path when you want Stepper as a normal npm dependency. The package ships compiled CSS, so no Tailwind source scan is required."
->
-  <InstallCommand />
   <CodeBlock
-    code={packageStylesImportSnippet}
-    filename="app/globals.css"
-    lang="css"
-    showLineNumbers={false}
-    compact
+    code={usageSnippet}
+    filename="app/page.tsx"
+    lang="tsx"
   />
 </Section>
 

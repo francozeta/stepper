@@ -1,7 +1,7 @@
 const siteConfig = {
   name: "Stepper",
   description:
-    "A lightweight Stepper component for React, Next.js, Tailwind CSS, and shadcn/ui-style projects.",
+    "A shadcn registry component for guided multi-step flows in React, Next.js, and Tailwind CSS projects.",
   url: "https://francozeta-stepper.vercel.app",
   repository: "https://github.com/francozeta/stepper",
   registryItem: "/stepper.json",

@@ -1,6 +1,6 @@
 ---
 title: "Styling"
-description: "The Stepper uses shadcn/ui theme tokens and data attributes so users can restyle it without changing the logic."
+description: "Stepper uses shadcn/ui theme tokens, data attributes, and local source ownership for styling."
 eyebrow: "guides"
 ---
 
@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/card";
 import {
   indicatorCode,
-  packageStylesImportSnippet,
   stateSelectorsCode,
   themeTokensSnippet,
 } from "@/lib/docs";
@@ -35,7 +34,7 @@ export const tokens = [
 
 <Section
   title="Theme tokens"
-  description="The core avoids one-off color values and leans on semantic Tailwind tokens."
+  description="The copied component avoids one-off color values and leans on semantic Tailwind tokens."
 >
   <div className="flex flex-wrap gap-2">
     {tokens.map((token) => (
@@ -47,19 +46,8 @@ export const tokens = [
 </Section>
 
 <Section
-  title="NPM package usage"
-  description="Direct npm usage imports compiled package CSS. You do not need @source, Tailwind content config, or node_modules scanning."
->
-  <CodeBlock
-    code={packageStylesImportSnippet}
-    filename="app/globals.css"
-    lang="css"
-  />
-</Section>
-
-<Section
   title="Theme token overrides"
-  description="The package CSS includes fallback values. shadcn/ui projects can still override the same semantic tokens globally."
+  description="Stepper reads the same semantic tokens as the rest of your shadcn/ui project."
 >
   <CodeBlock code={themeTokensSnippet} filename="globals.css" lang="css" />
 </Section>
@@ -74,7 +62,7 @@ export const tokens = [
 
 <Section
   title="Customize by composition"
-  description="For V1, icons, labels, and descriptions are composed inside the trigger instead of being encoded as variants."
+  description="Because Stepper is copied into your app, you can pass className, target data attributes, or edit components/ui/stepper.tsx directly."
 >
   <Card>
     <CardHeader>

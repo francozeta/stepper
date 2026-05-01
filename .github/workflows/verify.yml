@@ -1,24 +1,22 @@
-name: Release
+name: Verify
 
 on:
   push:
     branches:
       - main
+  pull_request:
   workflow_dispatch:
 
 permissions:
-  contents: write
-  issues: write
-  pull-requests: write
-  id-token: write
+  contents: read
 
 concurrency:
-  group: release-${{ github.ref }}
-  cancel-in-progress: false
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  release:
-    name: Release
+  verify:
+    name: Verify
     runs-on: ubuntu-latest
 
     steps:
@@ -41,9 +39,3 @@ jobs:
 
       - name: Verify
         run: pnpm check
-
-      - name: Release
-        run: pnpm release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

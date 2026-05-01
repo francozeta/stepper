@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  ChevronDown,
-  ExternalLink,
-} from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 import { CopyButton } from "@/components/copy-button";
 import { Button } from "@/components/ui/button";

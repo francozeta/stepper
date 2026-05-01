@@ -13,15 +13,9 @@
       "persistent": true
     },
     "lint": {},
-    "package:build": {
-      "dependsOn": ["registry:build"],
-      "outputs": ["packages/stepper/dist/**"]
-    },
     "registry:build": {
       "outputs": [
         "registry/default/ui/**",
-        "packages/stepper/src/index.tsx",
-        "packages/stepper/registry/default/ui/**",
         "public/*.json"
       ]
     },

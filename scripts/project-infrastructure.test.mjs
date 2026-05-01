@@ -16,7 +16,7 @@ async function readJson(filePath) {
 }
 
 describe("project infrastructure", () => {
-  it("declares the package workspace and Turbo task graph", async () => {
+  it("declares the registry workspace and Turbo task graph", async () => {
     const vercelIgnore = await readText(".vercelignore");
     const workspace = await readText("pnpm-workspace.yaml");
     const turbo = await readJson("turbo.json");
@@ -25,11 +25,12 @@ describe("project infrastructure", () => {
     expect(vercelIgnore).toContain("node_modules");
     expect(vercelIgnore).toContain(".next");
     expect(workspace).toContain('"."');
-    expect(workspace).toContain('"packages/*"');
+    expect(workspace).not.toContain('"packages/*"');
     expect(packageJson.devDependencies).toHaveProperty("turbo");
     expect(turbo.tasks.build.dependsOn).toContain("^build");
     expect(turbo.tasks.dev.persistent).toBe(true);
     expect(turbo.tasks["registry:build"].outputs).toContain("public/*.json");
+    expect(turbo.tasks).not.toHaveProperty("package:build");
   });
 
   it("builds a public shadcn registry from the root registry manifest", async () => {
@@ -38,6 +39,8 @@ describe("project infrastructure", () => {
 
     expect(packageJson.scripts["registry:build"]).toContain("shadcn build");
     expect(packageJson.scripts["registry:check"]).toContain("shadcn build");
+    expect(packageJson.scripts).not.toHaveProperty("package:build");
+    expect(packageJson.scripts.check).not.toContain("package:build");
     expect(registry).toMatchObject({
       name: "stepper",
       homepage: "https://francozeta-stepper.vercel.app",

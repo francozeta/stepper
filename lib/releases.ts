@@ -1,4 +1,4 @@
-import { packageVersion } from "@/lib/docs";
+import { registryVersion } from "@/lib/docs";
 import { absoluteUrl, siteConfig } from "@/lib/site";
 
 type ReleaseLink = {
@@ -7,7 +7,7 @@ type ReleaseLink = {
 };
 
 type ReleaseSection = {
-  title: "Added" | "Changed" | "Fixed" | "Docs" | "Registry" | "Package";
+  title: "Added" | "Changed" | "Fixed" | "Docs" | "Registry" | "Infra";
   items: string[];
 };
 
@@ -71,8 +71,8 @@ const releases: StepperRelease[] = [
       {
         title: "Changed",
         items: [
-          "Connected release automation to the package metadata and docs version badge.",
-          "Documented the registry flow next to the npm package flow instead of treating them as separate experiments.",
+          "Connected the docs version badge to the registry component version.",
+          "Documented the registry flow as the primary source-ownership install path.",
         ],
       },
     ],
@@ -116,15 +116,15 @@ const releases: StepperRelease[] = [
   {
     version: "0.1.5",
     date: "2026-05-01",
-    title: "Package CSS export",
+    title: "Styling guidance",
     summary:
-      "Direct npm usage became cleaner by shipping compiled CSS from the package and exposing it through the package exports map.",
+      "The styling docs clarified how Stepper uses shadcn/ui semantic tokens and data attributes.",
     sections: [
       {
-        title: "Package",
+        title: "Docs",
         items: [
-          "Added a package CSS build output at packages/stepper/dist/styles.css.",
-          "Documented @import \"@francozeta/stepper/styles.css\" as the direct package styling path.",
+          "Documented the theme tokens that Stepper reads from the host app.",
+          "Added examples for state selectors and indicator composition.",
         ],
       },
     ],
@@ -161,7 +161,7 @@ const releases: StepperRelease[] = [
 ];
 
 function getCurrentRelease() {
-  return releases.find((release) => release.version === packageVersion);
+  return releases.find((release) => release.version === registryVersion);
 }
 
 function getReleaseUrl(release: StepperRelease) {

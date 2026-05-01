@@ -11,8 +11,8 @@ const docsToc: Record<string, DocsTocItem[]> = {
     { title: "Why another Stepper?", href: "#why-another-stepper" },
   ],
   "/getting-started": [
-    { title: "Install package", href: "#install-package" },
-    { title: "Copy the component", href: "#copy-the-component" },
+    { title: "Install", href: "#install" },
+    { title: "What gets added", href: "#what-gets-added" },
     { title: "Use it uncontrolled", href: "#use-it-uncontrolled" },
     { title: "Use it controlled", href: "#use-it-controlled" },
   ],
@@ -46,8 +46,7 @@ const docsToc: Record<string, DocsTocItem[]> = {
   ],
   "/styling": [
     { title: "Theme tokens", href: "#theme-tokens" },
-    { title: "NPM package usage", href: "#npm-package-usage" },
-    { title: "Required tokens", href: "#required-tokens" },
+    { title: "Theme token overrides", href: "#theme-token-overrides" },
     { title: "State selectors", href: "#state-selectors" },
     { title: "Customize by composition", href: "#customize-by-composition" },
   ],

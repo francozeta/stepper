@@ -21,7 +21,6 @@
 
 # production
 /build
-/packages/stepper/dist
 
 # misc
 .DS_Store

@@ -18,8 +18,28 @@ describe("release and AI documentation surfaces", () => {
 
     expect(changelog).toContain("<ChangelogList />");
     expect(changelog).not.toContain("releaseItems");
+    expect(changelog).not.toContain("npm publishes");
+    expect(changelog).not.toContain("package changes");
     expect(releases).toContain("Flat registry URLs");
     expect(releases).toContain("MDX docs and shadcn registry infrastructure");
+  });
+
+  it("keeps public docs registry-only", async () => {
+    const docs = await Promise.all(
+      [
+        "README.md",
+        "content/docs/index.mdx",
+        "content/docs/getting-started.mdx",
+        "content/docs/styling.mdx",
+        "lib/docs-markdown.ts",
+      ].map((filePath) => readText(filePath))
+    );
+    const combinedDocs = docs.join("\n");
+
+    expect(combinedDocs).toContain("shadcn registry");
+    expect(combinedDocs).not.toContain("@francozeta/stepper");
+    expect(combinedDocs).not.toContain("pnpm add @francozeta/stepper");
+    expect(combinedDocs).not.toContain("@import \"@francozeta/stepper/styles.css\"");
   });
 
   it("exposes RSS and Markdown route handlers", async () => {

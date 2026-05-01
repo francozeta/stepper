@@ -4,5 +4,4 @@
 .turbo
 coverage
 node_modules
-packages/stepper/dist
 tsconfig.tsbuildinfo

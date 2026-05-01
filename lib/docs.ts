@@ -10,7 +10,7 @@ import {
   Rocket,
 } from "lucide-react";
 
-import stepperPackageJson from "@/packages/stepper/package.json";
+import packageJson from "@/package.json";
 
 type DocsNavItem = {
   title: string;
@@ -23,7 +23,7 @@ type DocsNavGroup = {
   items: DocsNavItem[];
 };
 
-const packageVersion = stepperPackageJson.version;
+const registryVersion = packageJson.version;
 
 const docsNav: DocsNavGroup[] = [
   {
@@ -94,11 +94,10 @@ const quickFacts = [
 ];
 
 const releaseItems = [
-  "Conventional commits decide whether the next release is patch, minor, or major.",
-  "semantic-release updates changelog files and packages/stepper/package.json.",
-  "GitHub Actions creates the tag, GitHub Release, and npm publish from main.",
-  "The docs read the package version from packages/stepper/package.json.",
-  "The registry output remains generated before release verification.",
+  "The registry output is generated from components/ui/stepper/*.",
+  "GitHub Actions verifies the registry, docs, tests, and production build.",
+  "The public install command points at the root-level /stepper.json item.",
+  "The component is copied into the user's app instead of installed as a runtime dependency.",
 ];
 
 const gettingStartedSnippet = `import {
@@ -161,17 +160,6 @@ const usageSnippet = `import {
 
 const registryInstallSnippet = `pnpm dlx shadcn@latest add https://francozeta-stepper.vercel.app/stepper.json`;
 
-const pnpmInstallSnippet = `pnpm add @francozeta/stepper`;
-
-const npmInstallSnippet = `npm install @francozeta/stepper`;
-
-const packageUsageSnippet = `import {
-  Stepper,
-  StepperContent,
-  StepperItem,
-  StepperList,
-} from "@francozeta/stepper";`;
-
 const whyStepper = [
   {
     label: "Compose first",
@@ -180,8 +168,8 @@ const whyStepper = [
   },
   {
     label: "Own the code",
-    value: "Copy-paste",
-    help: "Ship a generated single-file primitive while keeping source modules maintainable.",
+    value: "shadcn registry",
+    help: "Install the generated single-file primitive into your app and keep full source ownership.",
   },
   {
     label: "Style the states",
@@ -240,8 +228,6 @@ const worksWith = [
     help: "Used only for custom trigger/content composition.",
   },
 ];
-
-const packageStylesImportSnippet = `@import "@francozeta/stepper/styles.css";`;
 
 const themeTokensSnippet = `:root {
   --background: oklch(1 0 0);
@@ -1188,11 +1174,11 @@ const useStepperRows = [
   },
 ];
 
-const packageNotes = [
+const registryNotes = [
   {
     label: "Version",
-    value: packageVersion,
-    help: "Read from packages/stepper/package.json.",
+    value: `v${registryVersion}`,
+    help: "Versioned as the registry component, not as a runtime package.",
   },
   {
     label: "Core file",
@@ -1281,13 +1267,9 @@ export {
   listProps,
   mobileDrawerPatternSnippet,
   navigationProps,
-  npmInstallSnippet,
-  packageVersion,
-  packageStylesImportSnippet,
-  packageUsageSnippet,
+  registryVersion,
   registryInstallSnippet,
-  packageNotes,
-  pnpmInstallSnippet,
+  registryNotes,
   quickFacts,
   releaseItems,
   rootProps,

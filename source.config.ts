@@ -7,9 +7,9 @@ export const docs = defineDocs({
   docs: {
     schema: pageSchema.extend({
       badge: z.string().optional(),
+      copyCopiedLabel: z.string().optional(),
       copyImport: z.string().optional(),
       copyLabel: z.string().optional(),
-      copyToast: z.string().optional(),
       eyebrow: z.string().optional(),
       rss: z.boolean().optional(),
     }),

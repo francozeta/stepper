@@ -1,8 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "incremental": false,
-    "noEmit": false
-  },
-  "include": ["packages/stepper/src/index.tsx"]
-}
