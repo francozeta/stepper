@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { PackageCheck } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
 
-import { docsNav } from "@/lib/docs";
+import { docsNav, packageVersion } from "@/lib/docs";
 import { cn } from "@/lib/utils";
 
 function DocsSidebar() {
@@ -121,14 +121,16 @@ function SidebarFooter() {
         href="/changelog"
         className="rounded-lg border border-border bg-muted/30 p-3 outline-none transition-[background-color,box-shadow] hover:bg-muted/60 focus-visible:ring-ring/50 focus-visible:ring-[3px]"
       >
-        <p className="text-sm font-medium text-foreground">Release 0.1.4</p>
+        <p className="text-sm font-medium text-foreground">
+          Release {packageVersion}
+        </p>
         <p className="mt-1 text-xs leading-5 text-muted-foreground">
-          Clearer default states and simpler install docs.
+          Automated changelog, tags, GitHub Releases, and npm publish.
         </p>
       </Link>
       <div className="flex items-center justify-between">
         <span className="rounded-md border border-border bg-background px-2 py-1 font-mono text-xs text-muted-foreground">
-          v0.1.4
+          v{packageVersion}
         </span>
         <a
           href="https://github.com/francozeta/stepper"
