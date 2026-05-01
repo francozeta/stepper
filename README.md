@@ -45,7 +45,7 @@ Publishing is automated with semantic-release from `main`. Conventional commits 
 pnpm release:dry-run
 ```
 
-Local dry runs still need release credentials because the GitHub and npm plugins verify auth. The GitHub workflow expects either npm trusted publishing to be configured for this repository, or an `NPM_TOKEN` repository secret. `GITHUB_TOKEN` is provided by GitHub Actions.
+Local dry runs still need release credentials because the GitHub and npm plugins verify auth. The GitHub workflow expects either npm trusted publishing to be configured for this repository, or an `NPM_TOKEN` repository secret with publish access to `@francozeta/stepper`. `GITHUB_TOKEN` is provided by GitHub Actions.
 
 Direct npm consumers only need the package stylesheet:
 
