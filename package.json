@@ -1,6 +1,6 @@
 {
   "name": "stepper",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "private": true,
   "packageManager": "pnpm@9.15.3",
   "scripts": {
@@ -10,12 +10,14 @@
     "lint": "eslint",
     "registry:build": "node scripts/build-stepper-registry.mjs",
     "registry:check": "node scripts/build-stepper-registry.mjs --check",
-    "package:build": "pnpm registry:build && tsup --config tsup.config.ts",
+    "package:build": "pnpm registry:build && tsup --config tsup.config.ts && pnpm package:build:css && pnpm package:check",
+    "package:build:css": "tailwindcss -i packages/stepper/src/styles.css -o packages/stepper/dist/styles.css --minify",
+    "package:check": "node scripts/check-stepper-package.mjs",
     "package:pack": "pnpm package:build && npm pack ./packages/stepper --dry-run",
     "package:publish": "pnpm package:build && npm publish ./packages/stepper --access public",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "check": "pnpm registry:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build"
+    "check": "pnpm registry:check && pnpm lint && pnpm typecheck && pnpm test && pnpm package:build && pnpm build"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
@@ -48,6 +50,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@tailwindcss/cli": "^4.2.4",
     "@tailwindcss/postcss": "^4",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",

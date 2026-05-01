@@ -1,5 +1,12 @@
 # @francozeta/stepper Changelog
 
+## 0.1.5
+
+- Added compiled package CSS at `@francozeta/stepper/styles.css`.
+- Removed the need for Tailwind `@source`, `content`, or node_modules scanning in consumer apps.
+- Added package-local fallback theme variables while still respecting shadcn/ui semantic tokens.
+- Kept the generated shadcn-style registry artifact available for copy-paste ownership.
+
 ## 0.1.4
 
 - Default completed indicators now render a completion mark instead of repeating the step number.

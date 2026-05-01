@@ -6,8 +6,8 @@ import {
   controlledSnippet,
   gettingStartedSnippet,
   npmInstallSnippet,
+  packageStylesImportSnippet,
   pnpmInstallSnippet,
-  tailwindV4SourceSnippet,
 } from "@/lib/docs";
 
 export const metadata: Metadata = {
@@ -32,14 +32,14 @@ export default function GettingStartedPage() {
 
       <Section
         title="Install package"
-        description="Use this path when you want Stepper as a normal npm dependency."
+        description="Use this path when you want Stepper as a normal npm dependency. The package ships compiled CSS, so no Tailwind source scan is required."
       >
         <div className="grid gap-4 md:grid-cols-2">
           <CodeBlock code={pnpmInstallSnippet} filename="pnpm" lang="bash" />
           <CodeBlock code={npmInstallSnippet} filename="npm" lang="bash" />
         </div>
         <CodeBlock
-          code={tailwindV4SourceSnippet}
+          code={packageStylesImportSnippet}
           filename="app/globals.css"
           lang="css"
         />

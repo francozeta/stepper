@@ -71,7 +71,7 @@ const docsNav: DocsNavGroup[] = [
         icon: Palette,
       },
       {
-        title: "Release 0.1.4",
+        title: "Release 0.1.5",
         href: "/changelog",
         icon: Rocket,
       },
@@ -90,10 +90,10 @@ const quickFacts = [
 ];
 
 const releaseItems = [
-  "Default completed indicators now render a completion mark instead of repeating the step number.",
-  "Step items expose data-position for previous, current, and next styling hooks.",
-  "The docs home page is reduced to preview, install, usage, and positioning.",
-  "Install commands are visible before advanced implementation details.",
+  "The npm package now exports a compiled styles.css file for direct package usage.",
+  "Consumers can import @francozeta/stepper/styles.css instead of adding @source rules.",
+  "Package CSS is built from the Stepper source only and excludes docs/app utilities.",
+  "shadcn semantic tokens are still respected, with package-local fallbacks for vanilla apps.",
   "Registry output remains generated from modular source for copy-paste distribution.",
 ];
 
@@ -158,6 +158,13 @@ const usageSnippet = `import {
 const pnpmInstallSnippet = `pnpm add @francozeta/stepper`;
 
 const npmInstallSnippet = `npm install @francozeta/stepper`;
+
+const packageUsageSnippet = `import {
+  Stepper,
+  StepperContent,
+  StepperItem,
+  StepperList,
+} from "@francozeta/stepper";`;
 
 const whyStepper = [
   {
@@ -228,21 +235,7 @@ const worksWith = [
   },
 ];
 
-const tailwindV4SourceSnippet = `@import "tailwindcss";
-
-@source "../node_modules/@francozeta/stepper/dist";`;
-
-const tailwindV3ContentSnippet = `import type { Config } from "tailwindcss";
-
-const config = {
-  content: [
-    "./app/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
-    "./node_modules/@francozeta/stepper/dist/**/*.{js,mjs,cjs}",
-  ],
-} satisfies Config;
-
-export default config;`;
+const packageStylesImportSnippet = `@import "@francozeta/stepper/styles.css";`;
 
 const themeTokensSnippet = `:root {
   --background: oklch(1 0 0);
@@ -255,19 +248,6 @@ const themeTokensSnippet = `:root {
   --muted-foreground: oklch(0.556 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-border: var(--border);
-  --color-ring: var(--ring);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
 }`;
 
 const formWizardGuideSnippet = `"use client";
@@ -1065,8 +1045,8 @@ const useStepperRows = [
 const packageNotes = [
   {
     label: "Version",
-    value: "0.1.4",
-    help: "Indicator clarity and install docs polish.",
+    value: "0.1.5",
+    help: "Compiled package CSS for direct npm usage.",
   },
   {
     label: "Core file",
@@ -1154,6 +1134,8 @@ export {
   mobileDrawerPatternSnippet,
   navigationProps,
   npmInstallSnippet,
+  packageStylesImportSnippet,
+  packageUsageSnippet,
   packageNotes,
   pnpmInstallSnippet,
   quickFacts,
@@ -1162,8 +1144,6 @@ export {
   routeBasedPatternSnippet,
   stateSelectorsCode,
   statusExampleCode,
-  tailwindV3ContentSnippet,
-  tailwindV4SourceSnippet,
   themeTokensSnippet,
   triggerProps,
   usageSnippet,

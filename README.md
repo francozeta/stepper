@@ -40,15 +40,13 @@ pnpm package:publish
 
 The package name is `@francozeta/stepper`. The docs app remains private; only `packages/stepper` is meant to be published.
 
-Direct npm consumers must include the package output in Tailwind and provide shadcn-style semantic tokens. For Tailwind v4:
+Direct npm consumers only need the package stylesheet:
 
 ```css
-@import "tailwindcss";
-
-@source "../node_modules/@francozeta/stepper/dist";
+@import "@francozeta/stepper/styles.css";
 ```
 
-For Tailwind v3, include `./node_modules/@francozeta/stepper/dist/**/*.{js,mjs,cjs}` in `content`. The required token names are `background`, `foreground`, `border`, `ring`, `primary`, `primary-foreground`, `muted`, `muted-foreground`, `destructive`, and `destructive-foreground`.
+No `@source`, `content`, or node_modules scanning is required. The generated CSS respects shadcn-style semantic tokens when they exist and ships package-local fallbacks for vanilla apps.
 
 ## Features
 

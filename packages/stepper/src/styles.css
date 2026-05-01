@@ -1,0 +1,67 @@
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities) source(none);
+
+@source "./index.tsx";
+
+@theme inline {
+  --color-background: var(--stepper-background);
+  --color-foreground: var(--stepper-foreground);
+  --color-border: var(--stepper-border);
+  --color-ring: var(--stepper-ring);
+  --color-primary: var(--stepper-primary);
+  --color-primary-foreground: var(--stepper-primary-foreground);
+  --color-muted: var(--stepper-muted);
+  --color-muted-foreground: var(--stepper-muted-foreground);
+  --color-destructive: var(--stepper-destructive);
+  --color-destructive-foreground: var(--stepper-destructive-foreground);
+}
+
+@layer theme {
+  :root,
+  :host {
+    --stepper-background: var(--background, oklch(1 0 0));
+    --stepper-foreground: var(--foreground, oklch(0.145 0 0));
+    --stepper-border: var(--border, oklch(0.922 0 0));
+    --stepper-ring: var(--ring, oklch(0.708 0 0));
+    --stepper-primary: var(--primary, oklch(0.205 0 0));
+    --stepper-primary-foreground: var(
+      --primary-foreground,
+      oklch(0.985 0 0)
+    );
+    --stepper-muted: var(--muted, oklch(0.97 0 0));
+    --stepper-muted-foreground: var(
+      --muted-foreground,
+      oklch(0.556 0 0)
+    );
+    --stepper-destructive: var(--destructive, oklch(0.577 0.245 27.325));
+    --stepper-destructive-foreground: var(
+      --destructive-foreground,
+      oklch(0.985 0 0)
+    );
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root,
+    :host {
+      --stepper-background: var(--background, oklch(0.145 0 0));
+      --stepper-foreground: var(--foreground, oklch(0.985 0 0));
+      --stepper-border: var(--border, oklch(1 0 0 / 10%));
+      --stepper-ring: var(--ring, oklch(0.556 0 0));
+      --stepper-primary: var(--primary, oklch(0.922 0 0));
+      --stepper-primary-foreground: var(
+        --primary-foreground,
+        oklch(0.205 0 0)
+      );
+      --stepper-muted: var(--muted, oklch(0.269 0 0));
+      --stepper-muted-foreground: var(
+        --muted-foreground,
+        oklch(0.708 0 0)
+      );
+      --stepper-destructive: var(--destructive, oklch(0.704 0.191 22.216));
+      --stepper-destructive-foreground: var(
+        --destructive-foreground,
+        oklch(0.985 0 0)
+      );
+    }
+  }
+}

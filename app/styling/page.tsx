@@ -11,9 +11,8 @@ import {
 } from "@/components/ui/card";
 import {
   indicatorCode,
+  packageStylesImportSnippet,
   stateSelectorsCode,
-  tailwindV3ContentSnippet,
-  tailwindV4SourceSnippet,
   themeTokensSnippet,
 } from "@/lib/docs";
 
@@ -58,25 +57,18 @@ export default function StylingPage() {
 
       <Section
         title="NPM package usage"
-        description="When importing the compiled package directly, Tailwind must scan the package output. Copy-paste registry usage does not need this because the component lives in your app source."
+        description="Direct npm usage imports compiled package CSS. You do not need @source, Tailwind content config, or node_modules scanning."
       >
-        <div className="grid gap-4">
-          <CodeBlock
-            code={tailwindV4SourceSnippet}
-            filename="app/globals.css"
-            lang="css"
-          />
-          <CodeBlock
-            code={tailwindV3ContentSnippet}
-            filename="tailwind.config.ts"
-            lang="ts"
-          />
-        </div>
+        <CodeBlock
+          code={packageStylesImportSnippet}
+          filename="app/globals.css"
+          lang="css"
+        />
       </Section>
 
       <Section
-        title="Required tokens"
-        description="Vanilla Tailwind apps need the same semantic color names that shadcn/ui projects already provide."
+        title="Theme token overrides"
+        description="The package CSS includes fallback values. shadcn/ui projects can still override the same semantic tokens globally."
       >
         <CodeBlock
           code={themeTokensSnippet}

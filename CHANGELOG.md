@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.5
+
+Package CSS export for direct npm usage.
+
+### Changed
+
+- Added a Tailwind CSS build pipeline for the npm package.
+- Generated `packages/stepper/dist/styles.css` from the Stepper package source only.
+- Exported `@francozeta/stepper/styles.css` through package exports.
+- Marked CSS as a package side effect so bundlers keep the stylesheet import.
+- Updated docs to use `@import "@francozeta/stepper/styles.css";` instead of Tailwind `@source`.
+
 ## 0.1.4
 
 UI clarity and docs simplification.

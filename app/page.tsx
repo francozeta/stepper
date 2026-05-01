@@ -12,8 +12,9 @@ import { StepperExample } from "@/components/stepper-examples";
 import { Button } from "@/components/ui/button";
 import {
   npmInstallSnippet,
+  packageStylesImportSnippet,
+  packageUsageSnippet,
   pnpmInstallSnippet,
-  usageSnippet,
   workspaceExampleCode,
   whyStepper,
 } from "@/lib/docs";
@@ -25,7 +26,7 @@ export default function Home() {
         eyebrow="components/ui"
         title="Stepper"
         description="A lightweight primitive for guided multi-step flows in React, Next.js, Tailwind CSS, and shadcn/ui-style projects."
-        badge="v0.1.4"
+        badge="v0.1.5"
       />
 
       <Section
@@ -50,16 +51,21 @@ export default function Home() {
           <CodeBlock code={pnpmInstallSnippet} filename="pnpm" lang="bash" />
           <CodeBlock code={npmInstallSnippet} filename="npm" lang="bash" />
         </div>
+        <CodeBlock
+          code={packageStylesImportSnippet}
+          filename="app/globals.css"
+          lang="css"
+        />
       </Section>
 
       <Section
         title="Usage"
         description="Import the pieces you need, then connect validation and routing in your app layer."
       >
-        <CodeBlock code={usageSnippet} filename="import.tsx" />
+        <CodeBlock code={packageUsageSnippet} filename="import.tsx" />
         <p className="max-w-2xl text-pretty text-sm leading-6 text-muted-foreground">
-          Direct npm usage needs Tailwind to scan the package output. The
-          Styling page includes the Tailwind v4, Tailwind v3, and token setup.
+          Direct npm usage works with the package stylesheet. The registry path
+          is still available when you want full source ownership.
         </p>
       </Section>
 
