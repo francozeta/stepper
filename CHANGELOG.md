@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.1](https://github.com/francozeta/stepper/compare/v0.2.0...v0.2.1) (2026-05-01)
+
+### Bug Fixes
+
+* update package version to 0.2.0 and add sync-release-version script with tests ([a857be9](https://github.com/francozeta/stepper/commit/a857be9c271fbd1384740e2efc97836bbd37738d))
+
 ## [0.2.0](https://github.com/francozeta/stepper/compare/v0.1.6...v0.2.0) (2026-05-01)
 
 ### Features
