@@ -173,6 +173,7 @@ type DemoStepProps = {
   title: string;
   description: string;
   icon: LucideIcon;
+  active?: boolean;
   completed?: boolean;
   disabled?: boolean;
   error?: boolean;
@@ -183,14 +184,17 @@ function DemoStep({
   title,
   description,
   icon: Icon,
+  active,
   completed,
   disabled,
   error,
 }: DemoStepProps) {
+  const isCompleted = Boolean(completed && !active);
+
   return (
     <StepperItem
       value={value}
-      completed={completed}
+      completed={isCompleted}
       disabled={disabled}
       error={error}
     >
@@ -200,7 +204,7 @@ function DemoStep({
             <AlertCircle />
           ) : disabled ? (
             <Lock />
-          ) : completed ? (
+          ) : isCompleted ? (
             <Check />
           ) : (
             <Icon />
@@ -520,6 +524,7 @@ function StepperExample() {
           title="Workspace"
           description={workspaceCompleted ? "Ready" : "Required"}
           icon={Building2}
+          active={value === "workspace"}
           completed={workspaceCompleted}
           error={Boolean(attemptedSteps.workspace && !workspaceValid)}
         />
@@ -528,6 +533,7 @@ function StepperExample() {
           title="Preferences"
           description={preferencesDisabled ? "Locked" : "Defaults"}
           icon={Settings2}
+          active={value === "preferences"}
           completed={preferencesCompleted}
           disabled={preferencesDisabled}
           error={Boolean(attemptedSteps.preferences && !preferencesValid)}
@@ -537,6 +543,7 @@ function StepperExample() {
           title="Members"
           description={membersDisabled ? "Locked" : "Optional"}
           icon={Users}
+          active={value === "members"}
           completed={membersCompleted}
           disabled={membersDisabled}
           error={Boolean(attemptedSteps.members && !membersValid)}
@@ -546,6 +553,7 @@ function StepperExample() {
           title="Review"
           description={reviewDisabled ? "Locked" : "Summary"}
           icon={Send}
+          active={value === "review"}
           disabled={reviewDisabled}
         />
       </StepperList>
@@ -1001,6 +1009,7 @@ function StepperControlledExample() {
           title="Details"
           description="Collect"
           icon={FileCheck}
+          active={value === "details"}
           completed={currentIndex > 0}
         />
         <DemoStep
@@ -1008,6 +1017,7 @@ function StepperControlledExample() {
           title="Review"
           description="Check"
           icon={AlertCircle}
+          active={value === "review"}
           completed={currentIndex > 1}
         />
         <DemoStep
@@ -1015,6 +1025,7 @@ function StepperControlledExample() {
           title="Confirm"
           description="Submit"
           icon={Check}
+          active={value === "confirm"}
         />
       </StepperList>
 

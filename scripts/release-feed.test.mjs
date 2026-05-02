@@ -65,10 +65,11 @@ describe("release and AI documentation surfaces", () => {
   it("keeps recipes focused on stepper patterns instead of segmented tab-like lines", async () => {
     const patterns = await readText("content/docs/patterns.mdx");
     const examples = await readText("components/stepper-examples.tsx");
-    const toc = await readText("lib/docs-toc.ts");
+    const toc = await readText("components/docs-toc.tsx");
 
     expect(patterns).not.toContain("Segmented line");
     expect(examples).not.toContain("StepperSegmentedRecipeExample");
     expect(toc).not.toContain("Segmented line");
+    expect(toc).toContain("fumadocs-core/toc");
   });
 });

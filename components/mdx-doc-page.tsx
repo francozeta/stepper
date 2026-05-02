@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
+import type { TableOfContents } from "fumadocs-core/toc";
 import { Rss } from "lucide-react";
 import { notFound } from "next/navigation";
 
 import { CopyButton } from "@/components/copy-button";
 import { DocsPageActions } from "@/components/docs-page-actions";
 import { PageHeader } from "@/components/docs-content";
+import {
+  DocsMobileTableOfContents,
+  DocsTableOfContents,
+  DocsTocProvider,
+} from "@/components/docs-toc";
 import { Button } from "@/components/ui/button";
 import { registryVersion } from "@/lib/docs";
 import { source } from "@/lib/source";
@@ -19,6 +25,7 @@ type DocFrontmatter = {
   eyebrow?: string;
   rss?: boolean;
   title: string;
+  toc?: TableOfContents;
 };
 
 function resolveBadge(badge?: string) {
@@ -66,6 +73,7 @@ function MdxDocPage({ slug = [] }: { slug?: string[] }) {
   const page = getDoc(slug);
   const data = page.data as DocFrontmatter;
   const MDX = page.data.body;
+  const toc = data.toc ?? [];
   const action = (
     <>
       <DocsPageActions slug={slug} title={data.title} />
@@ -82,18 +90,27 @@ function MdxDocPage({ slug = [] }: { slug?: string[] }) {
   );
 
   return (
-    <>
-      <PageHeader
-        eyebrow={data.eyebrow}
-        title={data.title}
-        description={data.description ?? ""}
-        badge={resolveBadge(data.badge)}
-        action={action}
-      />
-      <div className="flex flex-col gap-10">
-        <MDX components={mdxComponents} />
+    <DocsTocProvider toc={toc}>
+      <DocsMobileTableOfContents />
+      <div className="mx-auto grid w-full min-w-0 max-w-6xl grid-cols-1 gap-10 px-4 py-8 sm:px-6 sm:py-10 md:px-8 xl:grid-cols-[minmax(0,1fr)_11rem]">
+        <main
+          data-docs-content
+          className="flex min-w-0 max-w-3xl flex-col gap-10"
+        >
+          <PageHeader
+            eyebrow={data.eyebrow}
+            title={data.title}
+            description={data.description ?? ""}
+            badge={resolveBadge(data.badge)}
+            action={action}
+          />
+          <div className="flex flex-col gap-10">
+            <MDX components={mdxComponents} />
+          </div>
+        </main>
+        <DocsTableOfContents />
       </div>
-    </>
+    </DocsTocProvider>
   );
 }
 

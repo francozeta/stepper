@@ -2,20 +2,20 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, Waypoints } from "lucide-react";
+import { Menu, Waypoints, X } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
 
 import { docsNav, registryVersion } from "@/lib/docs";
 import { Button } from "@/components/ui/button";
 import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
 
 function DocsSidebar() {
@@ -67,7 +67,7 @@ function DocsSidebar() {
           <SidebarBrand compact />
           <div className="flex items-center gap-1">
             <GithubLink className="size-10 rounded-lg" iconClassName="size-5" />
-            <MobileNavSheet pathname={pathname} />
+            <MobileNavDrawer pathname={pathname} />
           </div>
         </div>
       </header>
@@ -128,10 +128,10 @@ function SidebarFooter() {
   );
 }
 
-function MobileNavSheet({ pathname }: { pathname: string }) {
+function MobileNavDrawer({ pathname }: { pathname: string }) {
   return (
-    <Sheet>
-      <SheetTrigger asChild>
+    <Drawer direction="left">
+      <DrawerTrigger asChild>
         <Button
           type="button"
           variant="ghost"
@@ -141,19 +141,26 @@ function MobileNavSheet({ pathname }: { pathname: string }) {
         >
           <Menu className="size-5" />
         </Button>
-      </SheetTrigger>
-      <SheetContent
-        side="left"
-        className="w-[19rem] gap-0 p-0"
-        showCloseButton
-      >
-        <SheetHeader className="border-b border-border p-4 pr-12 text-left">
+      </DrawerTrigger>
+      <DrawerContent className="w-[19rem] max-w-[85vw] gap-0 p-0">
+        <DrawerHeader className="border-b border-border p-4 pr-12 text-left">
           <SidebarBrand />
-          <SheetTitle className="sr-only">Documentation navigation</SheetTitle>
-          <SheetDescription className="sr-only">
+          <DrawerTitle className="sr-only">Documentation navigation</DrawerTitle>
+          <DrawerDescription className="sr-only">
             Browse Stepper documentation pages.
-          </SheetDescription>
-        </SheetHeader>
+          </DrawerDescription>
+          <DrawerClose asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="absolute right-3 top-3 size-9 rounded-lg text-muted-foreground"
+              aria-label="Close documentation navigation"
+            >
+              <X className="size-4" />
+            </Button>
+          </DrawerClose>
+        </DrawerHeader>
         <nav className="docs-scrollbar flex min-h-0 flex-1 flex-col gap-7 overflow-y-auto p-4">
           {docsNav.map((group) => (
             <div key={group.title} className="flex flex-col gap-2">
@@ -166,7 +173,7 @@ function MobileNavSheet({ pathname }: { pathname: string }) {
                   const Icon = item.icon;
 
                   return (
-                    <SheetClose key={item.href} asChild>
+                    <DrawerClose key={item.href} asChild>
                       <Link
                         href={item.href}
                         aria-current={isActive ? "page" : undefined}
@@ -180,15 +187,15 @@ function MobileNavSheet({ pathname }: { pathname: string }) {
                         <Icon className="size-4 shrink-0" />
                         <span className="truncate">{item.title}</span>
                       </Link>
-                    </SheetClose>
+                    </DrawerClose>
                   );
                 })}
               </div>
             </div>
           ))}
         </nav>
-      </SheetContent>
-    </Sheet>
+      </DrawerContent>
+    </Drawer>
   );
 }
 
