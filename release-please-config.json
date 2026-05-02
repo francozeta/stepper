@@ -45,7 +45,8 @@
   ],
   "packages": {
     ".": {
-      "changelog-path": "CHANGELOG.md"
+      "changelog-path": "CHANGELOG.md",
+      "pull-request-title-pattern": "chore(release): v${version}"
     }
   }
 }

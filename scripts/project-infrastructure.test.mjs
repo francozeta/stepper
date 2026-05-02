@@ -94,6 +94,7 @@ describe("project infrastructure", () => {
       packages: {
         ".": {
           "changelog-path": "CHANGELOG.md",
+          "pull-request-title-pattern": "chore(release): v${version}",
         },
       },
     });
