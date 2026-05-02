@@ -22,6 +22,46 @@ type StepperRelease = {
 
 const releases: StepperRelease[] = [
   {
+    version: "0.7.0",
+    date: "2026-05-02",
+    title: "Registry release candidate",
+    summary:
+      "The hardened Stepper registry component is now the current release candidate, with clearer docs around composition, fallback behavior, and copied-source ownership.",
+    sections: [
+      {
+        title: "Added",
+        items: [
+          "Promoted the release-candidate hardening work into the current registry version.",
+          "Kept the public docs focused on the shadcn registry component instead of package-style distribution.",
+        ],
+      },
+      {
+        title: "Docs",
+        items: [
+          "Kept the changelog aligned with the release-please version bump.",
+          "Clarified the path toward final production QA: install from /stepper.json, verify copied source, then publish usage guidance.",
+        ],
+      },
+      {
+        title: "Registry",
+        items: [
+          "Validated that generated public registry artifacts remain up to date after the release bump.",
+          "Preserved flat registry URLs for shadcn CLI installs and compatibility rewrites.",
+        ],
+      },
+    ],
+    links: [
+      {
+        label: "GitHub release",
+        href: `${siteConfig.repository}/releases/tag/v0.7.0`,
+      },
+      {
+        label: "Compare",
+        href: `${siteConfig.repository}/compare/v0.6.2...v0.7.0`,
+      },
+    ],
+  },
+  {
     version: "0.6.2",
     date: "2026-05-02",
     title: "Release candidate hardening",
