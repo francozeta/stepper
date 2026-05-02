@@ -11,6 +11,10 @@ async function readText(filePath) {
   return readFile(path.join(root, filePath), "utf8");
 }
 
+async function readJson(filePath) {
+  return JSON.parse(await readText(filePath));
+}
+
 describe("release and AI documentation surfaces", () => {
   it("renders the changelog from editorial release data", async () => {
     const changelog = await readText("content/docs/changelog.mdx");
@@ -22,6 +26,16 @@ describe("release and AI documentation surfaces", () => {
     expect(changelog).not.toContain("package changes");
     expect(releases).toContain("Flat registry URLs");
     expect(releases).toContain("MDX docs and shadcn registry infrastructure");
+  });
+
+  it("keeps the editorial changelog aligned with the registry version", async () => {
+    const packageJson = await readJson("package.json");
+    const changelogList = await readText("components/changelog-list.tsx");
+    const releases = await readText("lib/releases.ts");
+
+    expect(releases).toContain(`version: "${packageJson.version}"`);
+    expect(releases).toContain(`/releases/tag/v${packageJson.version}`);
+    expect(changelogList).toContain("current");
   });
 
   it("keeps public docs registry-only", async () => {

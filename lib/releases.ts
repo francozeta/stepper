@@ -22,6 +22,49 @@ type StepperRelease = {
 
 const releases: StepperRelease[] = [
   {
+    version: "0.6.2",
+    date: "2026-05-02",
+    title: "Release candidate hardening",
+    summary:
+      "Stepper now catches the common composition mistakes that used to fail silently, while the docs explain the registry-first workflow more directly.",
+    sections: [
+      {
+        title: "Added",
+        items: [
+          "Added development warnings for duplicate StepperItem values.",
+          "Added development warnings when StepperContent points at a missing StepperItem value.",
+          "Added development warnings when StepperItem is rendered outside StepperList.",
+        ],
+      },
+      {
+        title: "Fixed",
+        items: [
+          "Prevented accidental StepperItem nodes inside StepperContent from changing the real step order.",
+          "Preserved the StepperContent primitive marker in the generated single-file registry output.",
+        ],
+      },
+      {
+        title: "Docs",
+        items: [
+          "Documented controlled fallback behavior for missing or disabled values.",
+          "Documented asChild requirements for custom triggers and navigation controls.",
+          "Clarified that Stepper represents UI state while the app owns validation, routing, and persistence.",
+          "Reframed recipes with copy-this-when guidance for faster pattern selection.",
+        ],
+      },
+    ],
+    links: [
+      {
+        label: "GitHub release",
+        href: `${siteConfig.repository}/releases/tag/v0.6.2`,
+      },
+      {
+        label: "Compare",
+        href: `${siteConfig.repository}/compare/v0.6.1...v0.6.2`,
+      },
+    ],
+  },
+  {
     version: "0.3.2",
     date: "2026-05-01",
     title: "Flat registry URLs",
