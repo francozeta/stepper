@@ -54,3 +54,12 @@ pnpm check
 ```
 
 That verifies the registry output, lint, typecheck, tests, and production build.
+
+## Releases
+
+Release Please opens release PRs from Conventional Commits on `main`.
+Merging that PR updates `package.json`, `CHANGELOG.md`, the Git tag, and the
+GitHub Release for the registry component.
+
+This repo does not publish to npm. The version tracks the public shadcn registry
+component only.

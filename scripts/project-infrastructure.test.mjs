@@ -71,6 +71,42 @@ describe("project infrastructure", () => {
     );
   });
 
+  it("automates registry version releases without npm publishing", async () => {
+    const packageJson = await readJson("package.json");
+    const releaseWorkflow = await readText(".github/workflows/release-please.yml");
+    const verifyWorkflow = await readText(".github/workflows/verify.yml");
+    const releaseConfig = await readJson("release-please-config.json");
+    const releaseManifest = await readJson(".release-please-manifest.json");
+
+    expect(releaseWorkflow).toContain("googleapis/release-please-action@v4");
+    expect(releaseWorkflow).toContain("config-file: release-please-config.json");
+    expect(releaseWorkflow).toContain(
+      "manifest-file: .release-please-manifest.json"
+    );
+    expect(releaseWorkflow).not.toContain("NPM_TOKEN");
+    expect(releaseWorkflow).not.toContain("npm publish");
+    expect(verifyWorkflow).toContain("pnpm check");
+
+    expect(releaseConfig).toMatchObject({
+      "release-type": "node",
+      "include-component-in-tag": false,
+      "include-v-in-tag": true,
+      packages: {
+        ".": {
+          "changelog-path": "CHANGELOG.md",
+        },
+      },
+    });
+    expect(releaseConfig["changelog-sections"]).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ type: "feat", section: "Features" }),
+        expect.objectContaining({ type: "fix", section: "Bug Fixes" }),
+        expect.objectContaining({ type: "docs", section: "Documentation" }),
+      ])
+    );
+    expect(releaseManifest["."]).toBe(packageJson.version);
+  });
+
   it("declares MDX docs as a generated content source", async () => {
     const packageJson = await readJson("package.json");
     const tsconfig = await readJson("tsconfig.json");
