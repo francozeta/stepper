@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.5.0](https://github.com/francozeta/stepper/compare/v0.4.1...v0.5.0) (2026-05-02)
+
+
+### Features
+
+* **release:** add pull request title pattern to changelog configuration ([06e1460](https://github.com/francozeta/stepper/commit/06e146040f9ea0fabd499a603e6ed9ec22e37331))
+* **release:** add release automation workflow and configuration ([c745d5e](https://github.com/francozeta/stepper/commit/c745d5ed26fcbcf4c0a20b84e5b4c9d49e6f49f4))
+
+
+### Refactors
+
+* update pnpm workspace configuration and remove package build tasks ([7be2ad4](https://github.com/francozeta/stepper/commit/7be2ad4f707f842c464e118ce1d7b1e444362d83))
+
 ## 0.4.1 - 2026-05-01
 
 ### Changed
