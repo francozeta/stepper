@@ -26,6 +26,7 @@ import {
   Users,
   type LucideIcon,
 } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
 import { useForm, useWatch, type FieldPath } from "react-hook-form";
 import { z } from "zod/v3";
 
@@ -1247,16 +1248,10 @@ function StepperCircleProgressRecipeExample() {
       <RecipeHiddenStepList currentIndex={currentIndex} />
 
       <div className="flex items-center gap-3">
-        <span
-          className="grid size-10 shrink-0 place-items-center rounded-full"
-          style={{
-            background: `conic-gradient(var(--foreground) ${progress}%, color-mix(in oklab, var(--muted-foreground) 20%, transparent) 0)`,
-          }}
-        >
-          <span className="grid size-8 place-items-center rounded-full bg-card text-xs font-semibold text-foreground">
-            {currentIndex + 1}
-          </span>
-        </span>
+        <AnimatedProgressRing
+          value={progress}
+          label={`${currentIndex + 1}`}
+        />
         <div className="min-w-0">
           <p className="text-sm font-medium text-foreground">
             {currentStep.title}
@@ -1279,6 +1274,66 @@ function StepperCircleProgressRecipeExample() {
 
       <StepperActions note="Use this compact recipe when the full step list would take too much space." />
     </Stepper>
+  );
+}
+
+function AnimatedProgressRing({
+  label,
+  value,
+}: {
+  label: string;
+  value: number;
+}) {
+  const shouldReduceMotion = useReducedMotion();
+  const size = 40;
+  const strokeWidth = 2;
+  const radius = size / 2 - strokeWidth;
+  const circumference = 2 * Math.PI * radius;
+  const normalizedValue = Math.min(Math.max(value, 0), 100);
+  const strokeDashoffset =
+    circumference - (normalizedValue / 100) * circumference;
+
+  return (
+    <span className="relative grid size-10 shrink-0 place-items-center rounded-full text-foreground">
+      <svg
+        role="progressbar"
+        aria-label="Recipe progress"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round(normalizedValue)}
+        viewBox={`0 0 ${size} ${size}`}
+        className="absolute inset-0 size-10 -rotate-90"
+      >
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          strokeWidth={strokeWidth}
+          className="stroke-muted-foreground/20"
+        />
+        <motion.circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="currentColor"
+          strokeDasharray={circumference}
+          strokeLinecap="round"
+          strokeWidth={strokeWidth}
+          initial={false}
+          animate={{ strokeDashoffset }}
+          transition={
+            shouldReduceMotion
+              ? { duration: 0 }
+              : { duration: 0.24, ease: [0.2, 0, 0, 1] }
+          }
+        />
+      </svg>
+      <span className="grid size-8 place-items-center rounded-full bg-card text-xs font-semibold text-foreground ring-1 ring-border/70">
+        {label}
+      </span>
+    </span>
   );
 }
 

@@ -2,10 +2,20 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { PackageCheck } from "lucide-react";
+import { Menu, Waypoints } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
 
 import { docsNav, registryVersion } from "@/lib/docs";
+import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
 function DocsSidebar() {
@@ -55,36 +65,11 @@ function DocsSidebar() {
       <header className="sticky top-0 z-20 border-b border-border bg-background/95 px-4 backdrop-blur md:hidden">
         <div className="flex min-h-14 items-center justify-between gap-3">
           <SidebarBrand compact />
-          <a
-            href="https://github.com/francozeta/stepper"
-            aria-label="Open GitHub repository"
-            className="inline-flex size-9 items-center justify-center rounded-md text-muted-foreground transition-[background-color,color] hover:bg-muted hover:text-foreground focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none"
-          >
-            <FaGithub className="size-4" />
-          </a>
+          <div className="flex items-center gap-1">
+            <GithubLink className="size-10 rounded-lg" iconClassName="size-5" />
+            <MobileNavSheet pathname={pathname} />
+          </div>
         </div>
-        <nav className="docs-scrollbar-muted -mx-4 flex gap-1 overflow-x-auto px-4 pb-3">
-          {docsNav.flatMap((group) =>
-            group.items.map((item) => {
-              const isActive = pathname === item.href;
-
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  aria-current={isActive ? "page" : undefined}
-                  className={cn(
-                    "shrink-0 rounded-md px-2.5 py-1.5 text-sm font-medium text-muted-foreground",
-                    "transition-[background-color,color] hover:bg-muted hover:text-foreground",
-                    isActive && "bg-muted text-foreground"
-                  )}
-                >
-                  {item.title}
-                </Link>
-              );
-            })
-          )}
-        </nav>
       </header>
     </>
   );
@@ -99,8 +84,13 @@ function SidebarBrand({ compact = false }: { compact?: boolean }) {
         compact ? "py-1" : "border-b border-dashed border-border pb-4"
       )}
     >
-      <span className="flex size-8 shrink-0 items-center justify-center rounded-md border border-border bg-muted text-foreground">
-        <PackageCheck className="size-4" />
+      <span
+        className={cn(
+          "flex shrink-0 items-center justify-center rounded-lg border border-border bg-muted text-foreground shadow-sm",
+          compact ? "size-9" : "size-8"
+        )}
+      >
+        <Waypoints className={compact ? "size-5" : "size-4"} />
       </span>
       <span className="min-w-0">
         <span className="block truncate text-sm font-semibold text-foreground">
@@ -132,15 +122,95 @@ function SidebarFooter() {
         <span className="rounded-md border border-border bg-background px-2 py-1 font-mono text-xs text-muted-foreground">
           v{registryVersion}
         </span>
-        <a
-          href="https://github.com/francozeta/stepper"
-          aria-label="Open GitHub repository"
-          className="inline-flex size-9 items-center justify-center rounded-md text-muted-foreground transition-[background-color,color] hover:bg-muted hover:text-foreground focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none"
-        >
-          <FaGithub className="size-4" />
-        </a>
+        <GithubLink />
       </div>
     </div>
+  );
+}
+
+function MobileNavSheet({ pathname }: { pathname: string }) {
+  return (
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon-lg"
+          className="size-10 rounded-lg text-muted-foreground"
+          aria-label="Open documentation navigation"
+        >
+          <Menu className="size-5" />
+        </Button>
+      </SheetTrigger>
+      <SheetContent
+        side="left"
+        className="w-[19rem] gap-0 p-0"
+        showCloseButton
+      >
+        <SheetHeader className="border-b border-border p-4 pr-12 text-left">
+          <SidebarBrand />
+          <SheetTitle className="sr-only">Documentation navigation</SheetTitle>
+          <SheetDescription className="sr-only">
+            Browse Stepper documentation pages.
+          </SheetDescription>
+        </SheetHeader>
+        <nav className="docs-scrollbar flex min-h-0 flex-1 flex-col gap-7 overflow-y-auto p-4">
+          {docsNav.map((group) => (
+            <div key={group.title} className="flex flex-col gap-2">
+              <p className="px-2 text-xs font-medium text-muted-foreground">
+                {group.title}
+              </p>
+              <div className="flex flex-col gap-1">
+                {group.items.map((item) => {
+                  const isActive = pathname === item.href;
+                  const Icon = item.icon;
+
+                  return (
+                    <SheetClose key={item.href} asChild>
+                      <Link
+                        href={item.href}
+                        aria-current={isActive ? "page" : undefined}
+                        className={cn(
+                          "flex min-h-10 items-center gap-2 rounded-md px-2 text-sm font-medium text-muted-foreground outline-none",
+                          "transition-[background-color,color,box-shadow] hover:bg-muted hover:text-foreground",
+                          "focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+                          isActive && "bg-muted text-foreground"
+                        )}
+                      >
+                        <Icon className="size-4 shrink-0" />
+                        <span className="truncate">{item.title}</span>
+                      </Link>
+                    </SheetClose>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </nav>
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+function GithubLink({
+  className,
+  iconClassName,
+}: {
+  className?: string;
+  iconClassName?: string;
+}) {
+  return (
+    <a
+      href="https://github.com/francozeta/stepper"
+      aria-label="Open GitHub repository"
+      className={cn(
+        "inline-flex size-9 items-center justify-center rounded-md text-muted-foreground transition-[background-color,color]",
+        "hover:bg-muted hover:text-foreground focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none",
+        className
+      )}
+    >
+      <FaGithub className={cn("size-4", iconClassName)} />
+    </a>
   );
 }
 

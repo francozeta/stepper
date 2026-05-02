@@ -298,11 +298,12 @@ function StepperSeparator({ className, ...props }: StepperSeparatorProps) {
       aria-hidden="true"
       data-slot="stepper-separator"
       className={cn(
-        "bg-muted-foreground/25",
+        "overflow-hidden bg-muted-foreground/25 after:absolute after:inset-0 after:bg-primary after:content-['']",
+        "after:transition-transform after:duration-[220ms] after:ease-out motion-reduce:after:transition-none",
         orientation === "horizontal" &&
-          "absolute left-[calc(50%+var(--stepper-separator-offset))] right-[calc(-50%+var(--stepper-separator-offset))] top-[calc(var(--stepper-indicator-size)/2)] h-px group-data-[state=completed]/stepper-item:bg-primary",
+          "absolute left-[calc(50%+var(--stepper-separator-offset))] right-[calc(-50%+var(--stepper-separator-offset))] top-[calc(var(--stepper-indicator-size)/2)] h-px after:origin-left after:scale-x-0 group-data-[state=completed]/stepper-item:after:scale-x-100",
         orientation === "vertical" &&
-          "absolute left-[calc(var(--stepper-indicator-size)/2)] top-[calc(var(--stepper-indicator-size)+0.5rem)] h-[calc(100%-var(--stepper-indicator-size)+0.75rem)] w-px group-data-[state=completed]/stepper-item:bg-primary",
+          "absolute left-[calc(var(--stepper-indicator-size)/2)] top-[calc(var(--stepper-indicator-size)+0.5rem)] h-[calc(100%-var(--stepper-indicator-size)+0.75rem)] w-px after:origin-top after:scale-y-0 group-data-[state=completed]/stepper-item:after:scale-y-100",
         className
       )}
       {...props}
