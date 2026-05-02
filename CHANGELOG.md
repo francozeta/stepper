@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://github.com/francozeta/stepper/compare/v0.6.2...v0.7.0) (2026-05-02)
+
+
+### Features
+
+* add release candidate 0.6.2 with new warnings and documentation updates ([4114d37](https://github.com/francozeta/stepper/commit/4114d37ce88d6b422b65748737fe7603c0ce16a0))
+
 ## [0.6.2](https://github.com/francozeta/stepper/compare/v0.6.1...v0.6.2) (2026-05-02)
 
 
