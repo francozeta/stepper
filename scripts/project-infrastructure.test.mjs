@@ -71,6 +71,29 @@ describe("project infrastructure", () => {
     );
   });
 
+  it("preserves Stepper primitive markers in the flattened registry output", async () => {
+    const registrySource = await readText("registry/default/ui/stepper.tsx");
+    const publicItem = await readJson("public/stepper.json");
+    const publicSource = publicItem.files.find(
+      (file) => file.target === "components/ui/stepper.tsx"
+    )?.content;
+
+    expect(registrySource).toContain("__stepperPrimitive");
+    expect(registrySource).toContain("function markStepperPrimitive");
+    expect(registrySource).toContain(
+      "markStepperPrimitive(StepperItem, STEPPER_PRIMITIVES.item)"
+    );
+    expect(registrySource).toContain(
+      "markStepperPrimitive(StepperDescription, STEPPER_PRIMITIVES.description)"
+    );
+    expect(registrySource).toContain("getStepperPrimitiveName(primitive.type)");
+    expect(registrySource).toContain("getStepperPrimitiveName(primitive.render)");
+    expect(publicSource).toContain("__stepperPrimitive");
+    expect(publicSource).toContain(
+      "markStepperPrimitive(StepperSeparator, STEPPER_PRIMITIVES.separator)"
+    );
+  });
+
   it("automates registry version releases without npm publishing", async () => {
     const packageJson = await readJson("package.json");
     const releaseWorkflow = await readText(".github/workflows/release-please.yml");

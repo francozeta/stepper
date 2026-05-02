@@ -2,6 +2,7 @@ import * as React from "react";
 import Link from "next/link";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { axe } from "jest-axe";
 import { describe, expect, it, vi } from "vitest";
 
 import {
@@ -50,6 +51,12 @@ function BasicStepper({
 }
 
 describe("Stepper", () => {
+  it("has no automated accessibility violations in the default markup", async () => {
+    const { container } = render(<BasicStepper defaultValue="profile" />);
+
+    expect((await axe(container)).violations).toEqual([]);
+  });
+
   it("renders an accessible progress list and marks the active step", () => {
     render(<BasicStepper defaultValue="profile" />);
 
@@ -531,11 +538,12 @@ describe("Stepper", () => {
 
   it("exposes current index and total steps from useStepper", () => {
     function StepperStatus() {
-      const { currentIndex, totalSteps } = useStepper();
+      const { currentIndex, getStepIndex, totalSteps } = useStepper();
 
       return (
         <output data-testid="stepper-status">
-          Step {currentIndex + 1} of {totalSteps}
+          Step {currentIndex + 1} of {totalSteps}; payment index{" "}
+          {getStepIndex("payment")}
         </output>
       );
     }
@@ -555,7 +563,7 @@ describe("Stepper", () => {
     );
 
     expect(screen.getByTestId("stepper-status")).toHaveTextContent(
-      "Step 2 of 3"
+      "Step 2 of 3; payment index 2"
     );
   });
 
