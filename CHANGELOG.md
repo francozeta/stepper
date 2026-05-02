@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.6.2](https://github.com/francozeta/stepper/compare/v0.6.1...v0.6.2) (2026-05-02)
+
+
+### Bug Fixes
+
+* enhance CopyButton and Docs components with improved responsiveness and functionality ([e3dc743](https://github.com/francozeta/stepper/commit/e3dc743886149220e9ea6857e65e38a7487e833b))
+* enhance stepper functionality with duplicate value checks and context management ([7ac3d6c](https://github.com/francozeta/stepper/commit/7ac3d6c03f7aa3c142e92d094a2c6ceb35e26e76))
+
 ## [0.6.1](https://github.com/francozeta/stepper/compare/v0.6.0...v0.6.1) (2026-05-02)
 
 
