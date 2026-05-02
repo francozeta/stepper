@@ -8,12 +8,13 @@ import type {
 } from "./types";
 
 const STEPPER_PRIMITIVES = {
-  item: "StepperItem",
-  trigger: "StepperTrigger",
-  indicator: "StepperIndicator",
-  label: "StepperLabel",
+  content: "StepperContent",
   description: "StepperDescription",
+  indicator: "StepperIndicator",
+  item: "StepperItem",
+  label: "StepperLabel",
   separator: "StepperSeparator",
+  trigger: "StepperTrigger",
 } as const;
 
 type StepperPrimitiveName =
@@ -54,10 +55,6 @@ function getStepperPrimitiveName(type: unknown): StepperPrimitiveName | undefine
     getStepperPrimitiveName(primitive.type) ??
     getStepperPrimitiveName(primitive.render)
   );
-}
-
-function isStepperPrimitive(type: unknown, name: StepperPrimitiveName) {
-  return getStepperPrimitiveName(type) === name;
 }
 
 function markStepperPrimitive<T extends StepperPrimitiveComponent>(
@@ -174,7 +171,9 @@ function collectSteps(children: React.ReactNode) {
       return;
     }
 
-    if (isStepperPrimitive(child.type, STEPPER_PRIMITIVES.item)) {
+    const primitiveName = getStepperPrimitiveName(child.type);
+
+    if (primitiveName === STEPPER_PRIMITIVES.item) {
       const props = child.props as Pick<StepperItemProps, "disabled" | "value">;
 
       steps.push({
@@ -182,6 +181,10 @@ function collectSteps(children: React.ReactNode) {
         disabled: Boolean(props.disabled),
       });
 
+      return;
+    }
+
+    if (primitiveName === STEPPER_PRIMITIVES.content) {
       return;
     }
 
@@ -238,7 +241,6 @@ export {
   getStepperPrimitiveName,
   getStepperStepMeta,
   hasStepperPrimitiveChild,
-  isStepperPrimitive,
   markStepperPrimitive,
   sortRegisteredSteps,
   toStepRecord,

@@ -336,6 +336,88 @@ describe("Stepper", () => {
     expect(screen.getByText("Profile content")).toBeVisible();
   });
 
+  it("warns in development when step values are duplicated", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    render(
+      <Stepper defaultValue="account">
+        <StepperList>
+          <StepperItem value="account">Account</StepperItem>
+          <StepperItem value="account">Duplicate account</StepperItem>
+        </StepperList>
+      </Stepper>
+    );
+
+    await waitFor(() => {
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringContaining('StepperItem value "account" is duplicated')
+      );
+    });
+
+    warn.mockRestore();
+  });
+
+  it("warns in development when content references a missing step value", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    render(
+      <Stepper defaultValue="account">
+        <StepperList>
+          <StepperItem value="account">Account</StepperItem>
+        </StepperList>
+
+        <StepperContent value="missing">Missing content</StepperContent>
+      </Stepper>
+    );
+
+    await waitFor(() => {
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringContaining(
+          'StepperContent value "missing" does not match any StepperItem'
+        )
+      );
+    });
+
+    warn.mockRestore();
+  });
+
+  it("does not count accidental StepperItems nested inside StepperContent", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    function StepperStatus() {
+      const { totalSteps } = useStepper();
+
+      return <output data-testid="nested-total">{totalSteps}</output>;
+    }
+
+    render(
+      <Stepper defaultValue="account">
+        <StepperList>
+          <StepperItem value="account">Account</StepperItem>
+        </StepperList>
+
+        <StepperContent value="account">
+          <StepperItem value="nested">Nested</StepperItem>
+        </StepperContent>
+
+        <StepperStatus />
+      </Stepper>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("nested-total")).toHaveTextContent("1");
+    });
+    await waitFor(() => {
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringContaining(
+          'StepperItem with value "nested" must be rendered inside StepperList'
+        )
+      );
+    });
+
+    warn.mockRestore();
+  });
+
   it("does not render a fallback trigger when primitives are nested inside wrappers", () => {
     render(
       <Stepper defaultValue="account">

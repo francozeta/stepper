@@ -242,6 +242,42 @@ const worksWith = [
   },
 ];
 
+const controlledBehaviorNotes = [
+  {
+    label: "Missing value",
+    value: "First enabled step",
+    help: "When value points to a step that does not exist, Stepper renders the first enabled step and calls onValueChange with that fallback.",
+  },
+  {
+    label: "Disabled value",
+    value: "Skipped",
+    help: "When the selected step becomes disabled, Stepper moves to the first enabled step so controls and content stay coherent.",
+  },
+  {
+    label: "Real flows",
+    value: "App derived",
+    help: "For routes, forms, and server data, derive value from the app state instead of treating Stepper as the workflow owner.",
+  },
+];
+
+const asChildRequirements = [
+  {
+    label: "Focusable child",
+    value: "button or link",
+    help: "StepperTrigger asChild should render a focusable element that can receive keyboard focus.",
+  },
+  {
+    label: "Prop forwarding",
+    value: "className and aria-*",
+    help: "Custom components must spread props so state attributes, classes, events, and ARIA props reach the real element.",
+  },
+  {
+    label: "Refs and events",
+    value: "forwardRef",
+    help: "Forward refs for custom components and avoid preventDefault unless you intentionally block navigation.",
+  },
+];
+
 const themeTokensSnippet = `:root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -1305,10 +1341,12 @@ const v2Roadmap = [
 export {
   accessibilityNotes,
   apiComponents,
+  asChildRequirements,
   checkoutExampleCode,
   circleProgressRecipeSnippet,
   compositionCode,
   contentProps,
+  controlledBehaviorNotes,
   controlledExampleCode,
   controlledSnippet,
   controlsOnlyRecipeSnippet,

@@ -11,6 +11,7 @@ import type {
 const StepperContext = React.createContext<StepperContextValue | null>(null);
 const StepperItemContext =
   React.createContext<StepperItemContextValue | null>(null);
+const StepperListContext = React.createContext(false);
 
 function useStepperContext(component: string) {
   const context = React.useContext(StepperContext);
@@ -30,6 +31,10 @@ function useStepperItemContext(component: string) {
   }
 
   return context;
+}
+
+function useStepperListContext() {
+  return React.useContext(StepperListContext);
 }
 
 function useStepper(): StepperApi {
@@ -53,7 +58,9 @@ function useStepper(): StepperApi {
 export {
   StepperContext,
   StepperItemContext,
+  StepperListContext,
   useStepper,
   useStepperContext,
   useStepperItemContext,
+  useStepperListContext,
 };

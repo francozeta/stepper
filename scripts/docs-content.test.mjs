@@ -32,4 +32,19 @@ describe("MDX docs content", () => {
     expect(route).toContain("MdxDocPage");
     expect(route).toContain("createDocMetadata");
   });
+
+  it("documents Stepper ownership, controlled fallback, and composition boundaries", async () => {
+    const api = await readText("content/docs/api.mdx");
+    const forms = await readText("content/docs/forms.mdx");
+    const patterns = await readText("content/docs/patterns.mdx");
+    const docsData = await readText("lib/docs.ts");
+
+    expect(api).toContain("Controlled fallback");
+    expect(api).toContain("asChild requirements");
+    expect(forms).toContain("Stepper represents UI state");
+    expect(forms).not.toContain("Owns active step");
+    expect(patterns).toContain("Copy this when");
+    expect(docsData).toContain("asChildRequirements");
+    expect(docsData).toContain("controlledBehaviorNotes");
+  });
 });

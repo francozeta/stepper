@@ -13,7 +13,7 @@ export const boundaries = [
   {
     label: "Stepper",
     value: "UI state",
-    help: "Owns active step, disabled steps, completed states, and content panels.",
+    help: "Stepper represents UI state: active step, disabled, completed, error, and content visibility.",
   },
   {
     label: "react-hook-form",
@@ -47,7 +47,7 @@ export const validationFlow = [
 
 <Section
   title="Primitive boundary"
-  description="Stepper does not own your form state. It coordinates the UI around it."
+  description="Stepper does not own your form state. Your app decides what each state means, then Stepper reflects it."
 >
   <InfoGrid items={boundaries} />
 </Section>

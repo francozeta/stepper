@@ -60,6 +60,22 @@ function getControlledFallbackReason(
   return undefined;
 }
 
+function getDuplicateStepValues(steps: Array<{ value: string }>) {
+  const seenValues = new Set<string>();
+  const duplicateValues = new Set<string>();
+
+  steps.forEach((step) => {
+    if (seenValues.has(step.value)) {
+      duplicateValues.add(step.value);
+      return;
+    }
+
+    seenValues.add(step.value);
+  });
+
+  return Array.from(duplicateValues);
+}
+
 function Stepper({
   value,
   defaultValue,
@@ -73,6 +89,11 @@ function Stepper({
   const isControlled = value !== undefined;
   const [uncontrolledValue, setUncontrolledValue] = React.useState(defaultValue);
   const collectedSteps = React.useMemo(() => collectSteps(children), [children]);
+  const duplicateStepValues = React.useMemo(
+    () => getDuplicateStepValues(collectedSteps),
+    [collectedSteps]
+  );
+  const duplicateStepValuesKey = duplicateStepValues.join("\0");
   const [registeredSteps, setRegisteredSteps] = React.useState<
     RegisteredStep[]
   >([]);
@@ -190,6 +211,21 @@ function Stepper({
   React.useLayoutEffect(() => {
     fallbackSyncStateRef.current = fallbackSyncState;
   }, [fallbackSyncState]);
+
+  React.useEffect(() => {
+    if (
+      process.env.NODE_ENV === "production" ||
+      duplicateStepValues.length === 0
+    ) {
+      return;
+    }
+
+    duplicateStepValues.forEach((stepValue) => {
+      console.warn(
+        `StepperItem value "${stepValue}" is duplicated. Step values must be unique within a Stepper.`
+      );
+    });
+  }, [duplicateStepValues, duplicateStepValuesKey]);
 
   React.useEffect(() => {
     const fallbackReason = getControlledFallbackReason(fallbackSyncState);

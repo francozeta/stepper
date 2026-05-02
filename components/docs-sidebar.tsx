@@ -28,9 +28,9 @@ function DocsSidebar() {
         <div className="flex min-h-0 flex-1 flex-col px-4 py-5">
           <SidebarBrand />
           <div className="relative mt-3 min-h-0 flex-1">
-            <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-2 bg-gradient-to-b from-background via-background/80 to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-3 bg-gradient-to-b from-background via-background/80 to-transparent" />
             <nav className="docs-scrollbar h-full overflow-y-auto pr-1">
-              <div className="flex flex-col gap-7 py-2">
+              <div className="flex flex-col gap-7 py-2 pb-4">
                 {docsNav.map((group) => (
                   <div key={group.title} className="flex flex-col gap-2">
                     <p className="px-2 text-xs font-medium text-muted-foreground">
@@ -63,7 +63,7 @@ function DocsSidebar() {
                 ))}
               </div>
             </nav>
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-7 bg-gradient-to-t from-background via-background/80 to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-4 bg-gradient-to-t from-background via-background/80 to-transparent" />
           </div>
           <SidebarFooter />
         </div>
@@ -115,7 +115,7 @@ function SidebarBrand({ compact = false }: { compact?: boolean }) {
 
 function SidebarFooter() {
   return (
-    <div className="relative mt-4 flex flex-col gap-4 pt-3 before:absolute before:left-0 before:top-0 before:h-px before:w-full before:bg-gradient-to-r before:from-transparent before:via-border/90 before:to-transparent">
+    <div className="relative mt-4 flex flex-col gap-4 pt-2 before:absolute before:left-0 before:top-0 before:h-px before:w-full before:bg-gradient-to-r before:from-transparent before:via-border/90 before:to-transparent">
       <Link
         href="/changelog"
         className="rounded-lg border border-border bg-muted/30 p-3 outline-none transition-[background-color,box-shadow] hover:bg-muted/60 focus-visible:ring-ring/50 focus-visible:ring-[3px]"

@@ -123,12 +123,13 @@ type StepperNextProps = StepperButtonProps & {
 
 // components/ui/stepper/utils.ts
 const STEPPER_PRIMITIVES = {
-  item: "StepperItem",
-  trigger: "StepperTrigger",
-  indicator: "StepperIndicator",
-  label: "StepperLabel",
+  content: "StepperContent",
   description: "StepperDescription",
+  indicator: "StepperIndicator",
+  item: "StepperItem",
+  label: "StepperLabel",
   separator: "StepperSeparator",
+  trigger: "StepperTrigger",
 } as const;
 
 type StepperPrimitiveName =
@@ -169,10 +170,6 @@ function getStepperPrimitiveName(type: unknown): StepperPrimitiveName | undefine
     getStepperPrimitiveName(primitive.type) ??
     getStepperPrimitiveName(primitive.render)
   );
-}
-
-function isStepperPrimitive(type: unknown, name: StepperPrimitiveName) {
-  return getStepperPrimitiveName(type) === name;
 }
 
 function markStepperPrimitive<T extends StepperPrimitiveComponent>(
@@ -289,7 +286,9 @@ function collectSteps(children: React.ReactNode) {
       return;
     }
 
-    if (isStepperPrimitive(child.type, STEPPER_PRIMITIVES.item)) {
+    const primitiveName = getStepperPrimitiveName(child.type);
+
+    if (primitiveName === STEPPER_PRIMITIVES.item) {
       const props = child.props as Pick<StepperItemProps, "disabled" | "value">;
 
       steps.push({
@@ -297,6 +296,10 @@ function collectSteps(children: React.ReactNode) {
         disabled: Boolean(props.disabled),
       });
 
+      return;
+    }
+
+    if (primitiveName === STEPPER_PRIMITIVES.content) {
       return;
     }
 
@@ -347,6 +350,7 @@ function hasStepperPrimitiveChild(
 const StepperContext = React.createContext<StepperContextValue | null>(null);
 const StepperItemContext =
   React.createContext<StepperItemContextValue | null>(null);
+const StepperListContext = React.createContext(false);
 
 function useStepperContext(component: string) {
   const context = React.useContext(StepperContext);
@@ -366,6 +370,10 @@ function useStepperItemContext(component: string) {
   }
 
   return context;
+}
+
+function useStepperListContext() {
+  return React.useContext(StepperListContext);
 }
 
 function useStepper(): StepperApi {
@@ -426,6 +434,22 @@ function getControlledFallbackReason(
   return undefined;
 }
 
+function getDuplicateStepValues(steps: Array<{ value: string }>) {
+  const seenValues = new Set<string>();
+  const duplicateValues = new Set<string>();
+
+  steps.forEach((step) => {
+    if (seenValues.has(step.value)) {
+      duplicateValues.add(step.value);
+      return;
+    }
+
+    seenValues.add(step.value);
+  });
+
+  return Array.from(duplicateValues);
+}
+
 function Stepper({
   value,
   defaultValue,
@@ -439,6 +463,11 @@ function Stepper({
   const isControlled = value !== undefined;
   const [uncontrolledValue, setUncontrolledValue] = React.useState(defaultValue);
   const collectedSteps = React.useMemo(() => collectSteps(children), [children]);
+  const duplicateStepValues = React.useMemo(
+    () => getDuplicateStepValues(collectedSteps),
+    [collectedSteps]
+  );
+  const duplicateStepValuesKey = duplicateStepValues.join("\0");
   const [registeredSteps, setRegisteredSteps] = React.useState<
     RegisteredStep[]
   >([]);
@@ -558,6 +587,21 @@ function Stepper({
   }, [fallbackSyncState]);
 
   React.useEffect(() => {
+    if (
+      process.env.NODE_ENV === "production" ||
+      duplicateStepValues.length === 0
+    ) {
+      return;
+    }
+
+    duplicateStepValues.forEach((stepValue) => {
+      console.warn(
+        `StepperItem value "${stepValue}" is duplicated. Step values must be unique within a Stepper.`
+      );
+    });
+  }, [duplicateStepValues, duplicateStepValuesKey]);
+
+  React.useEffect(() => {
     const fallbackReason = getControlledFallbackReason(fallbackSyncState);
 
     if (!isControlled || !fallbackReason) {
@@ -650,24 +694,29 @@ function Stepper({
 function StepperList({
   className,
   "aria-label": ariaLabel = "Progress steps",
+  children,
   ...props
 }: StepperListProps) {
   const { orientation } = useStepperContext("StepperList");
 
   return (
-    <ol
-      aria-label={props["aria-labelledby"] ? undefined : ariaLabel}
-      data-slot="stepper-list"
-      data-orientation={orientation}
-      className={cn(
-        "flex min-w-0",
-        "data-[orientation=horizontal]:w-full data-[orientation=horizontal]:gap-3 data-[orientation=horizontal]:overflow-x-auto data-[orientation=horizontal]:pb-2",
-        "data-[orientation=vertical]:flex-col data-[orientation=vertical]:gap-4",
-        "[&>li:last-child_[data-slot=stepper-separator]]:hidden",
-        className
-      )}
-      {...props}
-    />
+    <StepperListContext.Provider value>
+      <ol
+        aria-label={props["aria-labelledby"] ? undefined : ariaLabel}
+        data-slot="stepper-list"
+        data-orientation={orientation}
+        className={cn(
+          "flex min-w-0",
+          "data-[orientation=horizontal]:w-full data-[orientation=horizontal]:gap-3 data-[orientation=horizontal]:overflow-x-auto data-[orientation=horizontal]:pb-2",
+          "data-[orientation=vertical]:flex-col data-[orientation=vertical]:gap-4",
+          "[&>li:last-child_[data-slot=stepper-separator]]:hidden",
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </ol>
+    </StepperListContext.Provider>
   );
 }
 
@@ -693,6 +742,7 @@ function StepperItem({
     getContentId,
   } = useStepperContext("StepperItem");
   const itemRef = React.useRef<HTMLLIElement>(null);
+  const isInsideStepperList = useStepperListContext();
   const index = getStepIndex(value);
   const currentIndex =
     currentValue === undefined ? -1 : getStepIndex(currentValue);
@@ -721,9 +771,15 @@ function StepperItem({
   );
   const isLastStep = index >= 0 && index === steps.length - 1;
   const shouldRenderSeparator =
-    !isLastStep && (!hasCustomChildren || !hasCustomSeparator);
+    isInsideStepperList &&
+    !isLastStep &&
+    (!hasCustomChildren || !hasCustomSeparator);
 
   React.useLayoutEffect(() => {
+    if (!isInsideStepperList) {
+      return;
+    }
+
     registerStep({
       value,
       disabled,
@@ -731,10 +787,28 @@ function StepperItem({
     });
 
     return () => unregisterStep(value);
-  }, [disabled, registerStep, unregisterStep, value]);
+  }, [disabled, isInsideStepperList, registerStep, unregisterStep, value]);
 
   React.useEffect(() => {
-    if (process.env.NODE_ENV === "production" || index >= 0) {
+    if (process.env.NODE_ENV === "production" || isInsideStepperList) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      console.warn(
+        `StepperItem with value "${value}" must be rendered inside StepperList to participate in step order.`
+      );
+    }, 0);
+
+    return () => window.clearTimeout(timeout);
+  }, [isInsideStepperList, value]);
+
+  React.useEffect(() => {
+    if (
+      process.env.NODE_ENV === "production" ||
+      !isInsideStepperList ||
+      index >= 0
+    ) {
       return;
     }
 
@@ -745,7 +819,7 @@ function StepperItem({
     }, 0);
 
     return () => window.clearTimeout(timeout);
-  }, [index, value]);
+  }, [index, isInsideStepperList, value]);
 
   const itemContext = React.useMemo<StepperItemContextValue>(
     () => ({
@@ -1063,10 +1137,26 @@ function StepperContent({
 }: StepperContentProps) {
   const {
     value: currentValue,
+    steps,
     getTriggerId,
     getContentId,
   } = useStepperContext("StepperContent");
   const isActive = currentValue === value;
+  const hasMatchingStep = steps.some((step) => step.value === value);
+
+  React.useEffect(() => {
+    if (process.env.NODE_ENV === "production" || hasMatchingStep) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      console.warn(
+        `StepperContent value "${value}" does not match any StepperItem. Content values should map to a step value.`
+      );
+    }, 0);
+
+    return () => window.clearTimeout(timeout);
+  }, [hasMatchingStep, value]);
 
   if (!forceMount && !isActive) {
     return null;
@@ -1092,6 +1182,8 @@ function StepperContent({
     </Comp>
   );
 }
+
+markStepperPrimitive(StepperContent, STEPPER_PRIMITIVES.content);
 
 // components/ui/stepper/navigation.tsx
 async function resolveNavigationGuard(

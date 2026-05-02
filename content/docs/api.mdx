@@ -16,8 +16,10 @@ import {
 import {
   apiComponents,
   accessibilityNotes,
+  asChildRequirements,
   compositionCode,
   contentProps,
+  controlledBehaviorNotes,
   itemProps,
   listProps,
   navigationProps,
@@ -31,6 +33,13 @@ import {
   <PropsTable rows={rootProps} />
 </Section>
 
+<Section
+  title="Controlled fallback"
+  description="Controlled values are still normalized to an enabled step so the UI never points at missing or disabled content."
+>
+  <InfoGrid items={controlledBehaviorNotes} />
+</Section>
+
 <Section title="List props">
   <PropsTable rows={listProps} />
 </Section>
@@ -41,6 +50,13 @@ import {
 
 <Section title="Trigger props">
   <PropsTable rows={triggerProps} />
+</Section>
+
+<Section
+  title="asChild requirements"
+  description="StepperTrigger and navigation helpers use Radix Slot composition. The child owns the final element, so it must accept the props Stepper passes."
+>
+  <InfoGrid items={asChildRequirements} />
 </Section>
 
 <Section title="Content props">

@@ -5,7 +5,12 @@ import { Slot } from "@radix-ui/react-slot";
 
 import { cn } from "@/lib/utils";
 
-import { StepperItemContext, useStepperContext, useStepperItemContext } from "./context";
+import {
+  StepperItemContext,
+  useStepperContext,
+  useStepperItemContext,
+  useStepperListContext,
+} from "./context";
 import type {
   StepperDescriptionProps,
   StepperIndicatorProps,
@@ -44,6 +49,7 @@ function StepperItem({
     getContentId,
   } = useStepperContext("StepperItem");
   const itemRef = React.useRef<HTMLLIElement>(null);
+  const isInsideStepperList = useStepperListContext();
   const index = getStepIndex(value);
   const currentIndex =
     currentValue === undefined ? -1 : getStepIndex(currentValue);
@@ -72,9 +78,15 @@ function StepperItem({
   );
   const isLastStep = index >= 0 && index === steps.length - 1;
   const shouldRenderSeparator =
-    !isLastStep && (!hasCustomChildren || !hasCustomSeparator);
+    isInsideStepperList &&
+    !isLastStep &&
+    (!hasCustomChildren || !hasCustomSeparator);
 
   React.useLayoutEffect(() => {
+    if (!isInsideStepperList) {
+      return;
+    }
+
     registerStep({
       value,
       disabled,
@@ -82,10 +94,28 @@ function StepperItem({
     });
 
     return () => unregisterStep(value);
-  }, [disabled, registerStep, unregisterStep, value]);
+  }, [disabled, isInsideStepperList, registerStep, unregisterStep, value]);
 
   React.useEffect(() => {
-    if (process.env.NODE_ENV === "production" || index >= 0) {
+    if (process.env.NODE_ENV === "production" || isInsideStepperList) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      console.warn(
+        `StepperItem with value "${value}" must be rendered inside StepperList to participate in step order.`
+      );
+    }, 0);
+
+    return () => window.clearTimeout(timeout);
+  }, [isInsideStepperList, value]);
+
+  React.useEffect(() => {
+    if (
+      process.env.NODE_ENV === "production" ||
+      !isInsideStepperList ||
+      index >= 0
+    ) {
       return;
     }
 
@@ -96,7 +126,7 @@ function StepperItem({
     }, 0);
 
     return () => window.clearTimeout(timeout);
-  }, [index, value]);
+  }, [index, isInsideStepperList, value]);
 
   const itemContext = React.useMemo<StepperItemContextValue>(
     () => ({
