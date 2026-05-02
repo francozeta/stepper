@@ -21,10 +21,14 @@ type RegisteredStep = StepRecord & {
   order: number;
 };
 
+type StepperNavigationGuard = () => boolean | Promise<boolean>;
+
 type StepperApi = {
   value: string | undefined;
   orientation: StepperOrientation;
   steps: StepperStep[];
+  currentIndex: number;
+  totalSteps: number;
   setValue: (value: string) => void;
   getStepIndex: (value: string) => number;
   canGoPrevious: boolean;
@@ -100,6 +104,14 @@ type StepperButtonProps = React.ComponentPropsWithoutRef<"button"> & {
   asChild?: boolean;
 };
 
+type StepperPreviousProps = StepperButtonProps & {
+  onBeforePrevious?: StepperNavigationGuard;
+};
+
+type StepperNextProps = StepperButtonProps & {
+  onBeforeNext?: StepperNavigationGuard;
+};
+
 export type {
   RegisteredStep,
   StepperApi,
@@ -112,8 +124,11 @@ export type {
   StepperItemProps,
   StepperLabelProps,
   StepperListProps,
+  StepperNavigationGuard,
+  StepperNextProps,
   StepperOrientation,
   StepperStepPosition,
+  StepperPreviousProps,
   StepperProps,
   StepperSeparatorProps,
   StepperStep,

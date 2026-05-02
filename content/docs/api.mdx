@@ -4,7 +4,7 @@ description: "The V1 API keeps the surface small: one root, one ordered list, it
 eyebrow: "api"
 ---
 
-import { CodeBlock, Section } from "@/components/docs-content";
+import { CodeBlock, InfoGrid, Section } from "@/components/docs-content";
 import { PropsTable } from "@/components/props-table";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/card";
 import {
   apiComponents,
+  accessibilityNotes,
   compositionCode,
   contentProps,
   itemProps,
@@ -48,6 +49,13 @@ import {
 
 <Section title="Navigation props">
   <PropsTable rows={navigationProps} />
+</Section>
+
+<Section
+  title="Accessibility model"
+  description="Stepper uses progress-step semantics instead of tab semantics, so it can safely compose with forms, route links, and validation gates."
+>
+  <InfoGrid items={accessibilityNotes} />
 </Section>
 
 <Section

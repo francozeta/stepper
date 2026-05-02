@@ -67,7 +67,6 @@ import {
   StepperList,
   StepperNext,
   StepperPrevious,
-  StepperSeparator,
   StepperTrigger,
 } from "@/components/ui/stepper";
 
@@ -214,7 +213,6 @@ function DemoStep({
           </StepperDescription>
         </span>
       </StepperTrigger>
-      <StepperSeparator />
     </StepperItem>
   );
 }
@@ -1117,7 +1115,6 @@ function StepperRoutePatternExample() {
                   <StepperLabel>{step.title}</StepperLabel>
                 </a>
               </StepperTrigger>
-              {index < steps.length - 1 ? <StepperSeparator /> : null}
             </StepperItem>
           );
         })}

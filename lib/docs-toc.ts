@@ -34,6 +34,7 @@ const docsToc: Record<string, DocsTocItem[]> = {
     { title: "Trigger props", href: "#trigger-props" },
     { title: "Content props", href: "#content-props" },
     { title: "Navigation props", href: "#navigation-props" },
+    { title: "Accessibility model", href: "#accessibility-model" },
     { title: "useStepper hook", href: "#usestepper-hook" },
     { title: "Primitive parts", href: "#primitive-parts" },
     { title: "Composable trigger", href: "#composable-trigger" },

@@ -1,24 +1,36 @@
 "use client";
 
-import type * as React from "react";
+import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 
 import { cn } from "@/lib/utils";
 
 import { useStepperContext } from "./context";
-import type { StepperButtonProps } from "./types";
+import type { StepperNextProps, StepperPreviousProps } from "./types";
+
+async function resolveNavigationGuard(
+  guard: (() => boolean | Promise<boolean>) | undefined
+) {
+  if (!guard) {
+    return true;
+  }
+
+  return (await guard()) !== false;
+}
 
 function StepperPrevious({
   asChild = false,
   className,
   children = "Previous",
   disabled,
+  onBeforePrevious,
   onClick,
   tabIndex,
   ...props
-}: StepperButtonProps) {
+}: StepperPreviousProps) {
   const { canGoPrevious, goPrevious } = useStepperContext("StepperPrevious");
-  const isDisabled = disabled || !canGoPrevious;
+  const [isPending, setIsPending] = React.useState(false);
+  const isDisabled = disabled || !canGoPrevious || isPending;
   const Comp = asChild ? Slot : "button";
 
   return (
@@ -38,7 +50,7 @@ function StepperPrevious({
         "[&>svg]:size-4 [&>svg]:shrink-0",
         className
       )}
-      onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+      onClick={async (event: React.MouseEvent<HTMLButtonElement>) => {
         onClick?.(event);
 
         if (isDisabled) {
@@ -46,8 +58,20 @@ function StepperPrevious({
           return;
         }
 
-        if (!event.defaultPrevented) {
-          goPrevious();
+        if (event.defaultPrevented) {
+          return;
+        }
+
+        setIsPending(true);
+
+        try {
+          const canNavigate = await resolveNavigationGuard(onBeforePrevious);
+
+          if (canNavigate) {
+            goPrevious();
+          }
+        } finally {
+          setIsPending(false);
         }
       }}
       {...props}
@@ -62,12 +86,14 @@ function StepperNext({
   className,
   children = "Next",
   disabled,
+  onBeforeNext,
   onClick,
   tabIndex,
   ...props
-}: StepperButtonProps) {
+}: StepperNextProps) {
   const { canGoNext, goNext } = useStepperContext("StepperNext");
-  const isDisabled = disabled || !canGoNext;
+  const [isPending, setIsPending] = React.useState(false);
+  const isDisabled = disabled || !canGoNext || isPending;
   const Comp = asChild ? Slot : "button";
 
   return (
@@ -87,7 +113,7 @@ function StepperNext({
         "[&>svg]:size-4 [&>svg]:shrink-0",
         className
       )}
-      onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+      onClick={async (event: React.MouseEvent<HTMLButtonElement>) => {
         onClick?.(event);
 
         if (isDisabled) {
@@ -95,8 +121,20 @@ function StepperNext({
           return;
         }
 
-        if (!event.defaultPrevented) {
-          goNext();
+        if (event.defaultPrevented) {
+          return;
+        }
+
+        setIsPending(true);
+
+        try {
+          const canNavigate = await resolveNavigationGuard(onBeforeNext);
+
+          if (canNavigate) {
+            goNext();
+          }
+        } finally {
+          setIsPending(false);
         }
       }}
       {...props}

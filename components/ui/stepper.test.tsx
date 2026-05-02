@@ -474,6 +474,119 @@ describe("Stepper", () => {
     expect(screen.getByText("Profile content")).toBeVisible();
   });
 
+  it("exposes current index and total steps from useStepper", () => {
+    function StepperStatus() {
+      const { currentIndex, totalSteps } = useStepper();
+
+      return (
+        <output data-testid="stepper-status">
+          Step {currentIndex + 1} of {totalSteps}
+        </output>
+      );
+    }
+
+    render(
+      <Stepper defaultValue="profile">
+        <StepperList>
+          <StepperItem value="account">Account</StepperItem>
+          <StepperItem value="profile">Profile</StepperItem>
+          <StepperItem value="payment" disabled>
+            Payment
+          </StepperItem>
+        </StepperList>
+
+        <StepperStatus />
+      </Stepper>
+    );
+
+    expect(screen.getByTestId("stepper-status")).toHaveTextContent(
+      "Step 2 of 3"
+    );
+  });
+
+  it("runs an async guard before moving to the next step", async () => {
+    const user = userEvent.setup();
+    const onBeforeNext = vi.fn().mockResolvedValue(false);
+
+    render(
+      <Stepper defaultValue="account">
+        <StepperList>
+          <StepperItem value="account">Account</StepperItem>
+          <StepperItem value="profile">Profile</StepperItem>
+        </StepperList>
+
+        <StepperContent value="account">Account content</StepperContent>
+        <StepperContent value="profile">Profile content</StepperContent>
+
+        <StepperNext onBeforeNext={onBeforeNext}>Continue</StepperNext>
+      </Stepper>
+    );
+
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+
+    expect(onBeforeNext).toHaveBeenCalledOnce();
+    expect(screen.getByText("Account content")).toBeVisible();
+    expect(screen.queryByText("Profile content")).not.toBeInTheDocument();
+  });
+
+  it("moves focus between triggers with keyboard navigation without changing the current step", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <Stepper defaultValue="account">
+        <StepperList>
+          <StepperItem value="account">Account</StepperItem>
+          <StepperItem value="profile">Profile</StepperItem>
+          <StepperItem value="payment" disabled>
+            Payment
+          </StepperItem>
+        </StepperList>
+
+        <StepperContent value="account">Account content</StepperContent>
+        <StepperContent value="profile">Profile content</StepperContent>
+        <StepperContent value="payment">Payment content</StepperContent>
+      </Stepper>
+    );
+
+    const account = screen.getByRole("button", { name: /Account/ });
+    const profile = screen.getByRole("button", { name: /Profile/ });
+
+    account.focus();
+    await user.keyboard("{ArrowRight}");
+
+    expect(profile).toHaveFocus();
+    expect(screen.getByText("Account content")).toBeVisible();
+
+    await user.keyboard("{End}");
+
+    expect(profile).toHaveFocus();
+  });
+
+  it("adds separators automatically for custom trigger layouts", () => {
+    const { container } = render(
+      <Stepper defaultValue="account">
+        <StepperList>
+          <StepperItem value="account">
+            <StepperTrigger>
+              <StepperIndicator />
+              <StepperLabel>Account</StepperLabel>
+            </StepperTrigger>
+          </StepperItem>
+          <StepperItem value="profile">
+            <StepperTrigger>
+              <StepperIndicator />
+              <StepperLabel>Profile</StepperLabel>
+            </StepperTrigger>
+          </StepperItem>
+        </StepperList>
+      </Stepper>
+    );
+
+    expect(
+      container.querySelectorAll('[data-slot="stepper-separator"]')
+    ).toHaveLength(1);
+  });
+
   it("handles a stepper where every step is disabled", () => {
     render(
       <Stepper defaultValue="account">

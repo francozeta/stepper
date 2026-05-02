@@ -151,10 +151,14 @@ const controlledSnippet = `const [step, setStep] = React.useState("details");
 const usageSnippet = `import {
   Stepper,
   StepperContent,
+  StepperDescription,
+  StepperIndicator,
   StepperItem,
+  StepperLabel,
   StepperList,
   StepperNext,
   StepperPrevious,
+  StepperTrigger,
   useStepper,
 } from "@/components/ui/stepper";`;
 
@@ -179,11 +183,20 @@ const whyStepper = [
 ];
 
 const useStepperSnippet = `function WizardFooter() {
-  const { canGoPrevious, canGoNext, goPrevious, goNext, value } = useStepper();
+  const {
+    canGoPrevious,
+    canGoNext,
+    currentIndex,
+    totalSteps,
+    goPrevious,
+    goNext,
+  } = useStepper();
 
   return (
     <div className="flex items-center justify-between">
-      <span className="text-sm text-muted-foreground">Current: {value}</span>
+      <span className="text-sm text-muted-foreground">
+        Step {currentIndex + 1} of {totalSteps}
+      </span>
       <div className="flex gap-2">
         <Button type="button" variant="outline" disabled={!canGoPrevious} onClick={goPrevious}>
           Back
@@ -334,7 +347,6 @@ import {
   StepperItem,
   StepperLabel,
   StepperList,
-  StepperSeparator,
   StepperTrigger,
 } from "@/components/ui/stepper";
 
@@ -357,7 +369,7 @@ export function SetupRoutes({
   return (
     <Stepper value={currentStep}>
       <StepperList>
-        {setupSteps.map((step, index) => {
+        {setupSteps.map((step) => {
           const completed = completedSteps.includes(step.value);
           const disabled = !canVisitStep(step.value, completedSteps);
 
@@ -382,7 +394,6 @@ export function SetupRoutes({
                   <StepperLabel>{step.label}</StepperLabel>
                 </Link>
               </StepperTrigger>
-              {index < setupSteps.length - 1 ? <StepperSeparator /> : null}
             </StepperItem>
           );
         })}
@@ -620,7 +631,6 @@ import {
   StepperLabel,
   StepperList,
   StepperPrevious,
-  StepperSeparator,
   StepperTrigger,
 } from "@/components/ui/stepper";
 
@@ -684,21 +694,18 @@ export function WorkspaceSetup() {
             <StepperIndicator><Building2 /></StepperIndicator>
             <StepperLabel>Workspace</StepperLabel>
           </StepperTrigger>
-          <StepperSeparator />
         </StepperItem>
         <StepperItem value="preferences" completed={completed.preferences} disabled={!completed.workspace}>
           <StepperTrigger>
             <StepperIndicator>{completed.workspace ? <Settings2 /> : <Lock />}</StepperIndicator>
             <StepperLabel>Preferences</StepperLabel>
           </StepperTrigger>
-          <StepperSeparator />
         </StepperItem>
         <StepperItem value="members" completed={completed.members} disabled={!completed.preferences}>
           <StepperTrigger>
             <StepperIndicator>{completed.preferences ? <Users /> : <Lock />}</StepperIndicator>
             <StepperLabel>Members</StepperLabel>
           </StepperTrigger>
-          <StepperSeparator />
         </StepperItem>
         <StepperItem value="review" disabled={!completed.members}>
           <StepperTrigger>
@@ -809,7 +816,6 @@ import {
   StepperList,
   StepperNext,
   StepperPrevious,
-  StepperSeparator,
   StepperTrigger,
 } from "@/components/ui/stepper";
 
@@ -824,7 +830,6 @@ export function CheckoutFlow() {
             </StepperIndicator>
             <StepperLabel>Cart</StepperLabel>
           </StepperTrigger>
-          <StepperSeparator />
         </StepperItem>
         <StepperItem value="shipping">
           <StepperTrigger>
@@ -833,7 +838,6 @@ export function CheckoutFlow() {
             </StepperIndicator>
             <StepperLabel>Shipping</StepperLabel>
           </StepperTrigger>
-          <StepperSeparator />
         </StepperItem>
         <StepperItem value="payment" disabled>
           <StepperTrigger>
@@ -842,7 +846,6 @@ export function CheckoutFlow() {
             </StepperIndicator>
             <StepperLabel>Payment</StepperLabel>
           </StepperTrigger>
-          <StepperSeparator />
         </StepperItem>
       </StepperList>
 
@@ -868,7 +871,6 @@ import {
   StepperItem,
   StepperLabel,
   StepperList,
-  StepperSeparator,
   StepperTrigger,
 } from "@/components/ui/stepper";
 
@@ -886,7 +888,6 @@ export function WorkspaceOnboarding() {
               <StepperDescription>Identity</StepperDescription>
             </span>
           </StepperTrigger>
-          <StepperSeparator />
         </StepperItem>
         <StepperItem value="workspace">
           <StepperTrigger>
@@ -898,7 +899,6 @@ export function WorkspaceOnboarding() {
               <StepperDescription>Team defaults</StepperDescription>
             </span>
           </StepperTrigger>
-          <StepperSeparator />
         </StepperItem>
         <StepperItem value="invite" disabled>
           <StepperTrigger>
@@ -910,7 +910,6 @@ export function WorkspaceOnboarding() {
               <StepperDescription>Locked</StepperDescription>
             </span>
           </StepperTrigger>
-          <StepperSeparator />
         </StepperItem>
       </StepperList>
 
@@ -930,7 +929,6 @@ import {
   StepperItem,
   StepperLabel,
   StepperList,
-  StepperSeparator,
   StepperTrigger,
 } from "@/components/ui/stepper";
 
@@ -945,7 +943,6 @@ export function StepperWithStates() {
             </StepperIndicator>
             <StepperLabel>Account</StepperLabel>
           </StepperTrigger>
-          <StepperSeparator />
         </StepperItem>
         <StepperItem value="shipping" error>
           <StepperTrigger>
@@ -954,7 +951,6 @@ export function StepperWithStates() {
             </StepperIndicator>
             <StepperLabel>Shipping</StepperLabel>
           </StepperTrigger>
-          <StepperSeparator />
         </StepperItem>
         <StepperItem value="payment" disabled>
           <StepperTrigger>
@@ -963,7 +959,6 @@ export function StepperWithStates() {
             </StepperIndicator>
             <StepperLabel>Payment</StepperLabel>
           </StepperTrigger>
-          <StepperSeparator />
         </StepperItem>
       </StepperList>
 
@@ -1030,7 +1025,6 @@ const compositionCode = `<StepperItem value="shipping">
       <StepperDescription>Delivery address</StepperDescription>
     </span>
   </StepperTrigger>
-  <StepperSeparator />
 </StepperItem>`;
 
 const indicatorCode = `<StepperIndicator>
@@ -1144,6 +1138,16 @@ const navigationProps = [
     defaultValue: "false",
     description: "Disables the navigation button in addition to canGoPrevious or canGoNext.",
   },
+  {
+    name: "onBeforePrevious",
+    type: "() => boolean | Promise<boolean>",
+    description: "Runs before StepperPrevious changes the value. Return false to cancel navigation.",
+  },
+  {
+    name: "onBeforeNext",
+    type: "() => boolean | Promise<boolean>",
+    description: "Runs before StepperNext changes the value. Return false to cancel navigation.",
+  },
 ];
 
 const useStepperRows = [
@@ -1156,6 +1160,16 @@ const useStepperRows = [
     name: "steps",
     type: "{ value: string; disabled: boolean }[]",
     description: "Registered step order used by navigation helpers.",
+  },
+  {
+    name: "currentIndex",
+    type: "number",
+    description: "Zero-based index for the current active step, or -1 when no enabled step is active.",
+  },
+  {
+    name: "totalSteps",
+    type: "number",
+    description: "Total number of registered steps, including disabled steps.",
   },
   {
     name: "setValue",
@@ -1171,6 +1185,29 @@ const useStepperRows = [
     name: "goPrevious / goNext",
     type: "() => void",
     description: "Moves to the previous or next enabled step.",
+  },
+];
+
+const accessibilityNotes = [
+  {
+    label: "Current step",
+    value: 'aria-current="step"',
+    help: "The active trigger is announced as the current step in a related step list.",
+  },
+  {
+    label: "Keyboard",
+    value: "Arrows, Home, End",
+    help: "Arrow keys move focus between enabled triggers; Enter and Space keep the native button/link activation model.",
+  },
+  {
+    label: "Panels",
+    value: "aria-labelledby",
+    help: "StepperContent renders a region labelled by its trigger and can stay mounted with forceMount.",
+  },
+  {
+    label: "Semantics",
+    value: "Not tabs",
+    help: "Stepper avoids tab roles because it can represent route changes, validation gates, or progress indicators.",
   },
 ];
 
@@ -1219,6 +1256,21 @@ const apiComponents = [
     description: "Visual number, completed mark, error marker, or custom icon slot for a step.",
   },
   {
+    name: "StepperLabel",
+    element: "span",
+    description: "Text label primitive for custom triggers and composable layouts.",
+  },
+  {
+    name: "StepperDescription",
+    element: "span",
+    description: "Supporting text primitive for vertical steppers and richer step summaries.",
+  },
+  {
+    name: "StepperSeparator",
+    element: "span",
+    description: "Connector line between steps. Hidden automatically when rendered in the final item.",
+  },
+  {
     name: "StepperContent",
     element: "div / Slot",
     description: "Associated panel for a step value. Can stay mounted with forceMount or render asChild.",
@@ -1226,7 +1278,7 @@ const apiComponents = [
   {
     name: "StepperPrevious / StepperNext",
     element: "button / Slot",
-    description: "Basic navigation helpers that skip disabled steps and support asChild.",
+    description: "Navigation helpers that skip disabled steps, support asChild, and can run async guards.",
   },
   {
     name: "useStepper",
@@ -1251,6 +1303,7 @@ const v2Roadmap = [
 ];
 
 export {
+  accessibilityNotes,
   apiComponents,
   checkoutExampleCode,
   circleProgressRecipeSnippet,

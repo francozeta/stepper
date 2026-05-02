@@ -23,10 +23,11 @@ components/ui/stepper.tsx
 import {
   Stepper,
   StepperContent,
+  StepperDescription,
   StepperIndicator,
   StepperItem,
+  StepperLabel,
   StepperList,
-  StepperSeparator,
   StepperTrigger,
 } from "@/components/ui/stepper";
 ```

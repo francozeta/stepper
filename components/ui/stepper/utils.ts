@@ -199,7 +199,10 @@ function collectSteps(children: React.ReactNode) {
   return steps;
 }
 
-function hasStepperPrimitiveChild(children: React.ReactNode): boolean {
+function hasStepperPrimitiveChild(
+  children: React.ReactNode,
+  name?: StepperPrimitiveName
+): boolean {
   return React.Children.toArray(children).some((child) => {
     if (!React.isValidElement(child)) {
       return false;
@@ -207,13 +210,7 @@ function hasStepperPrimitiveChild(children: React.ReactNode): boolean {
 
     const primitiveName = getStepperPrimitiveName(child.type);
 
-    if (
-      primitiveName === STEPPER_PRIMITIVES.trigger ||
-      primitiveName === STEPPER_PRIMITIVES.indicator ||
-      primitiveName === STEPPER_PRIMITIVES.label ||
-      primitiveName === STEPPER_PRIMITIVES.description ||
-      primitiveName === STEPPER_PRIMITIVES.separator
-    ) {
+    if (name ? primitiveName === name : primitiveName) {
       return true;
     }
 
@@ -224,7 +221,7 @@ function hasStepperPrimitiveChild(children: React.ReactNode): boolean {
     ) {
       const childProps = child.props as { children?: React.ReactNode };
 
-      return hasStepperPrimitiveChild(childProps.children);
+      return hasStepperPrimitiveChild(childProps.children, name);
     }
 
     return false;

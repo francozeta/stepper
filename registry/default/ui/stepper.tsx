@@ -30,10 +30,14 @@ type RegisteredStep = StepRecord & {
   order: number;
 };
 
+type StepperNavigationGuard = () => boolean | Promise<boolean>;
+
 type StepperApi = {
   value: string | undefined;
   orientation: StepperOrientation;
   steps: StepperStep[];
+  currentIndex: number;
+  totalSteps: number;
   setValue: (value: string) => void;
   getStepIndex: (value: string) => number;
   canGoPrevious: boolean;
@@ -107,6 +111,14 @@ type StepperContentProps = React.ComponentPropsWithoutRef<"div"> & {
 
 type StepperButtonProps = React.ComponentPropsWithoutRef<"button"> & {
   asChild?: boolean;
+};
+
+type StepperPreviousProps = StepperButtonProps & {
+  onBeforePrevious?: StepperNavigationGuard;
+};
+
+type StepperNextProps = StepperButtonProps & {
+  onBeforeNext?: StepperNavigationGuard;
 };
 
 // components/ui/stepper/utils.ts
@@ -302,7 +314,10 @@ function collectSteps(children: React.ReactNode) {
   return steps;
 }
 
-function hasStepperPrimitiveChild(children: React.ReactNode): boolean {
+function hasStepperPrimitiveChild(
+  children: React.ReactNode,
+  name?: StepperPrimitiveName
+): boolean {
   return React.Children.toArray(children).some((child) => {
     if (!React.isValidElement(child)) {
       return false;
@@ -310,13 +325,7 @@ function hasStepperPrimitiveChild(children: React.ReactNode): boolean {
 
     const primitiveName = getStepperPrimitiveName(child.type);
 
-    if (
-      primitiveName === STEPPER_PRIMITIVES.trigger ||
-      primitiveName === STEPPER_PRIMITIVES.indicator ||
-      primitiveName === STEPPER_PRIMITIVES.label ||
-      primitiveName === STEPPER_PRIMITIVES.description ||
-      primitiveName === STEPPER_PRIMITIVES.separator
-    ) {
+    if (name ? primitiveName === name : primitiveName) {
       return true;
     }
 
@@ -327,7 +336,7 @@ function hasStepperPrimitiveChild(children: React.ReactNode): boolean {
     ) {
       const childProps = child.props as { children?: React.ReactNode };
 
-      return hasStepperPrimitiveChild(childProps.children);
+      return hasStepperPrimitiveChild(childProps.children, name);
     }
 
     return false;
@@ -366,6 +375,8 @@ function useStepper(): StepperApi {
     value: context.value,
     orientation: context.orientation,
     steps: context.steps,
+    currentIndex: context.currentIndex,
+    totalSteps: context.totalSteps,
     setValue: context.setValue,
     getStepIndex: context.getStepIndex,
     canGoPrevious: context.canGoPrevious,
@@ -424,6 +435,13 @@ function Stepper({
   );
   const nextStep = React.useMemo(
     () => getNextEnabledStep(steps, currentValue),
+    [currentValue, steps]
+  );
+  const currentIndex = React.useMemo(
+    () =>
+      currentValue === undefined
+        ? -1
+        : steps.findIndex((step) => step.value === currentValue),
     [currentValue, steps]
   );
 
@@ -512,6 +530,8 @@ function Stepper({
       value: currentValue,
       orientation,
       steps,
+      currentIndex,
+      totalSteps: steps.length,
       registerStep,
       unregisterStep,
       setValue: setStepperValue,
@@ -534,6 +554,7 @@ function Stepper({
     }),
     [
       currentValue,
+      currentIndex,
       id,
       nextStep,
       orientation,
@@ -597,6 +618,7 @@ function StepperItem({
   const {
     value: currentValue,
     orientation,
+    steps,
     registerStep,
     unregisterStep,
     setValue,
@@ -627,6 +649,13 @@ function StepperItem({
           ? "completed"
           : "inactive";
   const hasCustomChildren = hasStepperPrimitiveChild(children);
+  const hasCustomSeparator = hasStepperPrimitiveChild(
+    children,
+    STEPPER_PRIMITIVES.separator
+  );
+  const isLastStep = index >= 0 && index === steps.length - 1;
+  const shouldRenderSeparator =
+    !isLastStep && (!hasCustomChildren || !hasCustomSeparator);
 
   React.useLayoutEffect(() => {
     registerStep({
@@ -700,14 +729,17 @@ function StepperItem({
     >
       <StepperItemContext.Provider value={itemContext}>
         {hasCustomChildren ? (
-          children
+          <>
+            {children}
+            {shouldRenderSeparator ? <StepperSeparator /> : null}
+          </>
         ) : (
           <>
             <StepperTrigger>
               <StepperIndicator />
               <StepperLabel>{children}</StepperLabel>
             </StepperTrigger>
-            <StepperSeparator />
+            {shouldRenderSeparator ? <StepperSeparator /> : null}
           </>
         )}
       </StepperItemContext.Provider>
@@ -721,6 +753,7 @@ function StepperTrigger({
   children,
   disabled,
   onClick,
+  onKeyDown,
   tabIndex,
   ...props
 }: StepperTriggerProps) {
@@ -734,6 +767,7 @@ function StepperTrigger({
     triggerId,
     contentId,
   } = useStepperItemContext("StepperTrigger");
+  const { steps, getTriggerId } = useStepperContext("StepperTrigger");
   const isDisabled = itemDisabled || disabled;
   const Comp = asChild ? Slot : "button";
 
@@ -774,11 +808,82 @@ function StepperTrigger({
           setValue(value);
         }
       }}
+      onKeyDown={(event: React.KeyboardEvent<HTMLButtonElement>) => {
+        onKeyDown?.(event);
+
+        if (event.defaultPrevented || isDisabled) {
+          return;
+        }
+
+        const targetStepValue = getKeyboardNavigationStepValue({
+          key: event.key,
+          orientation,
+          steps,
+          value,
+        });
+
+        if (!targetStepValue || targetStepValue === value) {
+          return;
+        }
+
+        const targetTrigger = document.getElementById(
+          getTriggerId(targetStepValue)
+        );
+
+        if (targetTrigger instanceof HTMLElement) {
+          event.preventDefault();
+          targetTrigger.focus();
+        }
+      }}
       {...props}
     >
       {children}
     </Comp>
   );
+}
+
+function getKeyboardNavigationStepValue({
+  key,
+  orientation,
+  steps,
+  value,
+}: {
+  key: string;
+  orientation: "horizontal" | "vertical";
+  steps: StepperStep[];
+  value: string;
+}) {
+  const enabledSteps = steps.filter((step) => !step.disabled);
+  const currentIndex = enabledSteps.findIndex((step) => step.value === value);
+
+  if (currentIndex < 0) {
+    return undefined;
+  }
+
+  if (key === "Home") {
+    return enabledSteps.at(0)?.value;
+  }
+
+  if (key === "End") {
+    return enabledSteps.at(-1)?.value;
+  }
+
+  if (
+    (orientation === "horizontal" && key === "ArrowRight") ||
+    (orientation === "vertical" && key === "ArrowDown")
+  ) {
+    return enabledSteps[Math.min(currentIndex + 1, enabledSteps.length - 1)]
+      ?.value;
+  }
+
+  if (
+    (orientation === "horizontal" && key === "ArrowLeft") ||
+    (orientation === "vertical" && key === "ArrowUp")
+  ) {
+    return enabledSteps[Math.max(currentIndex - 1, 0)]?.value;
+  }
+
+  return undefined;
 }
 
 function StepperIndicator({
@@ -923,17 +1028,29 @@ function StepperContent({
 }
 
 // components/ui/stepper/navigation.tsx
+async function resolveNavigationGuard(
+  guard: (() => boolean | Promise<boolean>) | undefined
+) {
+  if (!guard) {
+    return true;
+  }
+
+  return (await guard()) !== false;
+}
+
 function StepperPrevious({
   asChild = false,
   className,
   children = "Previous",
   disabled,
+  onBeforePrevious,
   onClick,
   tabIndex,
   ...props
-}: StepperButtonProps) {
+}: StepperPreviousProps) {
   const { canGoPrevious, goPrevious } = useStepperContext("StepperPrevious");
-  const isDisabled = disabled || !canGoPrevious;
+  const [isPending, setIsPending] = React.useState(false);
+  const isDisabled = disabled || !canGoPrevious || isPending;
   const Comp = asChild ? Slot : "button";
 
   return (
@@ -953,7 +1070,7 @@ function StepperPrevious({
         "[&>svg]:size-4 [&>svg]:shrink-0",
         className
       )}
-      onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+      onClick={async (event: React.MouseEvent<HTMLButtonElement>) => {
         onClick?.(event);
 
         if (isDisabled) {
@@ -961,8 +1078,20 @@ function StepperPrevious({
           return;
         }
 
-        if (!event.defaultPrevented) {
-          goPrevious();
+        if (event.defaultPrevented) {
+          return;
+        }
+
+        setIsPending(true);
+
+        try {
+          const canNavigate = await resolveNavigationGuard(onBeforePrevious);
+
+          if (canNavigate) {
+            goPrevious();
+          }
+        } finally {
+          setIsPending(false);
         }
       }}
       {...props}
@@ -977,12 +1106,14 @@ function StepperNext({
   className,
   children = "Next",
   disabled,
+  onBeforeNext,
   onClick,
   tabIndex,
   ...props
-}: StepperButtonProps) {
+}: StepperNextProps) {
   const { canGoNext, goNext } = useStepperContext("StepperNext");
-  const isDisabled = disabled || !canGoNext;
+  const [isPending, setIsPending] = React.useState(false);
+  const isDisabled = disabled || !canGoNext || isPending;
   const Comp = asChild ? Slot : "button";
 
   return (
@@ -1002,7 +1133,7 @@ function StepperNext({
         "[&>svg]:size-4 [&>svg]:shrink-0",
         className
       )}
-      onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+      onClick={async (event: React.MouseEvent<HTMLButtonElement>) => {
         onClick?.(event);
 
         if (isDisabled) {
@@ -1010,8 +1141,20 @@ function StepperNext({
           return;
         }
 
-        if (!event.defaultPrevented) {
-          goNext();
+        if (event.defaultPrevented) {
+          return;
+        }
+
+        setIsPending(true);
+
+        try {
+          const canNavigate = await resolveNavigationGuard(onBeforeNext);
+
+          if (canNavigate) {
+            goNext();
+          }
+        } finally {
+          setIsPending(false);
         }
       }}
       {...props}
@@ -1045,7 +1188,10 @@ export type {
   StepperItemProps,
   StepperLabelProps,
   StepperListProps,
+  StepperNavigationGuard,
+  StepperNextProps,
   StepperOrientation,
+  StepperPreviousProps,
   StepperProps,
   StepperSeparatorProps,
   StepperStep,

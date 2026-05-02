@@ -39,6 +39,8 @@ function useStepper(): StepperApi {
     value: context.value,
     orientation: context.orientation,
     steps: context.steps,
+    currentIndex: context.currentIndex,
+    totalSteps: context.totalSteps,
     setValue: context.setValue,
     getStepIndex: context.getStepIndex,
     canGoPrevious: context.canGoPrevious,

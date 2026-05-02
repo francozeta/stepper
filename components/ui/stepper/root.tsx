@@ -71,6 +71,13 @@ function Stepper({
     () => getNextEnabledStep(steps, currentValue),
     [currentValue, steps]
   );
+  const currentIndex = React.useMemo(
+    () =>
+      currentValue === undefined
+        ? -1
+        : steps.findIndex((step) => step.value === currentValue),
+    [currentValue, steps]
+  );
 
   const registerStep = React.useCallback(
     (step: Omit<RegisteredStep, "order">) => {
@@ -157,6 +164,8 @@ function Stepper({
       value: currentValue,
       orientation,
       steps,
+      currentIndex,
+      totalSteps: steps.length,
       registerStep,
       unregisterStep,
       setValue: setStepperValue,
@@ -179,6 +188,7 @@ function Stepper({
     }),
     [
       currentValue,
+      currentIndex,
       id,
       nextStep,
       orientation,

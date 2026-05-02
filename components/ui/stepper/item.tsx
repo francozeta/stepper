@@ -13,6 +13,7 @@ import type {
   StepperItemProps,
   StepperLabelProps,
   StepperSeparatorProps,
+  StepperStep,
   StepperStepState,
   StepperTriggerProps,
 } from "./types";
@@ -34,6 +35,7 @@ function StepperItem({
   const {
     value: currentValue,
     orientation,
+    steps,
     registerStep,
     unregisterStep,
     setValue,
@@ -64,6 +66,13 @@ function StepperItem({
           ? "completed"
           : "inactive";
   const hasCustomChildren = hasStepperPrimitiveChild(children);
+  const hasCustomSeparator = hasStepperPrimitiveChild(
+    children,
+    STEPPER_PRIMITIVES.separator
+  );
+  const isLastStep = index >= 0 && index === steps.length - 1;
+  const shouldRenderSeparator =
+    !isLastStep && (!hasCustomChildren || !hasCustomSeparator);
 
   React.useLayoutEffect(() => {
     registerStep({
@@ -137,14 +146,17 @@ function StepperItem({
     >
       <StepperItemContext.Provider value={itemContext}>
         {hasCustomChildren ? (
-          children
+          <>
+            {children}
+            {shouldRenderSeparator ? <StepperSeparator /> : null}
+          </>
         ) : (
           <>
             <StepperTrigger>
               <StepperIndicator />
               <StepperLabel>{children}</StepperLabel>
             </StepperTrigger>
-            <StepperSeparator />
+            {shouldRenderSeparator ? <StepperSeparator /> : null}
           </>
         )}
       </StepperItemContext.Provider>
@@ -158,6 +170,7 @@ function StepperTrigger({
   children,
   disabled,
   onClick,
+  onKeyDown,
   tabIndex,
   ...props
 }: StepperTriggerProps) {
@@ -171,6 +184,7 @@ function StepperTrigger({
     triggerId,
     contentId,
   } = useStepperItemContext("StepperTrigger");
+  const { steps, getTriggerId } = useStepperContext("StepperTrigger");
   const isDisabled = itemDisabled || disabled;
   const Comp = asChild ? Slot : "button";
 
@@ -211,11 +225,82 @@ function StepperTrigger({
           setValue(value);
         }
       }}
+      onKeyDown={(event: React.KeyboardEvent<HTMLButtonElement>) => {
+        onKeyDown?.(event);
+
+        if (event.defaultPrevented || isDisabled) {
+          return;
+        }
+
+        const targetStepValue = getKeyboardNavigationStepValue({
+          key: event.key,
+          orientation,
+          steps,
+          value,
+        });
+
+        if (!targetStepValue || targetStepValue === value) {
+          return;
+        }
+
+        const targetTrigger = document.getElementById(
+          getTriggerId(targetStepValue)
+        );
+
+        if (targetTrigger instanceof HTMLElement) {
+          event.preventDefault();
+          targetTrigger.focus();
+        }
+      }}
       {...props}
     >
       {children}
     </Comp>
   );
+}
+
+function getKeyboardNavigationStepValue({
+  key,
+  orientation,
+  steps,
+  value,
+}: {
+  key: string;
+  orientation: "horizontal" | "vertical";
+  steps: StepperStep[];
+  value: string;
+}) {
+  const enabledSteps = steps.filter((step) => !step.disabled);
+  const currentIndex = enabledSteps.findIndex((step) => step.value === value);
+
+  if (currentIndex < 0) {
+    return undefined;
+  }
+
+  if (key === "Home") {
+    return enabledSteps.at(0)?.value;
+  }
+
+  if (key === "End") {
+    return enabledSteps.at(-1)?.value;
+  }
+
+  if (
+    (orientation === "horizontal" && key === "ArrowRight") ||
+    (orientation === "vertical" && key === "ArrowDown")
+  ) {
+    return enabledSteps[Math.min(currentIndex + 1, enabledSteps.length - 1)]
+      ?.value;
+  }
+
+  if (
+    (orientation === "horizontal" && key === "ArrowLeft") ||
+    (orientation === "vertical" && key === "ArrowUp")
+  ) {
+    return enabledSteps[Math.max(currentIndex - 1, 0)]?.value;
+  }
+
+  return undefined;
 }
 
 function StepperIndicator({

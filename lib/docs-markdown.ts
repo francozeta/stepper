@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 
 import {
+  accessibilityNotes,
   apiComponents,
   controlledSnippet,
   gettingStartedSnippet,
@@ -233,6 +234,12 @@ function getApiMarkdown() {
     "",
     ...useStepperRows.map(
       (row) => `- \`${row.name}\` - ${row.type}: ${row.description}`
+    ),
+    "",
+    "## Accessibility model",
+    "",
+    ...accessibilityNotes.map(
+      (item) => `- ${item.label}: ${item.value}. ${item.help}`
     ),
     "",
     "## Integrations",
