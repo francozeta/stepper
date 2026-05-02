@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.6.0](https://github.com/francozeta/stepper/compare/v0.5.0...v0.6.0) (2026-05-02)
+
+
+### Features
+
+* **docs:** refactor documentation components and integrate fumadocs for improved TOC handling ([266ae02](https://github.com/francozeta/stepper/commit/266ae023d32fde193e37f4bb453e8d8af5991bdb))
+* **stepper:** enhance stepper navigation with guards and keyboard support ([738796f](https://github.com/francozeta/stepper/commit/738796f292daa714dfb3c5a6625a30254ead4328))
+
+
+### Bug Fixes
+
+* implement controlled fallback synchronization logic ([8a20696](https://github.com/francozeta/stepper/commit/8a20696b733327987c697533b3790a28fe4c870f))
+
 ## [0.5.0](https://github.com/francozeta/stepper/compare/v0.4.1...v0.5.0) (2026-05-02)
 
 
