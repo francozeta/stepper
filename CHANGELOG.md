@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.2](https://github.com/francozeta/stepper/compare/v0.7.1...v0.7.2) (2026-05-02)
+
+
+### Bug Fixes
+
+* keep release feed aligned with registry version ([0064bc6](https://github.com/francozeta/stepper/commit/0064bc63bedaf35ff0eab5090a9d9ae539fd81a9))
+
 ## [0.7.1](https://github.com/francozeta/stepper/compare/v0.7.0...v0.7.1) (2026-05-02)
 
 
