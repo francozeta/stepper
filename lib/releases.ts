@@ -22,11 +22,11 @@ type StepperRelease = {
 
 const releases: StepperRelease[] = [
   {
-    version: "0.7.0",
+    version: registryVersion,
     date: "2026-05-02",
-    title: "Registry release candidate",
+    title: "Current registry release",
     summary:
-      "The hardened Stepper registry component is now the current release candidate, with clearer docs around composition, fallback behavior, and copied-source ownership.",
+      "The current Stepper registry release tracks the latest release-please bump while keeping the docs focused on copied-source ownership, composition, and production verification.",
     sections: [
       {
         title: "Added",
@@ -38,7 +38,43 @@ const releases: StepperRelease[] = [
       {
         title: "Docs",
         items: [
-          "Kept the changelog aligned with the release-please version bump.",
+          "Derived the current changelog entry from the registry version so release-please bumps do not require a manual feed edit.",
+          "Clarified the path toward final production QA: install from /stepper.json, verify copied source, then publish usage guidance.",
+        ],
+      },
+      {
+        title: "Registry",
+        items: [
+          "Validated that generated public registry artifacts remain up to date after the release bump.",
+          "Preserved flat registry URLs for shadcn CLI installs and compatibility rewrites.",
+        ],
+      },
+    ],
+    links: [
+      {
+        label: "GitHub release",
+        href: `${siteConfig.repository}/releases/tag/v${registryVersion}`,
+      },
+    ],
+  },
+  {
+    version: "0.7.0",
+    date: "2026-05-02",
+    title: "Registry release candidate",
+    summary:
+      "The hardened Stepper registry component became the release candidate, with clearer docs around composition, fallback behavior, and copied-source ownership.",
+    sections: [
+      {
+        title: "Added",
+        items: [
+          "Promoted the release-candidate hardening work into the registry version.",
+          "Kept the public docs focused on the shadcn registry component instead of package-style distribution.",
+        ],
+      },
+      {
+        title: "Docs",
+        items: [
+          "Aligned the changelog with the release-please version bump.",
           "Clarified the path toward final production QA: install from /stepper.json, verify copied source, then publish usage guidance.",
         ],
       },

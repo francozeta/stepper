@@ -33,8 +33,9 @@ describe("release and AI documentation surfaces", () => {
     const changelogList = await readText("components/changelog-list.tsx");
     const releases = await readText("lib/releases.ts");
 
-    expect(releases).toContain(`version: "${packageJson.version}"`);
-    expect(releases).toContain(`/releases/tag/v${packageJson.version}`);
+    expect(packageJson.version).toMatch(/^\d+\.\d+\.\d+$/);
+    expect(releases).toContain("version: registryVersion");
+    expect(releases).toContain("/releases/tag/v${registryVersion}");
     expect(changelogList).toContain("current");
   });
 
