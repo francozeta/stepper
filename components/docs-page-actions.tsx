@@ -23,20 +23,29 @@ type DocsPageActionsProps = {
 };
 
 function DocsPageActions({ slug = [], title }: DocsPageActionsProps) {
-  const pageUrl = absoluteUrl(slug.length ? `/${slug.join("/")}` : "/");
   const markdownPath = getMarkdownPath(slug);
   const markdownUrl = absoluteUrl(markdownPath);
   const v0Url = getOpenInV0Url();
   const prompt = `Use the Stepper documentation page "${title}" as context, then help me implement it correctly: ${markdownUrl}`;
   const chatGptUrl = `https://chatgpt.com/?q=${encodeURIComponent(prompt)}`;
   const claudeUrl = `https://claude.ai/new?q=${encodeURIComponent(prompt)}`;
+  const copyMarkdown = async () => {
+    const response = await fetch(markdownPath);
+
+    if (!response.ok) {
+      throw new Error(`Unable to load ${markdownPath}`);
+    }
+
+    return response.text();
+  };
 
   return (
     <ButtonGroup>
       <CopyButton
-        value={() => window.location.href || pageUrl}
+        value={copyMarkdown}
         label="Copy Page"
-        copiedLabel="Copied"
+        copiedLabel="Copied Markdown"
+        hideLabelOnMobile={false}
         variant="outline"
         size="sm"
       />

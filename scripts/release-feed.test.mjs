@@ -72,4 +72,19 @@ describe("release and AI documentation surfaces", () => {
     expect(toc).not.toContain("Segmented line");
     expect(toc).toContain("fumadocs-core/toc");
   });
+
+  it("keeps docs navigation markdown-first and visually quiet", async () => {
+    const actions = await readText("components/docs-page-actions.tsx");
+    const sidebar = await readText("components/docs-sidebar.tsx");
+    const toc = await readText("components/docs-toc.tsx");
+
+    expect(actions).toContain("fetch(markdownPath)");
+    expect(actions).not.toContain("window.location.href");
+    expect(sidebar).toContain("shouldScaleBackground={false}");
+    expect(sidebar).toContain("bg-gradient-to-r");
+    expect(sidebar).not.toContain("border-dashed");
+    expect(toc).toContain("MutationObserver");
+    expect(toc).toContain("bg-gradient-to-b");
+    expect(toc).not.toContain("border-dashed");
+  });
 });

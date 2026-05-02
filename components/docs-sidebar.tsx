@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, Waypoints, X } from "lucide-react";
@@ -26,38 +27,44 @@ function DocsSidebar() {
       <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col border-r border-border bg-background md:flex">
         <div className="flex min-h-0 flex-1 flex-col px-4 py-5">
           <SidebarBrand />
-          <nav className="docs-scrollbar mt-6 flex flex-1 flex-col gap-7 overflow-y-auto pr-1">
-            {docsNav.map((group) => (
-              <div key={group.title} className="flex flex-col gap-2">
-                <p className="px-2 text-xs font-medium text-muted-foreground">
-                  {group.title}
-                </p>
-                <div className="flex flex-col gap-1">
-                  {group.items.map((item) => {
-                    const isActive = pathname === item.href;
-                    const Icon = item.icon;
+          <div className="relative mt-3 min-h-0 flex-1">
+            <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-2 bg-gradient-to-b from-background via-background/80 to-transparent" />
+            <nav className="docs-scrollbar h-full overflow-y-auto pr-1">
+              <div className="flex flex-col gap-7 py-2">
+                {docsNav.map((group) => (
+                  <div key={group.title} className="flex flex-col gap-2">
+                    <p className="px-2 text-xs font-medium text-muted-foreground">
+                      {group.title}
+                    </p>
+                    <div className="flex flex-col gap-1">
+                      {group.items.map((item) => {
+                        const isActive = pathname === item.href;
+                        const Icon = item.icon;
 
-                    return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        aria-current={isActive ? "page" : undefined}
-                        className={cn(
-                          "group flex min-h-8 items-center gap-2 rounded-md px-2 text-sm font-medium text-muted-foreground outline-none",
-                          "transition-[background-color,color,box-shadow] hover:bg-muted hover:text-foreground",
-                          "focus-visible:ring-ring/50 focus-visible:ring-[3px]",
-                          isActive && "bg-muted text-foreground"
-                        )}
-                      >
-                        <Icon className="size-4 shrink-0" />
-                        <span className="truncate">{item.title}</span>
-                      </Link>
-                    );
-                  })}
-                </div>
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            aria-current={isActive ? "page" : undefined}
+                            className={cn(
+                              "group flex min-h-8 items-center gap-2 rounded-md px-2 text-sm font-medium text-muted-foreground outline-none",
+                              "transition-[background-color,color,box-shadow] hover:bg-muted hover:text-foreground",
+                              "focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+                              isActive && "bg-muted text-foreground"
+                            )}
+                          >
+                            <Icon className="size-4 shrink-0" />
+                            <span className="truncate">{item.title}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </nav>
+            </nav>
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-7 bg-gradient-to-t from-background via-background/80 to-transparent" />
+          </div>
           <SidebarFooter />
         </div>
       </aside>
@@ -81,7 +88,9 @@ function SidebarBrand({ compact = false }: { compact?: boolean }) {
       href="/"
       className={cn(
         "flex min-w-0 items-center gap-2 rounded-md outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px]",
-        compact ? "py-1" : "border-b border-dashed border-border pb-4"
+        compact
+          ? "py-1"
+          : "relative pb-3 after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:bg-gradient-to-r after:from-transparent after:via-border/90 after:to-transparent"
       )}
     >
       <span
@@ -106,7 +115,7 @@ function SidebarBrand({ compact = false }: { compact?: boolean }) {
 
 function SidebarFooter() {
   return (
-    <div className="mt-6 flex flex-col gap-4 border-t border-dashed border-border pt-4">
+    <div className="relative mt-4 flex flex-col gap-4 pt-3 before:absolute before:left-0 before:top-0 before:h-px before:w-full before:bg-gradient-to-r before:from-transparent before:via-border/90 before:to-transparent">
       <Link
         href="/changelog"
         className="rounded-lg border border-border bg-muted/30 p-3 outline-none transition-[background-color,box-shadow] hover:bg-muted/60 focus-visible:ring-ring/50 focus-visible:ring-[3px]"
@@ -129,8 +138,15 @@ function SidebarFooter() {
 }
 
 function MobileNavDrawer({ pathname }: { pathname: string }) {
+  const [open, setOpen] = React.useState(false);
+
   return (
-    <Drawer direction="left">
+    <Drawer
+      direction="left"
+      open={open}
+      onOpenChange={setOpen}
+      shouldScaleBackground={false}
+    >
       <DrawerTrigger asChild>
         <Button
           type="button"
@@ -142,7 +158,7 @@ function MobileNavDrawer({ pathname }: { pathname: string }) {
           <Menu className="size-5" />
         </Button>
       </DrawerTrigger>
-      <DrawerContent className="w-[19rem] max-w-[85vw] gap-0 p-0">
+      <DrawerContent className="w-[18.5rem] max-w-[84vw] gap-0 rounded-r-lg border-border/80 bg-background p-0 shadow-2xl">
         <DrawerHeader className="border-b border-border p-4 pr-12 text-left">
           <SidebarBrand />
           <DrawerTitle className="sr-only">Documentation navigation</DrawerTitle>
@@ -173,21 +189,21 @@ function MobileNavDrawer({ pathname }: { pathname: string }) {
                   const Icon = item.icon;
 
                   return (
-                    <DrawerClose key={item.href} asChild>
-                      <Link
-                        href={item.href}
-                        aria-current={isActive ? "page" : undefined}
-                        className={cn(
-                          "flex min-h-10 items-center gap-2 rounded-md px-2 text-sm font-medium text-muted-foreground outline-none",
-                          "transition-[background-color,color,box-shadow] hover:bg-muted hover:text-foreground",
-                          "focus-visible:ring-ring/50 focus-visible:ring-[3px]",
-                          isActive && "bg-muted text-foreground"
-                        )}
-                      >
-                        <Icon className="size-4 shrink-0" />
-                        <span className="truncate">{item.title}</span>
-                      </Link>
-                    </DrawerClose>
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      aria-current={isActive ? "page" : undefined}
+                      onClick={() => setOpen(false)}
+                      className={cn(
+                        "flex min-h-10 items-center gap-2 rounded-md px-2 text-sm font-medium text-muted-foreground outline-none",
+                        "transition-[background-color,color,box-shadow] hover:bg-muted hover:text-foreground",
+                        "focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+                        isActive && "bg-muted text-foreground"
+                      )}
+                    >
+                      <Icon className="size-4 shrink-0" />
+                      <span className="truncate">{item.title}</span>
+                    </Link>
                   );
                 })}
               </div>

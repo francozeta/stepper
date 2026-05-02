@@ -38,7 +38,7 @@ function PageHeader({
   action,
 }: PageHeaderProps) {
   return (
-    <header className="flex max-w-3xl flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <header className="grid max-w-4xl gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
       <div className="flex min-w-0 flex-col gap-4">
         {eyebrow ? (
           <p className="font-mono text-xs font-medium text-muted-foreground">
@@ -62,7 +62,7 @@ function PageHeader({
         </div>
       </div>
       {action ? (
-        <div className="flex shrink-0 flex-wrap gap-2 sm:justify-end">
+        <div className="flex shrink-0 flex-wrap gap-2 lg:justify-end lg:pt-6">
           {action}
         </div>
       ) : null}

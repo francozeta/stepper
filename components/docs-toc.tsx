@@ -38,11 +38,42 @@ function DocsTocProvider({
       return;
     }
 
-    const frame = window.requestAnimationFrame(() => {
-      setDomToc(getDomToc());
+    let frame: number | null = null;
+    const updateDomToc = () => {
+      if (frame !== null) {
+        window.cancelAnimationFrame(frame);
+      }
+
+      frame = window.requestAnimationFrame(() => {
+        frame = null;
+        setDomToc(getDomToc());
+      });
+    };
+
+    updateDomToc();
+
+    const content = document.querySelector("[data-docs-content]");
+
+    if (!content) {
+      return () => {
+        if (frame !== null) window.cancelAnimationFrame(frame);
+      };
+    }
+
+    const observer = new MutationObserver(updateDomToc);
+
+    observer.observe(content, {
+      attributeFilter: ["id"],
+      attributes: true,
+      characterData: true,
+      childList: true,
+      subtree: true,
     });
 
-    return () => window.cancelAnimationFrame(frame);
+    return () => {
+      observer.disconnect();
+      if (frame !== null) window.cancelAnimationFrame(frame);
+    };
   }, [normalizedToc.length]);
 
   return (
@@ -85,17 +116,17 @@ function DocsTableOfContents() {
   if (toc.length === 0) return null;
 
   return (
-    <aside className="sticky top-8 hidden h-fit xl:block">
-      <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-        <List className="size-3.5" />
+    <aside className="sticky top-8 hidden h-fit w-36 xl:block">
+      <div className="flex items-center gap-1.5 text-[0.7rem] font-medium text-muted-foreground">
+        <List className="size-3" />
         On this page
       </div>
       <div
         ref={containerRef}
-        className="docs-scrollbar mt-4 max-h-[calc(100vh-6rem)] overflow-y-auto border-l border-dashed border-border/80"
+        className="docs-scrollbar relative mt-3 max-h-[calc(100vh-6rem)] overflow-y-auto pl-2 before:absolute before:inset-y-0 before:left-0 before:w-px before:bg-gradient-to-b before:from-transparent before:via-border/80 before:to-transparent"
       >
         <ScrollProvider containerRef={containerRef}>
-          <nav aria-label="On this page">
+          <nav aria-label="On this page" className="space-y-0.5">
             {toc.map((item) => (
               <TocLink key={item.url} item={item} />
             ))}
@@ -118,7 +149,7 @@ function DocsMobileTableOfContents() {
     <Collapsible
       open={open}
       onOpenChange={setOpen}
-      className="sticky top-14 z-20 border-b border-border bg-background/94 backdrop-blur supports-[backdrop-filter]:bg-background/82 md:top-0 xl:hidden"
+      className="sticky top-14 z-20 border-b border-border/80 bg-background/96 backdrop-blur supports-[backdrop-filter]:bg-background/86 md:top-0 xl:hidden"
     >
       <CollapsibleTrigger
         className={cn(
@@ -158,12 +189,12 @@ function DocsMobileTableOfContents() {
       <CollapsibleContent>
         <div
           ref={containerRef}
-          className="docs-scrollbar max-h-[45vh] overflow-y-auto px-4 pb-3 sm:px-6 md:px-8"
+          className="docs-scrollbar max-h-[38vh] overflow-y-auto px-4 pb-3 sm:px-6 md:px-8"
         >
           <ScrollProvider containerRef={containerRef}>
             <nav
               aria-label="On this page"
-              className="border-l border-dashed border-border/80 py-1"
+              className="relative py-1 pl-2 before:absolute before:inset-y-0 before:left-0 before:w-px before:bg-gradient-to-b before:from-transparent before:via-border/80 before:to-transparent"
             >
               {toc.map((item) => (
                 <TocLink
@@ -195,10 +226,11 @@ function TocLink({
       href={item.url}
       onClick={onClick}
       className={cn(
-        "block border-l-2 border-transparent text-muted-foreground transition-[border-color,color]",
+        "relative block rounded-sm text-muted-foreground transition-[background-color,color]",
+        "before:absolute before:bottom-1.5 before:left-0 before:top-1.5 before:w-px before:rounded-full before:bg-gradient-to-b before:from-foreground/0 before:via-foreground before:to-foreground/0 before:opacity-0 before:transition-opacity",
         "hover:text-foreground focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none",
-        "data-[active=true]:-ml-px data-[active=true]:border-foreground data-[active=true]:text-foreground",
-        mobile ? "px-4 py-2 text-sm leading-5" : "px-4 py-1.5 text-sm leading-5"
+        "data-[active=true]:text-foreground data-[active=true]:before:opacity-100",
+        mobile ? "px-3 py-2 text-sm leading-5" : "px-3 py-1 text-xs leading-5"
       )}
       style={{ paddingLeft: `${1 + Math.max(0, item.depth - 2) * 0.75}rem` }}
     >
@@ -258,6 +290,21 @@ function normalizeToc(toc: TableOfContents) {
 
 function getDomToc(): TableOfContents {
   const items: TableOfContents = [];
+  const seenUrls = new Set<string>();
+  const pushHeading = (heading: HTMLElement, url: string) => {
+    const title = heading.textContent?.trim();
+
+    if (!title || seenUrls.has(url)) {
+      return;
+    }
+
+    seenUrls.add(url);
+    items.push({
+      depth: Number(heading.tagName.slice(1)),
+      title,
+      url,
+    });
+  };
   const sections = document.querySelectorAll<HTMLElement>(
     "[data-docs-content] section[id]"
   );
@@ -265,15 +312,15 @@ function getDomToc(): TableOfContents {
   sections.forEach((section) => {
     const heading = section.querySelector<HTMLElement>("h2, h3");
 
-    if (!heading?.textContent) {
-      return;
-    }
+    if (heading) pushHeading(heading, `#${section.id}`);
+  });
 
-    items.push({
-      depth: Number(heading.tagName.slice(1)),
-      title: heading.textContent,
-      url: `#${section.id}`,
-    });
+  const headings = document.querySelectorAll<HTMLElement>(
+    "[data-docs-content] h2[id], [data-docs-content] h3[id]"
+  );
+
+  headings.forEach((heading) => {
+    pushHeading(heading, `#${heading.id}`);
   });
 
   return items;

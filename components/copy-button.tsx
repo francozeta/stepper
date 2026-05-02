@@ -20,6 +20,7 @@ type CopyButtonProps = Omit<React.ComponentProps<typeof Button>, "value"> & {
   label?: string;
   copiedLabel?: string;
   blockedLabel?: string;
+  hideLabelOnMobile?: boolean;
   iconOnly?: boolean;
 };
 
@@ -28,6 +29,7 @@ function CopyButton({
   label = "Copy",
   copiedLabel = "Copied",
   blockedLabel = "Copy blocked",
+  hideLabelOnMobile = true,
   iconOnly = false,
   className,
   children,
@@ -106,7 +108,9 @@ function CopyButton({
         >
           <AnimatedCopyIcon status={status} />
           {!iconOnly && (children ?? (
-            <span className="hidden sm:inline">{currentLabel}</span>
+            <span className={hideLabelOnMobile ? "hidden sm:inline" : "inline"}>
+              {currentLabel}
+            </span>
           ))}
         </Button>
       </TooltipTrigger>
