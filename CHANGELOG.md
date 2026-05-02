@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.1](https://github.com/francozeta/stepper/compare/v0.6.0...v0.6.1) (2026-05-02)
+
+
+### Tests
+
+* add validation for Stepper primitive markers in registry output ([d1655f2](https://github.com/francozeta/stepper/commit/d1655f2a0731669bd99372fb573c28bf2ce2b153))
+
 ## [0.6.0](https://github.com/francozeta/stepper/compare/v0.5.0...v0.6.0) (2026-05-02)
 
 
