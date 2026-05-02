@@ -210,6 +210,61 @@ describe("Stepper", () => {
     });
   });
 
+  it("can select a wrapped step in the same update that enables it", async () => {
+    const user = userEvent.setup();
+
+    const WrappedStep = React.memo(function WrappedStep(
+      props: StepperItemProps
+    ) {
+      return <StepperItem {...props} />;
+    });
+
+    function ControlledStepper() {
+      const [value, setValue] = React.useState("account");
+      const [isProfileDisabled, setIsProfileDisabled] = React.useState(true);
+
+      return (
+        <>
+          <button
+            type="button"
+            onClick={() => {
+              setIsProfileDisabled(false);
+              setValue("profile");
+            }}
+          >
+            Enable and select profile
+          </button>
+          <output data-testid="enabled-current-value">{value}</output>
+
+          <Stepper value={value} onValueChange={setValue}>
+            <StepperList>
+              <WrappedStep value="account">Account</WrappedStep>
+              <WrappedStep value="profile" disabled={isProfileDisabled}>
+                Profile
+              </WrappedStep>
+            </StepperList>
+
+            <StepperContent value="account">Account content</StepperContent>
+            <StepperContent value="profile">Profile content</StepperContent>
+          </Stepper>
+        </>
+      );
+    }
+
+    render(<ControlledStepper />);
+
+    await user.click(
+      screen.getByRole("button", { name: "Enable and select profile" })
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("enabled-current-value")).toHaveTextContent(
+        "profile"
+      );
+    });
+    expect(screen.getByText("Profile content")).toBeVisible();
+  });
+
   it("falls back when the active uncontrolled step is removed", async () => {
     const user = userEvent.setup();
 

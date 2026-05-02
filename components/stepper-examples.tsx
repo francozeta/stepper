@@ -417,6 +417,9 @@ function StepperExample() {
   const workspaceCompleted = Boolean(completedSteps.workspace);
   const preferencesCompleted = Boolean(completedSteps.preferences);
   const membersCompleted = Boolean(completedSteps.members);
+  const currentWizardIndex = wizardSteps.indexOf(value);
+  const isPastWizardStep = (step: WizardStep) =>
+    wizardSteps.indexOf(step) < currentWizardIndex;
   const preferencesDisabled = !workspaceCompleted;
   const membersDisabled = !preferencesCompleted;
   const reviewDisabled = !membersCompleted;
@@ -525,7 +528,7 @@ function StepperExample() {
           description={workspaceCompleted ? "Ready" : "Required"}
           icon={Building2}
           active={value === "workspace"}
-          completed={workspaceCompleted}
+          completed={workspaceCompleted && isPastWizardStep("workspace")}
           error={Boolean(attemptedSteps.workspace && !workspaceValid)}
         />
         <DemoStep
@@ -534,7 +537,7 @@ function StepperExample() {
           description={preferencesDisabled ? "Locked" : "Defaults"}
           icon={Settings2}
           active={value === "preferences"}
-          completed={preferencesCompleted}
+          completed={preferencesCompleted && isPastWizardStep("preferences")}
           disabled={preferencesDisabled}
           error={Boolean(attemptedSteps.preferences && !preferencesValid)}
         />
@@ -544,7 +547,7 @@ function StepperExample() {
           description={membersDisabled ? "Locked" : "Optional"}
           icon={Users}
           active={value === "members"}
-          completed={membersCompleted}
+          completed={membersCompleted && isPastWizardStep("members")}
           disabled={membersDisabled}
           error={Boolean(attemptedSteps.members && !membersValid)}
         />

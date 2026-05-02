@@ -21,6 +21,45 @@ import {
   toStepRecord,
 } from "./utils";
 
+type FallbackSyncState = {
+  currentValue: string | undefined;
+  selectedCollectedStepDisabled: boolean | undefined;
+  selectedStepDisabled: boolean | undefined;
+  selectedStepExists: boolean;
+  selectedValue: string | undefined;
+};
+
+type FallbackSyncReason =
+  | "missing"
+  | "direct-disabled"
+  | "registered-disabled";
+
+function getControlledFallbackReason(
+  state: FallbackSyncState
+): FallbackSyncReason | undefined {
+  if (state.selectedValue === undefined || state.currentValue === undefined) {
+    return undefined;
+  }
+
+  if (state.selectedValue === state.currentValue) {
+    return undefined;
+  }
+
+  if (!state.selectedStepExists) {
+    return "missing";
+  }
+
+  if (state.selectedCollectedStepDisabled === true) {
+    return "direct-disabled";
+  }
+
+  if (state.selectedStepDisabled === true) {
+    return "registered-disabled";
+  }
+
+  return undefined;
+}
+
 function Stepper({
   value,
   defaultValue,
@@ -63,6 +102,23 @@ function Stepper({
     () => collectedSteps.find((step) => step.value === selectedValue),
     [collectedSteps, selectedValue]
   );
+  const fallbackSyncState = React.useMemo<FallbackSyncState>(
+    () => ({
+      currentValue,
+      selectedCollectedStepDisabled: selectedCollectedStep?.disabled,
+      selectedStepDisabled: selectedStep?.disabled,
+      selectedStepExists: Boolean(selectedStep),
+      selectedValue,
+    }),
+    [
+      currentValue,
+      selectedCollectedStep?.disabled,
+      selectedStep,
+      selectedValue,
+    ]
+  );
+  const fallbackSyncStateRef =
+    React.useRef<FallbackSyncState>(fallbackSyncState);
   const previousStep = React.useMemo(
     () => getPreviousEnabledStep(steps, currentValue),
     [currentValue, steps]
@@ -131,32 +187,42 @@ function Stepper({
     [isControlled, onValueChange, steps]
   );
 
+  React.useLayoutEffect(() => {
+    fallbackSyncStateRef.current = fallbackSyncState;
+  }, [fallbackSyncState]);
+
   React.useEffect(() => {
-    if (
-      !isControlled ||
-      selectedValue === undefined ||
-      currentValue === undefined
-    ) {
+    const fallbackReason = getControlledFallbackReason(fallbackSyncState);
+
+    if (!isControlled || !fallbackReason) {
       return;
     }
 
-    const shouldSyncFallback =
-      !selectedStep ||
-      selectedStep.disabled ||
-      selectedCollectedStep?.disabled === true;
+    const syncLatestFallback = () => {
+      const latestState = fallbackSyncStateRef.current;
 
-    if (selectedValue === currentValue || !shouldSyncFallback) {
+      if (
+        getControlledFallbackReason(latestState) &&
+        latestState.currentValue !== undefined
+      ) {
+        onValueChange?.(latestState.currentValue);
+      }
+    };
+
+    if (fallbackReason !== "registered-disabled") {
+      syncLatestFallback();
       return;
     }
 
-    onValueChange?.(currentValue);
+    // Wrapped StepperItem components report disabled changes from layout effects.
+    // Deferring avoids syncing from a stale registered disabled value.
+    const timeout = window.setTimeout(syncLatestFallback, 0);
+
+    return () => window.clearTimeout(timeout);
   }, [
-    currentValue,
+    fallbackSyncState,
     isControlled,
     onValueChange,
-    selectedCollectedStep,
-    selectedStep,
-    selectedValue,
   ]);
 
   const context = React.useMemo<StepperContextValue>(
