@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.1](https://github.com/francozeta/stepper/compare/v0.7.0...v0.7.1) (2026-05-02)
+
+
+### Documentation
+
+* align changelog with registry v0.7.0 ([449b273](https://github.com/francozeta/stepper/commit/449b27392315423200c837b5df0c2c51f623cc0b))
+
 ## [0.7.0](https://github.com/francozeta/stepper/compare/v0.6.2...v0.7.0) (2026-05-02)
 
 
