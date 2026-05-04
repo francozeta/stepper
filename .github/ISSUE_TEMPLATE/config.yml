@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: README
+    url: https://github.com/francozeta/stepper#readme
+    about: Installation, development, and release notes for Stepper.
+  - name: Documentation
+    url: https://francozeta-stepper.vercel.app
+    about: Browse Stepper docs and examples.

@@ -1,0 +1,57 @@
+[
+  {
+    "name": "bug",
+    "color": "b42318",
+    "description": "Something is not working as expected."
+  },
+  {
+    "name": "feature",
+    "color": "2563eb",
+    "description": "New functionality or an improvement request."
+  },
+  {
+    "name": "docs",
+    "color": "0e7490",
+    "description": "Documentation, examples, or README changes."
+  },
+  {
+    "name": "component",
+    "color": "7c3aed",
+    "description": "Changes to the Stepper component source."
+  },
+  {
+    "name": "registry",
+    "color": "475569",
+    "description": "Changes to registry source, output, or build scripts."
+  },
+  {
+    "name": "ci",
+    "color": "334155",
+    "description": "GitHub Actions, automation, or repository maintenance."
+  },
+  {
+    "name": "test",
+    "color": "15803d",
+    "description": "Tests or test configuration."
+  },
+  {
+    "name": "needs reproduction",
+    "color": "ca8a04",
+    "description": "Needs a minimal reproduction before it can move forward."
+  },
+  {
+    "name": "good first issue",
+    "color": "2e7d32",
+    "description": "Approachable for a first contribution."
+  },
+  {
+    "name": "help wanted",
+    "color": "0f766e",
+    "description": "Maintainers would welcome community help."
+  },
+  {
+    "name": "dependencies",
+    "color": "6b7280",
+    "description": "Dependency updates."
+  }
+]
