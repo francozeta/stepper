@@ -131,6 +131,22 @@ describe("project infrastructure", () => {
     expect(releaseManifest["."]).toBe(packageJson.version);
   });
 
+  it("enforces Conventional Commits locally with commitlint and Husky", async () => {
+    const packageJson = await readJson("package.json");
+    const commitlintConfig = await readText("commitlint.config.mjs");
+    const commitMessageHook = await readText(".husky/commit-msg");
+
+    expect(packageJson.scripts.commitlint).toBe("commitlint");
+    expect(packageJson.scripts.prepare).toBe("husky");
+    expect(packageJson.devDependencies).toHaveProperty("@commitlint/cli");
+    expect(packageJson.devDependencies).toHaveProperty(
+      "@commitlint/config-conventional"
+    );
+    expect(packageJson.devDependencies).toHaveProperty("husky");
+    expect(commitlintConfig).toContain("@commitlint/config-conventional");
+    expect(commitMessageHook.trim()).toBe('pnpm commitlint --edit "$1"');
+  });
+
   it("declares MDX docs as a generated content source", async () => {
     const packageJson = await readJson("package.json");
     const tsconfig = await readJson("tsconfig.json");
