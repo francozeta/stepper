@@ -23,6 +23,17 @@ export const metadata: Metadata = {
     template: "%s - Stepper",
   },
   description: siteConfig.description,
+  applicationName: siteConfig.name,
+  icons: {
+    icon: [
+      {
+        url: "/stepper-logo.svg",
+        type: "image/svg+xml",
+        sizes: "any",
+      },
+    ],
+    shortcut: "/stepper-logo.svg",
+  },
   alternates: {
     types: {
       "application/rss+xml": "/rss.xml",

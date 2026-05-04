@@ -3,9 +3,10 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, Waypoints, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
 
+import { StepperLogo } from "@/components/stepper-logo";
 import { docsNav, registryVersion } from "@/lib/docs";
 import { Button } from "@/components/ui/button";
 import {
@@ -99,7 +100,7 @@ function SidebarBrand({ compact = false }: { compact?: boolean }) {
           compact ? "size-9" : "size-8"
         )}
       >
-        <Waypoints className={compact ? "size-5" : "size-4"} />
+        <StepperLogo className={compact ? "size-6" : "size-5"} />
       </span>
       <span className="min-w-0">
         <span className="block truncate text-sm font-semibold text-foreground">
