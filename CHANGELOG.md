@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.0](https://github.com/francozeta/stepper/compare/v0.7.2...v0.8.0) (2026-05-04)
+
+
+### Features
+
+* **web:** add SVG icons and update layout metadata ([7869e44](https://github.com/francozeta/stepper/commit/7869e4484d062e57158bd2ecc6986a7400123319))
+
 ## [0.7.2](https://github.com/francozeta/stepper/compare/v0.7.1...v0.7.2) (2026-05-02)
 
 
