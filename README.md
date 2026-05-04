@@ -56,6 +56,10 @@ pnpm check
 
 That verifies the registry output, lint, typecheck, tests, and production build.
 
+## Contributing
+
+Contributions are welcome. Read `CONTRIBUTING.md` before opening a pull request.
+
 ## Releases
 
 Release Please opens release PRs from Conventional Commits on `main`.
@@ -64,3 +68,7 @@ GitHub Release for the registry component.
 
 This repo does not publish to npm. The version tracks the public shadcn registry
 component only.
+
+## License
+
+MIT

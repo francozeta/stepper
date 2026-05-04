@@ -2,6 +2,15 @@
   "name": "stepper",
   "version": "0.7.2",
   "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/francozeta/stepper.git"
+  },
+  "bugs": {
+    "url": "https://github.com/francozeta/stepper/issues"
+  },
+  "homepage": "https://francozeta-stepper.vercel.app",
   "packageManager": "pnpm@9.15.3",
   "scripts": {
     "dev": "next dev",
