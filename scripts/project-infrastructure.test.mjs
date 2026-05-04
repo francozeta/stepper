@@ -101,13 +101,16 @@ describe("project infrastructure", () => {
     const releaseConfig = await readJson("release-please-config.json");
     const releaseManifest = await readJson(".release-please-manifest.json");
 
-    expect(releaseWorkflow).toContain("googleapis/release-please-action@v4");
+    expect(releaseWorkflow).toContain("googleapis/release-please-action@v5");
     expect(releaseWorkflow).toContain("config-file: release-please-config.json");
     expect(releaseWorkflow).toContain(
       "manifest-file: .release-please-manifest.json"
     );
     expect(releaseWorkflow).not.toContain("NPM_TOKEN");
     expect(releaseWorkflow).not.toContain("npm publish");
+    expect(verifyWorkflow).toContain("actions/checkout@v6");
+    expect(verifyWorkflow).toContain("pnpm/action-setup@v6");
+    expect(verifyWorkflow).toContain("actions/setup-node@v6");
     expect(verifyWorkflow).toContain("pnpm check");
 
     expect(releaseConfig).toMatchObject({
