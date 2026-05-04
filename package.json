@@ -16,7 +16,9 @@
     "registry:check": "node scripts/build-stepper-registry.mjs --check && shadcn build --output public",
     "test": "vitest run",
     "typecheck": "pnpm docs:source && tsc --noEmit",
-    "check": "pnpm registry:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build"
+    "check": "pnpm registry:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "commitlint": "commitlint",
+    "prepare": "husky"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
@@ -51,6 +53,8 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.5.3",
+    "@commitlint/config-conventional": "^20.5.3",
     "@tailwindcss/cli": "^4.2.4",
     "@tailwindcss/postcss": "^4",
     "@testing-library/dom": "^10.4.1",
@@ -65,6 +69,7 @@
     "@vitejs/plugin-react": "^6.0.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
+    "husky": "^9.1.7",
     "jest-axe": "^10.0.0",
     "jsdom": "^29.1.0",
     "tailwindcss": "^4",
