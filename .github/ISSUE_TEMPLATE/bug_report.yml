@@ -1,0 +1,62 @@
+name: Bug report
+description: Report a reproducible problem with Stepper.
+title: "fix: "
+labels: ["bug"]
+body:
+  - type: checkboxes
+    id: existing_issues
+    attributes:
+      label: Existing issues
+      description: Please search existing issues before opening a new report.
+      options:
+        - label: I checked existing issues and did not find a duplicate.
+          required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug description
+      description: What happened?
+      placeholder: Describe the bug and the user-visible impact.
+    validations:
+      required: true
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction_steps
+    attributes:
+      label: Steps to reproduce
+      description: Keep this as small and direct as possible.
+      placeholder: |
+        1. Render Stepper with ...
+        2. Click ...
+        3. See ...
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Share the versions you tested with.
+      placeholder: |
+        - OS:
+        - Browser:
+        - Node:
+        - pnpm:
+    validations:
+      required: true
+  - type: input
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Link a minimal reproduction if you have one.
+      placeholder: https://stackblitz.com/...
+  - type: textarea
+    id: screenshots_logs
+    attributes:
+      label: Screenshots or logs
+      description: Add screenshots, console output, or test output if useful.

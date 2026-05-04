@@ -1,0 +1,50 @@
+docs:
+  - any:
+      - changed-files:
+          - any-glob-to-any-file:
+              - README.md
+              - content/docs/**
+              - app/**/page.tsx
+              - "**/*.md"
+              - "**/*.mdx"
+      - head-branch:
+          - "^docs/"
+
+component:
+  - changed-files:
+      - any-glob-to-any-file:
+          - components/ui/stepper/**
+          - components/ui/stepper.tsx
+
+registry:
+  - changed-files:
+      - any-glob-to-any-file:
+          - registry/**
+          - registry.json
+          - public/stepper.json
+          - public/registry.json
+          - scripts/build-stepper-registry.mjs
+
+ci:
+  - any:
+      - changed-files:
+          - any-glob-to-any-file:
+              - .github/**
+      - head-branch:
+          - "^chore/"
+
+test:
+  - changed-files:
+      - any-glob-to-any-file:
+          - test/**
+          - "**/*.test.ts"
+          - "**/*.test.tsx"
+          - vitest.config.*
+
+bug:
+  - head-branch:
+      - "^fix/"
+
+feature:
+  - head-branch:
+      - "^feat/"

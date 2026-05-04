@@ -1,0 +1,25 @@
+name: Documentation issue
+description: Report something confusing, missing, or outdated in the docs.
+title: "docs: "
+labels: ["docs"]
+body:
+  - type: input
+    id: page_section
+    attributes:
+      label: Page or section
+      description: Which page, route, or README section is affected?
+      placeholder: README > Development, /getting-started, /api
+    validations:
+      required: true
+  - type: textarea
+    id: issue
+    attributes:
+      label: What is confusing or missing?
+      description: Describe the docs problem.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Suggested improvement
+      description: Share a proposed wording or example if you have one.

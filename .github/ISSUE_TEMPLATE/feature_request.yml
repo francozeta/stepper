@@ -1,0 +1,44 @@
+name: Feature request
+description: Suggest an improvement for Stepper.
+title: "feat: "
+labels: ["feature"]
+body:
+  - type: checkboxes
+    id: existing_issues
+    attributes:
+      label: Existing issues
+      description: Please search existing issues before opening a new request.
+      options:
+        - label: I checked existing issues and did not find a duplicate.
+          required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What problem would this solve?
+      placeholder: Describe the workflow, limitation, or use case.
+    validations:
+      required: true
+  - type: textarea
+    id: desired_api_ux
+    attributes:
+      label: Desired API or UX
+      description: What would the ideal API or user experience look like?
+      placeholder: Show a short code example or describe the interaction.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What have you tried or considered instead?
+  - type: checkboxes
+    id: affected_area
+    attributes:
+      label: Affected area
+      description: Select every area this might touch.
+      options:
+        - label: Component
+        - label: Documentation
+        - label: Registry
+        - label: Not sure
