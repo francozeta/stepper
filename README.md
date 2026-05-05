@@ -8,7 +8,7 @@ source into your app, so you own the code and can customize it directly.
 ## Install
 
 ```bash
-pnpm dlx shadcn@latest add https://francozeta-stepper.vercel.app/stepper.json
+pnpm dlx shadcn@latest registry add @stepper
 ```
 
 The registry installs the source at:
