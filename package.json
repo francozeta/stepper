@@ -73,18 +73,18 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/jest-axe": "^3.5.9",
     "@types/mdx": "^2.0.13",
-    "@types/node": "^20",
+    "@types/node": "^25",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^6.0.1",
-    "eslint": "^9",
+    "eslint": "^10",
     "eslint-config-next": "16.2.4",
     "husky": "^9.1.7",
     "jest-axe": "^10.0.0",
-    "jsdom": "^29.1.0",
+    "jsdom": "^29.1.1",
     "tailwindcss": "^4",
-    "turbo": "^2.9.7",
-    "typescript": "^5",
+    "turbo": "^2.9.9",
+    "typescript": "^6",
     "vitest": "^4.1.5"
   }
 }
