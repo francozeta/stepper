@@ -71,10 +71,18 @@ describe("release and AI documentation surfaces", () => {
   it("points Open in v0 at a demo item with a default export", async () => {
     const actions = await readText("components/docs-page-actions.tsx");
     const demo = await readText("registry/default/examples/stepper-demo.tsx");
+    const publicDemo = await readText("public/stepper-demo.json");
 
     expect(actions).toContain("registryDemoItem");
     expect(actions).toContain("Open in v0");
     expect(demo).toContain("export default function StepperDemo");
+    expect(demo).toContain('from "@/components/ui/stepper"');
+    expect(demo).toContain("StepperIndicator");
+    expect(demo).toContain("StepperDescription");
+    expect(demo).not.toContain("@francozeta/stepper");
+    expect(demo).not.toContain("space-y-");
+    expect(publicDemo).toContain('\\"@/components/ui/stepper\\"');
+    expect(publicDemo).not.toContain("@francozeta/stepper");
   });
 
   it("keeps recipes focused on stepper patterns instead of segmented tab-like lines", async () => {

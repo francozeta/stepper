@@ -125,7 +125,7 @@ function buildStepperDemoItem() {
       type: "registry:block",
       title: "Stepper Demo",
       description:
-        "A v0-friendly Stepper demo with a default export and the Stepper source primitive.",
+        "A styled Stepper demo with a default export and the Stepper source primitive.",
       dependencies: ["@radix-ui/react-slot"],
       files: [
         {
