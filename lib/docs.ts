@@ -96,7 +96,7 @@ const quickFacts = [
 const releaseItems = [
   "The registry output is generated from components/ui/stepper/*.",
   "GitHub Actions verifies the registry, docs, tests, and production build.",
-  "The public install command uses the official @stepper shadcn registry namespace.",
+  "The public install command copies @stepper/stepper from the official shadcn registry namespace.",
   "The component is copied into the user's app instead of installed as a runtime dependency.",
 ];
 
@@ -162,7 +162,7 @@ const usageSnippet = `import {
   useStepper,
 } from "@/components/ui/stepper";`;
 
-const registryInstallSnippet = `pnpm dlx shadcn@latest registry add @stepper`;
+const registryInstallSnippet = `pnpm dlx shadcn@latest add @stepper/stepper`;
 
 const whyStepper = [
   {
