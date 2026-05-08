@@ -8,10 +8,10 @@ source into your app, so you own the code and can customize it directly.
 ## Install
 
 ```bash
-pnpm dlx shadcn@latest registry add @stepper
+pnpm dlx shadcn@latest add @stepper/stepper
 ```
 
-The registry installs the source at:
+The CLI installs the source at:
 
 ```txt
 components/ui/stepper.tsx

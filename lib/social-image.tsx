@@ -202,7 +202,7 @@ function createSocialImage() {
               padding: "22px 26px",
             }}
           >
-            pnpm dlx shadcn@latest registry add @stepper
+            pnpm dlx shadcn@latest add @stepper/stepper
           </div>
         </div>
         <div
