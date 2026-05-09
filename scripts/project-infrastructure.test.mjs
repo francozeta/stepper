@@ -67,6 +67,23 @@ describe("project infrastructure", () => {
             }),
           ]),
         }),
+        expect.objectContaining({
+          name: "stepper-notion-onboarding",
+          type: "registry:block",
+          registryDependencies: expect.arrayContaining([
+            "button",
+            "checkbox",
+            "field",
+            "input",
+            "separator",
+          ]),
+          files: expect.arrayContaining([
+            expect.objectContaining({
+              path: "registry/default/examples/stepper-notion-onboarding.tsx",
+              target: "components/stepper-notion-onboarding.tsx",
+            }),
+          ]),
+        }),
       ])
     );
   });

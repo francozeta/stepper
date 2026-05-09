@@ -98,6 +98,23 @@ describe("release and AI documentation surfaces", () => {
     expect(publicDemo).not.toContain("@francozeta/stepper");
   });
 
+  it("publishes the Notion-style onboarding registry block as local source", async () => {
+    const block = await readText(
+      "registry/default/examples/stepper-notion-onboarding.tsx"
+    );
+    const publicBlock = await readText("public/stepper-notion-onboarding.json");
+
+    expect(block).toContain("export { StepperNotionOnboardingExample }");
+    expect(block).toContain('from "@/components/ui/stepper"');
+    expect(block).toContain("HiddenStepList");
+    expect(block).toContain("Generating your starter workspace");
+    expect(block).not.toContain("@francozeta/stepper");
+    expect(publicBlock).toContain('"name": "stepper-notion-onboarding"');
+    expect(publicBlock).toContain('"react-hook-form"');
+    expect(publicBlock).toContain('"registryDependencies"');
+    expect(publicBlock).toContain('\\"@/components/ui/stepper\\"');
+  });
+
   it("keeps recipes focused on stepper patterns instead of segmented tab-like lines", async () => {
     const patterns = await readText("content/docs/patterns.mdx");
     const examples = await readText("components/stepper-examples.tsx");

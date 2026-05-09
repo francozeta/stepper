@@ -1,6 +1,6 @@
 ---
 title: "Examples"
-description: "Focused Stepper demos for product setup, checkout, vertical onboarding, and controlled React state."
+description: "Focused Stepper demos for intent onboarding, product setup, checkout, vertical onboarding, and controlled React state."
 eyebrow: "api"
 ---
 
@@ -11,6 +11,7 @@ import {
   StepperExample,
   StepperVerticalExample,
 } from "@/components/stepper-examples";
+import { StepperNotionOnboardingExample } from "@/components/stepper-notion-onboarding";
 import {
   checkoutExampleCode,
   controlledExampleCode,
@@ -19,6 +20,17 @@ import {
 } from "@/lib/docs";
 
 <div className="flex flex-col gap-6">
+  <DocsExample
+    title="Notion-style onboarding"
+    description="Model intent-based onboarding with hidden steps, profile validation, branching, interests, async generation, and an embedded workspace checklist."
+    badge="Block"
+    code={"pnpm dlx shadcn@latest add @stepper/stepper-notion-onboarding"}
+    filename="registry"
+    lang="bash"
+    preview={<StepperNotionOnboardingExample />}
+    previewClassName="bg-white p-0 sm:p-0"
+  />
+
   <DocsExample
     title="Create workspace"
     description="Show a product setup flow with blockers, completion, and disabled future steps."

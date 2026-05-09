@@ -54,7 +54,8 @@ const markdownDocs: MarkdownDoc[] = [
     slug: "examples",
     href: "/examples",
     title: "Examples",
-    description: "Product examples for checkout, onboarding, and status flows.",
+    description:
+      "Product examples for intent onboarding, checkout, onboarding, and status flows.",
     file: "examples.mdx",
   },
   {

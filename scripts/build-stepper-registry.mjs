@@ -145,6 +145,46 @@ function buildStepperDemoItem() {
   )}\n`;
 }
 
+function buildStepperNotionOnboardingItem() {
+  return `${JSON.stringify(
+    {
+      $schema: "https://ui.shadcn.com/schema/registry-item.json",
+      name: "stepper-notion-onboarding",
+      type: "registry:block",
+      title: "Stepper Notion Onboarding",
+      description:
+        "A Notion-inspired onboarding block with hidden Stepper state, intent routing, profile validation, interests, and async workspace generation.",
+      dependencies: [
+        "@radix-ui/react-slot",
+        "lucide-react",
+        "react-hook-form",
+        "zod",
+      ],
+      registryDependencies: [
+        "button",
+        "checkbox",
+        "field",
+        "input",
+        "separator",
+      ],
+      files: [
+        {
+          path: "registry/default/ui/stepper.tsx",
+          type: "registry:ui",
+          target: "components/ui/stepper.tsx",
+        },
+        {
+          path: "registry/default/examples/stepper-notion-onboarding.tsx",
+          type: "registry:component",
+          target: "components/stepper-notion-onboarding.tsx",
+        },
+      ],
+    },
+    null,
+    2
+  )}\n`;
+}
+
 async function writeOrCheck(filePath, content) {
   const absolutePath = path.join(root, filePath);
 
@@ -172,12 +212,25 @@ try {
   const registrySource = await buildStepperSource();
   const registryItem = buildRegistryItem();
   const stepperDemoItem = buildStepperDemoItem();
+  const stepperNotionOnboardingSource = await readFile(
+    path.join(root, "components/stepper-notion-onboarding.tsx"),
+    "utf8"
+  );
+  const stepperNotionOnboardingItem = buildStepperNotionOnboardingItem();
 
   await writeOrCheck("registry/default/ui/stepper.tsx", registrySource);
   await writeOrCheck("registry/default/ui/stepper.json", registryItem);
   await writeOrCheck(
     "registry/default/examples/stepper-demo.json",
     stepperDemoItem
+  );
+  await writeOrCheck(
+    "registry/default/examples/stepper-notion-onboarding.tsx",
+    stepperNotionOnboardingSource
+  );
+  await writeOrCheck(
+    "registry/default/examples/stepper-notion-onboarding.json",
+    stepperNotionOnboardingItem
   );
 
   console.log(
