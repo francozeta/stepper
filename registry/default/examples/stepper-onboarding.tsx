@@ -8,6 +8,8 @@ import {
   ArrowRight,
   Building2,
   Check,
+  CheckCircle2,
+  CircleHelp,
   Globe2,
   Lock,
   Mail,
@@ -18,22 +20,13 @@ import {
   Users,
   type LucideIcon,
 } from "lucide-react";
-import { motion, useReducedMotion } from "framer-motion";
 import { useForm, useWatch, type FieldPath } from "react-hook-form";
 import { z } from "zod/v3";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Field,
   FieldDescription,
@@ -42,7 +35,6 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -75,11 +67,12 @@ const workspaceSchema = z.object({
       /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
       "Use lowercase letters, numbers, and single hyphens."
     ),
+  workspaceDomain: z.enum(["vercel.app", "company.dev"]),
 });
 
 const preferencesSchema = z.object({
   region: z.enum(["iad1", "fra1", "sin1"]),
-  visibility: z.enum(["private", "team"]),
+  environment: z.enum(["production", "preview"]),
 });
 
 const teamSchema = z.object({
@@ -101,25 +94,25 @@ const onboardingSteps = [
   {
     value: "workspace",
     title: "Workspace",
-    description: "Name and URL",
+    description: "Name and identity",
     icon: Building2,
   },
   {
     value: "preferences",
     title: "Preferences",
-    description: "Region and access",
+    description: "Region and settings",
     icon: Settings2,
   },
   {
     value: "team",
     title: "Team",
-    description: "Invite or skip",
+    description: "Invite collaborators",
     icon: Users,
   },
   {
     value: "review",
     title: "Review",
-    description: "Create workspace",
+    description: "Confirm and create",
     icon: Send,
   },
 ] as const;
@@ -127,11 +120,20 @@ const onboardingSteps = [
 type OnboardingStep = (typeof onboardingSteps)[number]["value"];
 
 const stepFields = {
-  workspace: ["workspaceName", "workspaceSlug"],
-  preferences: ["region", "visibility"],
+  workspace: ["workspaceName", "workspaceSlug", "workspaceDomain"],
+  preferences: ["region", "environment"],
   team: ["inviteEmail", "inviteRole"],
   review: [],
 } satisfies Record<OnboardingStep, FieldPath<OnboardingValues>[]>;
+
+const regionLabels = {
+  iad1: "US East - iad1",
+  fra1: "Europe - fra1",
+  sin1: "Asia Pacific - sin1",
+} satisfies Record<OnboardingValues["region"], string>;
+
+const controlButtonClass =
+  "h-8 rounded-md px-3 text-sm font-medium [&_svg]:size-4";
 
 function StepperOnboardingExample() {
   const [value, setValue] = React.useState<OnboardingStep>("workspace");
@@ -142,15 +144,15 @@ function StepperOnboardingExample() {
     Partial<Record<OnboardingStep, boolean>>
   >({});
   const [submitted, setSubmitted] = React.useState(false);
-  const shouldReduceMotion = useReducedMotion();
   const form = useForm<OnboardingValues>({
     resolver: zodResolver(onboardingSchema),
     mode: "onChange",
     defaultValues: {
-      workspaceName: "",
-      workspaceSlug: "",
+      workspaceName: "francozeta",
+      workspaceSlug: "francozeta",
+      workspaceDomain: "vercel.app",
       region: "iad1",
-      visibility: "private",
+      environment: "production",
       inviteEmail: "",
       inviteRole: "member",
     },
@@ -160,16 +162,18 @@ function StepperOnboardingExample() {
     () => ({
       workspaceName: formValues.workspaceName ?? "",
       workspaceSlug: formValues.workspaceSlug ?? "",
+      workspaceDomain: formValues.workspaceDomain ?? "vercel.app",
       region: formValues.region ?? "iad1",
-      visibility: formValues.visibility ?? "private",
+      environment: formValues.environment ?? "production",
       inviteEmail: formValues.inviteEmail ?? "",
       inviteRole: formValues.inviteRole ?? "member",
     }),
     [
+      formValues.environment,
       formValues.inviteEmail,
       formValues.inviteRole,
       formValues.region,
-      formValues.visibility,
+      formValues.workspaceDomain,
       formValues.workspaceName,
       formValues.workspaceSlug,
     ]
@@ -179,13 +183,9 @@ function StepperOnboardingExample() {
   const completedCount = onboardingSteps.filter(
     (step) => completedSteps[step.value]
   ).length;
-  const progress = Math.round(
-    ((submitted ? onboardingSteps.length : Math.max(currentIndex + 1, 1)) /
-      onboardingSteps.length) *
-      100
-  );
   const currentFields = stepFields[value];
   const currentStepHasErrors = currentFields.some((field) => errors[field]);
+  const workspaceUrl = getWorkspaceUrl(values);
 
   function isLocked(step: OnboardingStep) {
     if (step === "workspace") return false;
@@ -248,8 +248,16 @@ function StepperOnboardingExample() {
     setSubmitted(true);
   }
 
+  function resetOnboarding() {
+    form.reset();
+    setValue("workspace");
+    setAttemptedSteps({});
+    setCompletedSteps({});
+    setSubmitted(false);
+  }
+
   function setSelectValue(
-    field: "region" | "visibility" | "inviteRole",
+    field: "workspaceDomain" | "region" | "environment" | "inviteRole",
     nextValue: string
   ) {
     const options = {
@@ -260,15 +268,24 @@ function StepperOnboardingExample() {
 
     form.clearErrors(field);
 
+    if (field === "workspaceDomain") {
+      form.setValue(
+        "workspaceDomain",
+        nextValue as OnboardingValues["workspaceDomain"],
+        options
+      );
+      return;
+    }
+
     if (field === "region") {
       form.setValue("region", nextValue as OnboardingValues["region"], options);
       return;
     }
 
-    if (field === "visibility") {
+    if (field === "environment") {
       form.setValue(
-        "visibility",
-        nextValue as OnboardingValues["visibility"],
+        "environment",
+        nextValue as OnboardingValues["environment"],
         options
       );
       return;
@@ -282,30 +299,8 @@ function StepperOnboardingExample() {
   }
 
   return (
-    <Card className="@container/onboarding mx-auto w-full max-w-5xl">
-      <CardHeader className="gap-3 border-b">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex min-w-0 flex-col gap-1.5">
-            <Badge variant="secondary" className="w-fit font-mono">
-              Dev-ready block
-            </Badge>
-            <CardTitle className="text-xl">Create workspace</CardTitle>
-            <CardDescription className="max-w-2xl">
-              A complete onboarding flow with per-step validation, completion
-              states, locked future steps, and motion-ready panels.
-            </CardDescription>
-          </div>
-          <CardAction className="static col-auto row-auto flex min-w-32 flex-col gap-2 justify-self-auto">
-            <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
-              <span>Progress</span>
-              <span className="font-mono text-foreground">{progress}%</span>
-            </div>
-            <Progress value={progress} aria-label="Workspace setup progress" />
-          </CardAction>
-        </div>
-      </CardHeader>
-
-      <CardContent className="grid min-w-0 gap-6 p-4 @4xl/onboarding:grid-cols-[minmax(0,1fr)_18rem] @4xl/onboarding:p-5">
+    <Card className="@container/onboarding mx-auto w-full max-w-5xl overflow-hidden border-border/80 bg-card">
+      <CardContent className="p-0">
         <Stepper
           value={value}
           onValueChange={(nextValue) => {
@@ -315,379 +310,575 @@ function StepperOnboardingExample() {
               setValue(nextStep);
             }
           }}
-          className="min-w-0 gap-5"
+          className="min-w-0 gap-0"
         >
-          <StepperList aria-label="Workspace onboarding steps" className="gap-3">
-            {onboardingSteps.map((step) => {
-              const active = value === step.value;
-              const completed = isStepCompleted(step.value);
-              const disabled = isLocked(step.value);
-              const error = hasStepError(step.value);
-              const Icon = step.icon;
+          <div className="border-b bg-muted/20 px-4 py-5 @lg/onboarding:px-8">
+            <StepperList
+              aria-label="Workspace onboarding steps"
+              className="mx-auto max-w-4xl gap-4"
+            >
+              {onboardingSteps.map((step, index) => {
+                const active = value === step.value;
+                const completed = isStepCompleted(step.value);
+                const disabled = isLocked(step.value);
+                const error = hasStepError(step.value);
+                const Icon = step.icon;
 
-              return (
-                <StepperItem
-                  key={step.value}
-                  value={step.value}
-                  completed={completed}
-                  disabled={disabled}
-                  error={error}
-                >
-                  <StepperTrigger>
-                    <StepperIndicator>
-                      {error ? (
-                        <AlertCircle />
-                      ) : disabled ? (
-                        <Lock />
-                      ) : completed ? (
-                        <Check />
-                      ) : (
-                        <Icon />
-                      )}
-                    </StepperIndicator>
-                    <span className="flex min-w-0 flex-col gap-1">
-                      <StepperLabel>{step.title}</StepperLabel>
-                      <StepperDescription className="hidden sm:block">
-                        {active ? "Current step" : step.description}
-                      </StepperDescription>
+                return (
+                  <StepperItem
+                    key={step.value}
+                    value={step.value}
+                    completed={completed}
+                    disabled={disabled}
+                    error={error}
+                    className="[--stepper-indicator-size:2rem] data-[orientation=horizontal]:min-w-32"
+                  >
+                    <StepperTrigger className="gap-2">
+                      <span className="relative">
+                        <StepperIndicator className="bg-card group-data-[state=active]:border-blue-500 group-data-[state=active]:bg-card group-data-[state=active]:text-blue-500 group-data-[state=active]:ring-4 group-data-[state=active]:ring-blue-500/15 group-data-[state=completed]:border-blue-500 group-data-[state=completed]:bg-blue-500 group-data-[state=completed]:text-white">
+                          {error ? (
+                            <AlertCircle />
+                          ) : disabled ? (
+                            <Lock />
+                          ) : completed ? (
+                            <Check />
+                          ) : (
+                            <Icon />
+                          )}
+                        </StepperIndicator>
+                        <span
+                          className={cn(
+                            "absolute -right-1 -bottom-1 flex size-4 items-center justify-center rounded-full border text-[10px] font-semibold",
+                            active
+                              ? "border-blue-500 bg-blue-500 text-white"
+                              : "border-border bg-muted text-muted-foreground",
+                            completed && "border-blue-500 bg-blue-500 text-white",
+                            error && "border-destructive bg-destructive text-destructive-foreground"
+                          )}
+                        >
+                          {index + 1}
+                        </span>
+                      </span>
+                      <span className="flex min-w-0 flex-col gap-1">
+                        <StepperLabel>{step.title}</StepperLabel>
+                        <StepperDescription className="hidden sm:block">
+                          {step.description}
+                        </StepperDescription>
+                      </span>
+                    </StepperTrigger>
+                  </StepperItem>
+                );
+              })}
+            </StepperList>
+          </div>
+
+          <div className="p-4 @lg/onboarding:p-8">
+            <StepperContent
+              value="workspace"
+              className="border-0 bg-transparent p-0 shadow-none"
+            >
+              <OnboardingPanel
+                title="Create your workspace"
+                description="This is where projects, teams, and deployments will live."
+              >
+                <FieldGroup className="gap-5">
+                  <Field data-invalid={Boolean(errors.workspaceName)}>
+                    <FieldLabel htmlFor="workspace-name">
+                      Workspace name
+                    </FieldLabel>
+                    <FieldDescription>
+                      This will be visible to your team members.
+                    </FieldDescription>
+                    <div className="relative max-w-md">
+                      <Input
+                        id="workspace-name"
+                        autoComplete="organization"
+                        aria-invalid={Boolean(errors.workspaceName)}
+                        className="pr-9"
+                        onInput={() => form.clearErrors("workspaceName")}
+                        {...form.register("workspaceName")}
+                      />
+                      {values.workspaceName && !errors.workspaceName ? (
+                        <CheckCircle2 className="absolute top-1/2 right-3 size-4 -translate-y-1/2 text-emerald-500" />
+                      ) : null}
+                    </div>
+                    <FieldError>{errors.workspaceName?.message}</FieldError>
+                  </Field>
+
+                  <Field data-invalid={Boolean(errors.workspaceSlug)}>
+                    <FieldLabel htmlFor="workspace-slug">
+                      Workspace URL
+                    </FieldLabel>
+                    <FieldDescription>
+                      Choose a unique URL for your workspace.
+                    </FieldDescription>
+                    <div className="flex max-w-md">
+                      <Input
+                        id="workspace-slug"
+                        autoCapitalize="none"
+                        autoComplete="off"
+                        aria-invalid={Boolean(errors.workspaceSlug)}
+                        className="rounded-r-none"
+                        onInput={() => form.clearErrors("workspaceSlug")}
+                        {...form.register("workspaceSlug")}
+                      />
+                      <Select
+                        value={values.workspaceDomain}
+                        onValueChange={(nextDomain) =>
+                          setSelectValue(
+                            "workspaceDomain",
+                            nextDomain as OnboardingValues["workspaceDomain"]
+                          )
+                        }
+                      >
+                        <SelectTrigger
+                          aria-label="Workspace domain"
+                          className="w-36 rounded-l-none border-l-0"
+                        >
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectItem value="vercel.app">
+                              .vercel.app
+                            </SelectItem>
+                            <SelectItem value="company.dev">
+                              .company.dev
+                            </SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    {values.workspaceSlug && !errors.workspaceSlug ? (
+                      <p className="flex items-center gap-1.5 text-xs text-emerald-500">
+                        <CheckCircle2 className="size-3.5" />
+                        {workspaceUrl} is available
+                      </p>
+                    ) : null}
+                    <FieldError>{errors.workspaceSlug?.message}</FieldError>
+                  </Field>
+
+                  <WorkspacePreview values={values} workspaceUrl={workspaceUrl} />
+                </FieldGroup>
+              </OnboardingPanel>
+            </StepperContent>
+
+            <StepperContent
+              value="preferences"
+              className="border-0 bg-transparent p-0 shadow-none"
+            >
+              <OnboardingPanel
+                title="Choose region and settings"
+                description="Set the defaults new projects inherit when the workspace is created."
+              >
+                <FieldGroup className="grid gap-5 @2xl/onboarding:grid-cols-2">
+                  <Field data-invalid={Boolean(errors.region)}>
+                    <FieldLabel htmlFor="workspace-region">Region</FieldLabel>
+                    <FieldDescription>
+                      Pick the closest region for production deployments.
+                    </FieldDescription>
+                    <Select
+                      value={values.region}
+                      onValueChange={(nextRegion) =>
+                        setSelectValue(
+                          "region",
+                          nextRegion as OnboardingValues["region"]
+                        )
+                      }
+                    >
+                      <SelectTrigger
+                        id="workspace-region"
+                        aria-invalid={Boolean(errors.region)}
+                        className="w-full"
+                      >
+                        <SelectValue placeholder="Select region" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectItem value="iad1">
+                            {regionLabels.iad1}
+                          </SelectItem>
+                          <SelectItem value="fra1">
+                            {regionLabels.fra1}
+                          </SelectItem>
+                          <SelectItem value="sin1">
+                            {regionLabels.sin1}
+                          </SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                    <FieldError>{errors.region?.message}</FieldError>
+                  </Field>
+
+                  <Field data-invalid={Boolean(errors.environment)}>
+                    <FieldLabel htmlFor="workspace-environment">
+                      Default environment
+                    </FieldLabel>
+                    <FieldDescription>
+                      Choose where collaborators land after setup.
+                    </FieldDescription>
+                    <Select
+                      value={values.environment}
+                      onValueChange={(nextEnvironment) =>
+                        setSelectValue(
+                          "environment",
+                          nextEnvironment as OnboardingValues["environment"]
+                        )
+                      }
+                    >
+                      <SelectTrigger
+                        id="workspace-environment"
+                        aria-invalid={Boolean(errors.environment)}
+                        className="w-full"
+                      >
+                        <SelectValue placeholder="Select environment" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectItem value="production">Production</SelectItem>
+                          <SelectItem value="preview">Preview</SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                    <FieldError>{errors.environment?.message}</FieldError>
+                  </Field>
+                </FieldGroup>
+
+                <div className="grid gap-3 @2xl/onboarding:grid-cols-2">
+                  <PreferenceCard
+                    icon={Rocket}
+                    title="Fast path"
+                    description="Create the workspace with production defaults and invite teammates later."
+                    active={values.environment === "production"}
+                  />
+                  <PreferenceCard
+                    icon={Globe2}
+                    title="Preview first"
+                    description="Start in preview mode when the team needs a private staging space."
+                    active={values.environment === "preview"}
+                  />
+                </div>
+              </OnboardingPanel>
+            </StepperContent>
+
+            <StepperContent
+              value="team"
+              className="border-0 bg-transparent p-0 shadow-none"
+            >
+              <OnboardingPanel
+                title="Invite collaborators"
+                description="Add the first teammate now, or leave the invite blank and do it later."
+              >
+                <FieldGroup className="grid gap-5 @2xl/onboarding:grid-cols-[minmax(0,1fr)_12rem]">
+                  <Field data-invalid={Boolean(errors.inviteEmail)}>
+                    <FieldLabel htmlFor="invite-email">Invite email</FieldLabel>
+                    <FieldDescription>
+                      Leave blank to invite members after setup.
+                    </FieldDescription>
+                    <Input
+                      id="invite-email"
+                      type="email"
+                      placeholder="teammate@company.com"
+                      autoComplete="email"
+                      aria-invalid={Boolean(errors.inviteEmail)}
+                      onInput={() => form.clearErrors("inviteEmail")}
+                      {...form.register("inviteEmail")}
+                    />
+                    <FieldError>{errors.inviteEmail?.message}</FieldError>
+                  </Field>
+
+                  <Field data-invalid={Boolean(errors.inviteRole)}>
+                    <FieldLabel htmlFor="invite-role">Role</FieldLabel>
+                    <FieldDescription>Access for this invite.</FieldDescription>
+                    <Select
+                      value={values.inviteRole}
+                      onValueChange={(nextRole) =>
+                        setSelectValue(
+                          "inviteRole",
+                          nextRole as OnboardingValues["inviteRole"]
+                        )
+                      }
+                    >
+                      <SelectTrigger
+                        id="invite-role"
+                        aria-invalid={Boolean(errors.inviteRole)}
+                        className="w-full"
+                      >
+                        <SelectValue placeholder="Select role" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectItem value="admin">Admin</SelectItem>
+                          <SelectItem value="member">Member</SelectItem>
+                          <SelectItem value="viewer">Viewer</SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                    <FieldError>{errors.inviteRole?.message}</FieldError>
+                  </Field>
+                </FieldGroup>
+
+                <div className="rounded-lg border bg-muted/20 p-4">
+                  <div className="flex items-start gap-3">
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-md border bg-card text-muted-foreground">
+                      <Users className="size-4" />
                     </span>
-                  </StepperTrigger>
-                </StepperItem>
-              );
-            })}
-          </StepperList>
+                    <div className="min-w-0 space-y-1">
+                      <p className="text-sm font-medium">
+                        Collaborators can join later
+                      </p>
+                      <p className="text-sm leading-6 text-muted-foreground">
+                        This block keeps team invitations optional while still
+                        validating malformed email addresses before review.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </OnboardingPanel>
+            </StepperContent>
 
-          <StepperContent value="workspace" className="p-0">
-            <MotionPanel
-              title="Name the workspace"
-              description="This step owns the public identity that appears in URLs and invites."
-              icon={Building2}
-              reduceMotion={Boolean(shouldReduceMotion)}
+            <StepperContent
+              value="review"
+              className="border-0 bg-transparent p-0 shadow-none"
             >
-              <FieldGroup className="grid gap-4 sm:grid-cols-2">
-                <Field data-invalid={Boolean(errors.workspaceName)}>
-                  <FieldLabel htmlFor="workspace-name">
-                    Workspace name
-                  </FieldLabel>
-                  <Input
-                    id="workspace-name"
-                    placeholder="Acme Design Systems"
-                    autoComplete="organization"
-                    aria-invalid={Boolean(errors.workspaceName)}
-                    onInput={() => form.clearErrors("workspaceName")}
-                    {...form.register("workspaceName")}
+              <OnboardingPanel
+                title={submitted ? "Workspace created" : "Review workspace"}
+                description={
+                  submitted
+                    ? "The local demo submitted successfully."
+                    : "Confirm the collected settings before creating the workspace."
+                }
+              >
+                <div className="grid gap-3">
+                  <SummaryRow
+                    icon={Building2}
+                    label="Workspace"
+                    value={values.workspaceName || "Untitled workspace"}
+                    help={workspaceUrl}
                   />
-                  <FieldError>{errors.workspaceName?.message}</FieldError>
-                </Field>
-                <Field data-invalid={Boolean(errors.workspaceSlug)}>
-                  <FieldLabel htmlFor="workspace-slug">
-                    Workspace slug
-                  </FieldLabel>
-                  <Input
-                    id="workspace-slug"
-                    placeholder="acme-design"
-                    autoCapitalize="none"
-                    autoComplete="off"
-                    aria-invalid={Boolean(errors.workspaceSlug)}
-                    onInput={() => form.clearErrors("workspaceSlug")}
-                    {...form.register("workspaceSlug")}
+                  <SummaryRow
+                    icon={Globe2}
+                    label="Defaults"
+                    value={regionLabels[values.region]}
+                    help={
+                      values.environment === "production"
+                        ? "Production is the default landing view"
+                        : "Preview is the default landing view"
+                    }
                   />
-                  <FieldDescription>
-                    Used in URLs, for example /acme-design.
-                  </FieldDescription>
-                  <FieldError>{errors.workspaceSlug?.message}</FieldError>
-                </Field>
-              </FieldGroup>
-            </MotionPanel>
-          </StepperContent>
-
-          <StepperContent value="preferences" className="p-0">
-            <MotionPanel
-              title="Choose workspace defaults"
-              description="Preferences stay in form state while Stepper only reflects navigation and progress."
-              icon={Settings2}
-              reduceMotion={Boolean(shouldReduceMotion)}
-            >
-              <FieldGroup className="grid gap-4 sm:grid-cols-2">
-                <Field data-invalid={Boolean(errors.region)}>
-                  <FieldLabel htmlFor="workspace-region">Region</FieldLabel>
-                  <Select
-                    value={values.region}
-                    onValueChange={(nextRegion) =>
-                      setSelectValue(
-                        "region",
-                        nextRegion as OnboardingValues["region"]
-                      )
+                  <SummaryRow
+                    icon={Mail}
+                    label="Invite"
+                    value={values.inviteEmail || "No invite yet"}
+                    help={
+                      values.inviteEmail
+                        ? `${values.inviteRole} access queued`
+                        : "Members can be invited later"
                     }
-                  >
-                    <SelectTrigger
-                      id="workspace-region"
-                      aria-invalid={Boolean(errors.region)}
-                      className="w-full"
-                    >
-                      <SelectValue placeholder="Select region" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectItem value="iad1">US East - iad1</SelectItem>
-                        <SelectItem value="fra1">Europe - fra1</SelectItem>
-                        <SelectItem value="sin1">
-                          Asia Pacific - sin1
-                        </SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                  <FieldDescription>
-                    Pick the closest default region for new projects.
-                  </FieldDescription>
-                  <FieldError>{errors.region?.message}</FieldError>
-                </Field>
-                <Field data-invalid={Boolean(errors.visibility)}>
-                  <FieldLabel htmlFor="workspace-visibility">
-                    Visibility
-                  </FieldLabel>
-                  <Select
-                    value={values.visibility}
-                    onValueChange={(nextVisibility) =>
-                      setSelectValue(
-                        "visibility",
-                        nextVisibility as OnboardingValues["visibility"]
-                      )
-                    }
-                  >
-                    <SelectTrigger
-                      id="workspace-visibility"
-                      aria-invalid={Boolean(errors.visibility)}
-                      className="w-full"
-                    >
-                      <SelectValue placeholder="Select visibility" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectItem value="private">Private</SelectItem>
-                        <SelectItem value="team">Team visible</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                  <FieldDescription>
-                    Control who can discover the workspace.
-                  </FieldDescription>
-                  <FieldError>{errors.visibility?.message}</FieldError>
-                </Field>
-              </FieldGroup>
-            </MotionPanel>
-          </StepperContent>
-
-          <StepperContent value="team" className="p-0">
-            <MotionPanel
-              title="Invite the first teammate"
-              description="The invite is optional, but invalid input still blocks the next step."
-              icon={Users}
-              reduceMotion={Boolean(shouldReduceMotion)}
-            >
-              <FieldGroup className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_12rem]">
-                <Field data-invalid={Boolean(errors.inviteEmail)}>
-                  <FieldLabel htmlFor="invite-email">Invite email</FieldLabel>
-                  <Input
-                    id="invite-email"
-                    type="email"
-                    placeholder="teammate@company.com"
-                    autoComplete="email"
-                    aria-invalid={Boolean(errors.inviteEmail)}
-                    onInput={() => form.clearErrors("inviteEmail")}
-                    {...form.register("inviteEmail")}
                   />
-                  <FieldDescription>
-                    Leave blank to invite members later.
-                  </FieldDescription>
-                  <FieldError>{errors.inviteEmail?.message}</FieldError>
-                </Field>
-                <Field data-invalid={Boolean(errors.inviteRole)}>
-                  <FieldLabel htmlFor="invite-role">Role</FieldLabel>
-                  <Select
-                    value={values.inviteRole}
-                    onValueChange={(nextRole) =>
-                      setSelectValue(
-                        "inviteRole",
-                        nextRole as OnboardingValues["inviteRole"]
-                      )
-                    }
-                  >
-                    <SelectTrigger
-                      id="invite-role"
-                      aria-invalid={Boolean(errors.inviteRole)}
-                      className="w-full"
-                    >
-                      <SelectValue placeholder="Select role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectItem value="admin">Admin</SelectItem>
-                        <SelectItem value="member">Member</SelectItem>
-                        <SelectItem value="viewer">Viewer</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                  <FieldError>{errors.inviteRole?.message}</FieldError>
-                </Field>
-              </FieldGroup>
-            </MotionPanel>
-          </StepperContent>
+                </div>
 
-          <StepperContent value="review" className="p-0">
-            <MotionPanel
-              title={submitted ? "Workspace created" : "Review setup"}
-              description={
-                submitted
-                  ? "The local demo submitted successfully."
-                  : "Confirm the collected values before creating the workspace."
-              }
-              icon={submitted ? ShieldCheck : Rocket}
-              reduceMotion={Boolean(shouldReduceMotion)}
-            >
-              <div className="grid gap-3">
-                <SummaryRow
-                  icon={Building2}
-                  label="Workspace"
-                  value={values.workspaceName || "Untitled workspace"}
-                  help={`/${values.workspaceSlug || "missing-slug"}`}
-                />
-                <SummaryRow
-                  icon={Globe2}
-                  label="Defaults"
-                  value={`${values.region.toUpperCase()} region`}
-                  help={
-                    values.visibility === "private"
-                      ? "Private workspace"
-                      : "Team visible workspace"
-                  }
-                />
-                <SummaryRow
-                  icon={Mail}
-                  label="Invite"
-                  value={values.inviteEmail || "No invite yet"}
-                  help={
-                    values.inviteEmail
-                      ? `${values.inviteRole} access queued`
-                      : "Members can be invited later"
-                  }
-                />
-              </div>
-            </MotionPanel>
-          </StepperContent>
+                {submitted ? (
+                  <Alert>
+                    <ShieldCheck />
+                    <AlertTitle>Workspace created</AlertTitle>
+                    <AlertDescription>
+                      The flow reached its submitted state and locked the final
+                      action.
+                    </AlertDescription>
+                  </Alert>
+                ) : null}
+              </OnboardingPanel>
+            </StepperContent>
 
-          <div className="flex flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
-            {currentStepHasErrors ? (
-              <Alert variant="destructive" className="sm:max-w-md">
-                <AlertCircle />
-                <AlertTitle>Step needs attention</AlertTitle>
-                <AlertDescription>
-                  Fix the highlighted fields before continuing.
-                </AlertDescription>
-              </Alert>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                Validation, persistence, and animation live outside the
-                primitive. Stepper only coordinates the flow.
-              </p>
-            )}
-            <div className="flex gap-2 sm:justify-end">
-              <StepperPrevious asChild>
-                <Button type="button" variant="outline">
-                  <ArrowLeft data-icon="inline-start" />
-                  Back
-                </Button>
-              </StepperPrevious>
-              {value === "review" ? (
-                <Button
-                  type="button"
-                  onClick={() => void createWorkspace()}
-                  disabled={submitted}
-                >
-                  {submitted ? "Created" : "Create workspace"}
-                  <Check data-icon="inline-end" />
-                </Button>
+            <Separator className="my-5" />
+
+            <div className="flex flex-col gap-4 @2xl/onboarding:flex-row @2xl/onboarding:items-center @2xl/onboarding:justify-between">
+              {currentStepHasErrors ? (
+                <Alert variant="destructive" className="@2xl/onboarding:max-w-md">
+                  <AlertCircle />
+                  <AlertTitle>Step needs attention</AlertTitle>
+                  <AlertDescription>
+                    Fix the highlighted fields before continuing.
+                  </AlertDescription>
+                </Alert>
               ) : (
-                <Button type="button" onClick={() => void continueToNextStep()}>
-                  Continue
-                  <ArrowRight data-icon="inline-end" />
-                </Button>
+                <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <CircleHelp className="size-4" />
+                  You can always change these settings later.
+                </p>
               )}
+
+              <div className="flex justify-end gap-2">
+                {currentIndex === 0 ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className={controlButtonClass}
+                    onClick={resetOnboarding}
+                  >
+                    Cancel
+                  </Button>
+                ) : (
+                  <StepperPrevious asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className={controlButtonClass}
+                    >
+                      <ArrowLeft data-icon="inline-start" />
+                      Back
+                    </Button>
+                  </StepperPrevious>
+                )}
+
+                {value === "review" ? (
+                  <Button
+                    type="button"
+                    className={cn(controlButtonClass, "min-w-32")}
+                    onClick={() => void createWorkspace()}
+                    disabled={submitted}
+                  >
+                    {submitted ? "Created" : "Create workspace"}
+                    <Check data-icon="inline-end" />
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    className={controlButtonClass}
+                    onClick={() => void continueToNextStep()}
+                  >
+                    Continue
+                    <ArrowRight data-icon="inline-end" />
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-5 flex items-center justify-between gap-3 text-xs text-muted-foreground">
+              <span>
+                {completedCount} of {onboardingSteps.length} gates complete
+              </span>
+              <span className="font-mono">stepper-onboarding</span>
             </div>
           </div>
         </Stepper>
-
-        <aside className="flex min-w-0 flex-col gap-3 rounded-lg border bg-muted/25 p-3">
-          <div className="flex items-center justify-between gap-3">
-            <div className="min-w-0">
-              <p className="text-sm font-medium">Setup state</p>
-              <p className="text-xs text-muted-foreground">
-                {completedCount} of {onboardingSteps.length} gates complete
-              </p>
-            </div>
-            <Badge variant={submitted ? "default" : "outline"}>
-              {submitted ? "done" : "draft"}
-            </Badge>
-          </div>
-          <Separator />
-          <div className="grid gap-2">
-            {onboardingSteps.map((step) => (
-              <StateRow
-                key={step.value}
-                title={step.title}
-                active={value === step.value}
-                completed={Boolean(completedSteps[step.value])}
-                locked={isLocked(step.value)}
-                error={hasStepError(step.value)}
-              />
-            ))}
-          </div>
-        </aside>
       </CardContent>
-
-      <CardFooter className="justify-between gap-3 text-sm text-muted-foreground">
-        <span>Installs as a shadcn block; the primitive stays dependency-light.</span>
-        <span className="hidden font-mono text-xs sm:inline">
-          stepper-onboarding
-        </span>
-      </CardFooter>
     </Card>
   );
 }
 
-function MotionPanel({
+function getWorkspaceUrl(values: Pick<OnboardingValues, "workspaceDomain" | "workspaceSlug">) {
+  const slug = values.workspaceSlug || "workspace";
+
+  return `${slug}.${values.workspaceDomain}`;
+}
+
+function OnboardingPanel({
   title,
   description,
-  icon: Icon,
-  reduceMotion,
   children,
 }: {
   title: string;
   description: string;
-  icon: LucideIcon;
-  reduceMotion: boolean;
   children: React.ReactNode;
 }) {
   return (
-    <motion.div
-      initial={reduceMotion ? false : { opacity: 0, y: 8 }}
-      animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-      transition={{ duration: 0.2, ease: [0.2, 0, 0, 1] }}
-      className="flex min-w-0 flex-col gap-5 rounded-lg bg-background p-4"
+    <section className="mx-auto flex max-w-3xl min-w-0 flex-col gap-6">
+      <div className="space-y-2">
+        <h3 className="text-xl font-semibold tracking-tight">{title}</h3>
+        <p className="max-w-xl text-sm leading-6 text-muted-foreground">
+          {description}
+        </p>
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function WorkspacePreview({
+  values,
+  workspaceUrl,
+}: {
+  values: OnboardingValues;
+  workspaceUrl: string;
+}) {
+  return (
+    <div className="rounded-lg border bg-muted/20 p-3">
+      <p className="mb-2 text-xs text-muted-foreground">Workspace preview</p>
+      <div className="overflow-hidden rounded-md border bg-background">
+        <div className="flex gap-1.5 border-b bg-muted/30 px-3 py-2">
+          <span className="size-2 rounded-full bg-muted-foreground/40" />
+          <span className="size-2 rounded-full bg-muted-foreground/40" />
+          <span className="size-2 rounded-full bg-muted-foreground/40" />
+        </div>
+        <div className="flex flex-col gap-4 p-4 @2xl/onboarding:flex-row @2xl/onboarding:items-center @2xl/onboarding:justify-between">
+          <div className="flex items-center gap-3">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-foreground text-background">
+              <Rocket className="size-4" />
+            </span>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <p className="truncate text-sm font-medium">
+                  {values.workspaceName || "Untitled workspace"}
+                </p>
+                <Badge variant="secondary" className="rounded-md px-1.5 py-0">
+                  Hobby
+                </Badge>
+              </div>
+              <p className="truncate text-xs text-muted-foreground">
+                {workspaceUrl}
+              </p>
+            </div>
+          </div>
+          <div className="grid grid-cols-3 rounded-md border bg-muted/20 p-1 text-xs text-muted-foreground">
+            <span className="rounded bg-background px-2 py-1 text-foreground shadow-sm">
+              Projects
+            </span>
+            <span className="px-2 py-1">Deployments</span>
+            <span className="px-2 py-1">Settings</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PreferenceCard({
+  icon: Icon,
+  title,
+  description,
+  active,
+}: {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  active: boolean;
+}) {
+  return (
+    <div
+      className={cn(
+        "rounded-lg border bg-muted/20 p-4",
+        active && "border-blue-500/50 bg-blue-500/5"
+      )}
     >
       <div className="flex items-start gap-3">
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-md border bg-muted text-muted-foreground [&>svg]:size-4">
-          <Icon />
+        <span
+          className={cn(
+            "flex size-8 shrink-0 items-center justify-center rounded-md border bg-card text-muted-foreground",
+            active && "border-blue-500/50 text-blue-500"
+          )}
+        >
+          <Icon className="size-4" />
         </span>
-        <div className="flex min-w-0 flex-col gap-1">
-          <h3 className="text-base font-medium">{title}</h3>
+        <div className="min-w-0 space-y-1">
+          <p className="text-sm font-medium">{title}</p>
           <p className="text-sm leading-6 text-muted-foreground">
             {description}
           </p>
         </div>
       </div>
-      {children}
-    </motion.div>
+    </div>
   );
 }
 
@@ -703,8 +894,8 @@ function SummaryRow({
   help: string;
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-md border bg-card p-3">
-      <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground [&>svg]:size-4">
+    <div className="flex items-center gap-3 rounded-lg border bg-muted/20 p-3">
+      <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-card text-muted-foreground [&>svg]:size-4">
         <Icon />
       </span>
       <div className="min-w-0">
@@ -712,48 +903,6 @@ function SummaryRow({
         <p className="truncate text-sm font-medium">{value}</p>
         <p className="truncate text-xs text-muted-foreground">{help}</p>
       </div>
-    </div>
-  );
-}
-
-function StateRow({
-  title,
-  active,
-  completed,
-  locked,
-  error,
-}: {
-  title: string;
-  active: boolean;
-  completed: boolean;
-  locked: boolean;
-  error: boolean;
-}) {
-  const status = error
-    ? "error"
-    : locked
-      ? "locked"
-      : completed
-        ? "done"
-        : active
-          ? "active"
-          : "ready";
-
-  return (
-    <div
-      className={cn(
-        "flex items-center justify-between gap-3 rounded-md border bg-background px-3 py-2",
-        active && "border-primary/40",
-        error && "border-destructive/50"
-      )}
-    >
-      <span className="truncate text-sm">{title}</span>
-      <Badge
-        variant={error ? "destructive" : completed ? "default" : "secondary"}
-        className="font-mono"
-      >
-        {status}
-      </Badge>
     </div>
   );
 }

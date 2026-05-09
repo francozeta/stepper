@@ -129,11 +129,10 @@ function buildStepperOnboardingItem() {
       type: "registry:block",
       title: "Stepper Onboarding",
       description:
-        "A dev-ready SaaS onboarding block with Stepper, Zod, React Hook Form, Framer Motion, and shadcn/ui fields.",
+        "A dev-ready SaaS onboarding block with Stepper, Zod, React Hook Form, and shadcn/ui fields.",
       dependencies: [
         "@hookform/resolvers",
         "@radix-ui/react-slot",
-        "framer-motion",
         "lucide-react",
         "react-hook-form",
         "zod",
@@ -145,7 +144,6 @@ function buildStepperOnboardingItem() {
         "card",
         "field",
         "input",
-        "progress",
         "select",
         "separator",
       ],

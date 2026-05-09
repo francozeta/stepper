@@ -133,7 +133,7 @@ function getLlmsTxt() {
     "## Registry",
     `- [Registry index](${absoluteUrl("/registry.json")}): Root shadcn registry index.`,
     `- [Stepper item](${absoluteUrl(siteConfig.registryItem)}): Single-file installable shadcn registry item for the Stepper primitive.`,
-    `- [Stepper onboarding block](${absoluteUrl(siteConfig.registryOnboardingItem)}): Installable SaaS onboarding block with Stepper, Zod, React Hook Form, Framer Motion, and shadcn/ui fields.`,
+    `- [Stepper onboarding block](${absoluteUrl(siteConfig.registryOnboardingItem)}): Installable SaaS onboarding block with Stepper, Zod, React Hook Form, and shadcn/ui fields.`,
     "",
     "## Feeds",
     `- [RSS](${absoluteUrl("/rss.xml")}): Release notes feed.`,

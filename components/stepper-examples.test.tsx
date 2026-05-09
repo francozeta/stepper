@@ -20,7 +20,7 @@ function fillWorkspaceFields() {
 
 function fillOnboardingWorkspaceFields() {
   const workspaceName = screen.getByLabelText("Workspace name");
-  const workspaceSlug = screen.getByLabelText("Workspace slug");
+  const workspaceSlug = screen.getByLabelText("Workspace URL");
 
   fireEvent.change(workspaceName, { target: { value: "Acme" } });
   fireEvent.change(workspaceSlug, { target: { value: "acme" } });
@@ -34,6 +34,8 @@ describe("Stepper examples", () => {
 
     render(<StepperOnboardingExample />);
 
+    await user.clear(screen.getByLabelText("Workspace name"));
+    await user.clear(screen.getByLabelText("Workspace URL"));
     await user.click(screen.getByRole("button", { name: /Continue/ }));
 
     expect(await screen.findByText("Enter a workspace name.")).toBeInTheDocument();
@@ -43,7 +45,7 @@ describe("Stepper examples", () => {
         .getAllByText("Workspace")[0]
         .closest('[data-slot="stepper-item"]')
     ).toHaveAttribute("data-state", "error");
-    expect(screen.getByText("Name the workspace")).toBeInTheDocument();
+    expect(screen.getByText("Create your workspace")).toBeInTheDocument();
   });
 
   it("unlocks onboarding steps only after each step validates", async () => {
@@ -54,7 +56,7 @@ describe("Stepper examples", () => {
     fillOnboardingWorkspaceFields();
 
     await user.click(screen.getByRole("button", { name: /Continue/ }));
-    await screen.findByText("Choose workspace defaults");
+    await screen.findByText("Choose region and settings");
 
     const workspaceStep = screen
       .getAllByText("Workspace")[0]
@@ -67,7 +69,7 @@ describe("Stepper examples", () => {
     expect(teamStep).toHaveAttribute("data-state", "disabled");
 
     await user.click(screen.getByRole("button", { name: /Continue/ }));
-    await screen.findByText("Invite the first teammate");
+    await screen.findByRole("heading", { name: /Invite collaborators/ });
 
     expect(teamStep).not.toHaveAttribute("data-state", "disabled");
   });
@@ -80,14 +82,16 @@ describe("Stepper examples", () => {
     fillOnboardingWorkspaceFields();
 
     await user.click(screen.getByRole("button", { name: /Continue/ }));
-    await screen.findByText("Choose workspace defaults");
+    await screen.findByText("Choose region and settings");
     await user.click(screen.getByRole("button", { name: /Continue/ }));
-    await screen.findByText("Invite the first teammate");
+    await screen.findByRole("heading", { name: /Invite collaborators/ });
     await user.click(screen.getByRole("button", { name: /Continue/ }));
-    await screen.findByText("Review setup");
+    await screen.findByText("Review workspace");
     await user.click(screen.getByRole("button", { name: /Create workspace/ }));
 
-    expect(await screen.findByText("Workspace created")).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: /Workspace created/ })
+    ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Created/ })).toBeDisabled();
   });
 

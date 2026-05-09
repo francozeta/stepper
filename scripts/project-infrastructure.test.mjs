@@ -64,7 +64,7 @@ describe("project infrastructure", () => {
             "field",
             "input",
             "select",
-            "progress",
+            "separator",
           ]),
           files: expect.arrayContaining([
             expect.objectContaining({

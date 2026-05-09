@@ -98,7 +98,7 @@ describe("release and AI documentation surfaces", () => {
     expect(publicDemo).not.toContain("@francozeta/stepper");
   });
 
-  it("publishes the onboarding registry block with form and motion dependencies", async () => {
+  it("publishes the onboarding registry block with form dependencies", async () => {
     const onboarding = await readText(
       "registry/default/examples/stepper-onboarding.tsx"
     );
@@ -107,10 +107,9 @@ describe("release and AI documentation surfaces", () => {
     expect(onboarding).toContain("export { StepperOnboardingExample }");
     expect(onboarding).toContain('from "@/components/ui/stepper"');
     expect(onboarding).toContain("zodResolver");
-    expect(onboarding).toContain("motion.div");
-    expect(onboarding).toContain("Progress");
+    expect(onboarding).toContain("WorkspacePreview");
+    expect(onboarding).not.toContain("framer-motion");
     expect(publicOnboarding).toContain('"name": "stepper-onboarding"');
-    expect(publicOnboarding).toContain('"framer-motion"');
     expect(publicOnboarding).toContain('"react-hook-form"');
     expect(publicOnboarding).toContain('"registryDependencies"');
     expect(publicOnboarding).toContain('\\"@/components/ui/stepper\\"');
