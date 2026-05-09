@@ -77,14 +77,11 @@ export default function StepperDemo() {
               key={step.value}
               value={step.value}
               completed={index < 1}
-              className="min-w-40 flex-1 sm:min-w-0"
             >
-              <StepperTrigger className="w-full flex-row items-start gap-3 rounded-lg border border-transparent p-2 text-left data-[state=active]:border-border data-[state=active]:bg-muted/60">
+              <StepperTrigger>
                 <StepperIndicator />
                 <span className="flex min-w-0 flex-col gap-1">
-                  <StepperLabel className="max-w-none">
-                    {step.title}
-                  </StepperLabel>
+                  <StepperLabel>{step.title}</StepperLabel>
                   <StepperDescription className="hidden sm:block">
                     {step.description}
                   </StepperDescription>

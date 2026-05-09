@@ -860,8 +860,8 @@ function StepperItem({
       data-completed={completed ? "" : undefined}
       className={cn(
         "group/stepper-item relative flex min-w-0",
-        "[--stepper-indicator-size:2.25rem] [--stepper-separator-offset:calc(var(--stepper-indicator-size)/2+0.125rem)]",
-        "data-[orientation=horizontal]:min-w-24 data-[orientation=horizontal]:flex-1 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:items-center",
+        "[--stepper-indicator-size:2.25rem] [--stepper-separator-offset:calc(var(--stepper-indicator-size)/2+0.375rem)] [--stepper-separator-y:calc(var(--stepper-indicator-size)/2)]",
+        "data-[orientation=horizontal]:min-w-28 data-[orientation=horizontal]:flex-1 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:items-center",
         "data-[orientation=vertical]:items-start data-[orientation=vertical]:gap-3",
         className
       )}
@@ -924,9 +924,9 @@ function StepperTrigger({
       data-state={stepState}
       data-disabled={isDisabled ? "" : undefined}
       className={cn(
-        "group inline-flex min-h-10 min-w-0 items-center gap-2 rounded-md text-left text-sm font-medium outline-none",
-        "text-muted-foreground transition-[color,background-color,box-shadow,transform] active:scale-[0.96]",
-        "focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+        "group inline-flex min-h-10 min-w-0 items-center gap-2 rounded-lg text-left text-sm font-medium outline-none",
+        "text-muted-foreground transition-[color,background-color,border-color,box-shadow,transform] hover:text-foreground active:scale-[0.96]",
+        "focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none",
         "disabled:pointer-events-none disabled:opacity-50",
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         "data-[state=active]:text-foreground",
@@ -1054,7 +1054,9 @@ function StepperIndicator({
         data-slot="stepper-indicator"
         className={cn(
           "flex size-(--stepper-indicator-size) shrink-0 items-center justify-center rounded-full border border-border bg-background text-xs font-semibold text-muted-foreground shadow-sm",
-          "group-data-[state=active]:border-primary group-data-[state=active]:bg-primary group-data-[state=active]:text-primary-foreground",
+          "transition-[color,background-color,border-color,box-shadow,transform]",
+          "group-hover:border-foreground/30",
+          "group-data-[state=active]:border-primary group-data-[state=active]:bg-primary group-data-[state=active]:text-primary-foreground group-data-[state=active]:shadow-md",
           "group-data-[state=completed]:border-primary group-data-[state=completed]:bg-primary group-data-[state=completed]:text-primary-foreground",
           "group-data-[state=error]:border-destructive group-data-[state=error]:bg-destructive group-data-[state=error]:text-destructive-foreground",
           "group-data-[position=previous]:text-foreground",
@@ -1076,8 +1078,8 @@ function StepperLabel({ className, ...props }: StepperLabelProps) {
     <span
       data-slot="stepper-label"
       className={cn(
-        "min-w-0 leading-none",
-        orientation === "horizontal" && "max-w-24 truncate",
+        "min-w-0 text-sm leading-tight font-medium",
+        orientation === "horizontal" && "max-w-40 text-balance",
         className
       )}
       {...props}
@@ -1086,11 +1088,14 @@ function StepperLabel({ className, ...props }: StepperLabelProps) {
 }
 
 function StepperDescription({ className, ...props }: StepperDescriptionProps) {
+  const { orientation } = useStepperItemContext("StepperDescription");
+
   return (
     <span
       data-slot="stepper-description"
       className={cn(
         "text-xs leading-snug font-normal text-muted-foreground",
+        orientation === "horizontal" && "max-w-44 text-balance",
         className
       )}
       {...props}
@@ -1109,7 +1114,7 @@ function StepperSeparator({ className, ...props }: StepperSeparatorProps) {
         "overflow-hidden bg-muted-foreground/25 after:absolute after:inset-0 after:bg-primary after:content-['']",
         "after:transition-transform after:duration-[220ms] after:ease-out motion-reduce:after:transition-none",
         orientation === "horizontal" &&
-          "absolute left-[calc(50%+var(--stepper-separator-offset))] right-[calc(-50%+var(--stepper-separator-offset))] top-[calc(var(--stepper-indicator-size)/2)] h-px after:origin-left after:scale-x-0 group-data-[state=completed]/stepper-item:after:scale-x-100",
+          "absolute left-[calc(50%+var(--stepper-separator-offset))] right-[calc(-50%+var(--stepper-separator-offset))] top-(--stepper-separator-y) h-px after:origin-left after:scale-x-0 group-data-[state=completed]/stepper-item:after:scale-x-100",
         orientation === "vertical" &&
           "absolute left-[calc(var(--stepper-indicator-size)/2)] top-[calc(var(--stepper-indicator-size)+0.5rem)] h-[calc(100%-var(--stepper-indicator-size)+0.75rem)] w-px after:origin-top after:scale-y-0 group-data-[state=completed]/stepper-item:after:scale-y-100",
         className

@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 
@@ -7,16 +7,26 @@ import {
   StepperRoutePatternExample,
 } from "@/components/stepper-examples";
 
+function fillWorkspaceFields() {
+  const workspaceName = screen.getByLabelText("Workspace name");
+  const workspaceSlug = screen.getByLabelText("Workspace slug");
+
+  fireEvent.change(workspaceName, { target: { value: "Acme" } });
+  fireEvent.change(workspaceSlug, { target: { value: "acme" } });
+
+  return { workspaceName, workspaceSlug };
+}
+
 describe("Stepper examples", () => {
   it("keeps the active workspace step visually current after returning from a completed step", async () => {
     const user = userEvent.setup();
 
     render(<StepperExample />);
 
-    await user.type(screen.getByLabelText("Workspace name"), "Acme");
-    await user.type(screen.getByLabelText("Workspace slug"), "acme");
-    expect(screen.getByLabelText("Workspace name")).toHaveValue("Acme");
-    expect(screen.getByLabelText("Workspace slug")).toHaveValue("acme");
+    const { workspaceName, workspaceSlug } = fillWorkspaceFields();
+
+    expect(workspaceName).toHaveValue("Acme");
+    expect(workspaceSlug).toHaveValue("acme");
     await user.click(screen.getByRole("button", { name: /Continue/ }));
     await user.click(screen.getByRole("button", { name: /Back/ }));
 
@@ -35,8 +45,8 @@ describe("Stepper examples", () => {
 
     render(<StepperExample />);
 
-    await user.type(screen.getByLabelText("Workspace name"), "Acme");
-    await user.type(screen.getByLabelText("Workspace slug"), "acme");
+    fillWorkspaceFields();
+
     await user.click(screen.getByRole("button", { name: /Continue/ }));
     await screen.findByText("Choose team defaults");
     await user.click(screen.getByRole("button", { name: /Continue/ }));

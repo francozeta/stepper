@@ -100,7 +100,7 @@ function SidebarBrand({ compact = false }: { compact?: boolean }) {
           compact ? "size-9" : "size-8"
         )}
       >
-        <StepperLogo className={compact ? "size-6" : "size-5"} />
+        <StepperLogo className={compact ? "h-7 w-6" : "h-6 w-5"} />
       </span>
       <span className="min-w-0">
         <span className="block truncate text-sm font-semibold text-foreground">

@@ -68,13 +68,26 @@ describe("release and AI documentation surfaces", () => {
     expect(llmsRoute).toContain("getLlmsTxt");
   });
 
-  it("points Open in v0 at a demo item with a default export", async () => {
+  it("points Open in v0 at the single-file Stepper primitive", async () => {
     const actions = await readText("components/docs-page-actions.tsx");
+    const primitive = await readText("public/stepper.json");
+
+    expect(actions).toContain("registryItem");
+    expect(actions).not.toContain("registryDemoItem");
+    expect(actions).toContain("title:");
+    expect(actions).toContain("prompt:");
+    expect(actions).toContain("Open in v0");
+    expect(actions).toContain("single installable component");
+    expect(primitive).toContain('"target": "components/ui/stepper.tsx"');
+    expect(primitive).toContain("StepperIndicator");
+    expect(primitive).toContain("StepperDescription");
+    expect(primitive).not.toContain("@francozeta/stepper");
+  });
+
+  it("keeps the demo registry block local-source based", async () => {
     const demo = await readText("registry/default/examples/stepper-demo.tsx");
     const publicDemo = await readText("public/stepper-demo.json");
 
-    expect(actions).toContain("registryDemoItem");
-    expect(actions).toContain("Open in v0");
     expect(demo).toContain("export default function StepperDemo");
     expect(demo).toContain('from "@/components/ui/stepper"');
     expect(demo).toContain("StepperIndicator");

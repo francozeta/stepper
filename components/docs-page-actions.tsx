@@ -25,8 +25,8 @@ type DocsPageActionsProps = {
 function DocsPageActions({ slug = [], title }: DocsPageActionsProps) {
   const markdownPath = getMarkdownPath(slug);
   const markdownUrl = absoluteUrl(markdownPath);
-  const v0Url = getOpenInV0Url();
-  const prompt = `Use the Stepper documentation page "${title}" as context, then help me implement it correctly: ${markdownUrl}`;
+  const prompt = getAssistantPrompt(markdownUrl);
+  const v0Url = getOpenInV0Url({ markdownUrl, title });
   const chatGptUrl = `https://chatgpt.com/?q=${encodeURIComponent(prompt)}`;
   const claudeUrl = `https://claude.ai/new?q=${encodeURIComponent(prompt)}`;
   const copyMarkdown = async () => {
@@ -98,10 +98,30 @@ function getMarkdownPath(slug: string[]) {
   return slug.length ? `/markdown/${slug.join("/")}.md` : "/markdown/index.md";
 }
 
-function getOpenInV0Url() {
-  const registryUrl = absoluteUrl(siteConfig.registryDemoItem);
+function getAssistantPrompt(markdownUrl: string) {
+  return [
+    `I'm looking at this Stepper shadcn registry documentation: ${markdownUrl}.`,
+    "Help me understand how to use the Stepper primitive.",
+    "Be ready to explain concepts, give examples, or help debug based on it.",
+    "Focus on the single installable component; demo blocks are separate examples.",
+  ].join(" ");
+}
 
-  return `https://v0.dev/chat/api/open?url=${encodeURIComponent(registryUrl)}`;
+function getOpenInV0Url({
+  markdownUrl,
+  title,
+}: {
+  markdownUrl: string;
+  title: string;
+}) {
+  const registryUrl = absoluteUrl(siteConfig.registryItem);
+  const searchParams = new URLSearchParams({
+    url: registryUrl,
+    title: title === siteConfig.name ? siteConfig.name : `${siteConfig.name} - ${title}`,
+    prompt: getAssistantPrompt(markdownUrl),
+  });
+
+  return `https://v0.dev/chat/api/open?${searchParams.toString()}`;
 }
 
 export { DocsPageActions };
