@@ -58,6 +58,22 @@ describe("project infrastructure", () => {
           ]),
         }),
         expect.objectContaining({
+          name: "stepper-onboarding",
+          type: "registry:block",
+          registryDependencies: expect.arrayContaining([
+            "field",
+            "input",
+            "select",
+            "progress",
+          ]),
+          files: expect.arrayContaining([
+            expect.objectContaining({
+              path: "registry/default/examples/stepper-onboarding.tsx",
+              target: "components/stepper-onboarding.tsx",
+            }),
+          ]),
+        }),
+        expect.objectContaining({
           name: "stepper-demo",
           type: "registry:block",
           files: expect.arrayContaining([

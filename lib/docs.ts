@@ -164,6 +164,8 @@ const usageSnippet = `import {
 
 const registryInstallSnippet = `pnpm dlx shadcn@latest add @stepper/stepper`;
 
+const stepperOnboardingCode = `pnpm dlx shadcn@latest add @stepper/stepper-onboarding`;
+
 const whyStepper = [
   {
     label: "Compose first",
@@ -1367,6 +1369,7 @@ export {
   routeBasedPatternSnippet,
   stateSelectorsCode,
   statusExampleCode,
+  stepperOnboardingCode,
   themeTokensSnippet,
   triggerProps,
   usageSnippet,

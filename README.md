@@ -17,7 +17,13 @@ The CLI installs the source at:
 components/ui/stepper.tsx
 ```
 
-Install the styled demo block with:
+Install the dev-ready onboarding block with:
+
+```bash
+pnpm dlx shadcn@latest add @stepper/stepper-onboarding
+```
+
+Install the smaller styled demo block with:
 
 ```bash
 pnpm dlx shadcn@latest add @stepper/stepper-demo

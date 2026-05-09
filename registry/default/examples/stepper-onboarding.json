@@ -1,0 +1,38 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "stepper-onboarding",
+  "type": "registry:block",
+  "title": "Stepper Onboarding",
+  "description": "A dev-ready SaaS onboarding block with Stepper, Zod, React Hook Form, Framer Motion, and shadcn/ui fields.",
+  "dependencies": [
+    "@hookform/resolvers",
+    "@radix-ui/react-slot",
+    "framer-motion",
+    "lucide-react",
+    "react-hook-form",
+    "zod"
+  ],
+  "registryDependencies": [
+    "alert",
+    "badge",
+    "button",
+    "card",
+    "field",
+    "input",
+    "progress",
+    "select",
+    "separator"
+  ],
+  "files": [
+    {
+      "path": "registry/default/ui/stepper.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/stepper.tsx"
+    },
+    {
+      "path": "registry/default/examples/stepper-onboarding.tsx",
+      "type": "registry:component",
+      "target": "components/stepper-onboarding.tsx"
+    }
+  ]
+}

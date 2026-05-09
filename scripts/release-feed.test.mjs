@@ -98,6 +98,25 @@ describe("release and AI documentation surfaces", () => {
     expect(publicDemo).not.toContain("@francozeta/stepper");
   });
 
+  it("publishes the onboarding registry block with form and motion dependencies", async () => {
+    const onboarding = await readText(
+      "registry/default/examples/stepper-onboarding.tsx"
+    );
+    const publicOnboarding = await readText("public/stepper-onboarding.json");
+
+    expect(onboarding).toContain("export { StepperOnboardingExample }");
+    expect(onboarding).toContain('from "@/components/ui/stepper"');
+    expect(onboarding).toContain("zodResolver");
+    expect(onboarding).toContain("motion.div");
+    expect(onboarding).toContain("Progress");
+    expect(publicOnboarding).toContain('"name": "stepper-onboarding"');
+    expect(publicOnboarding).toContain('"framer-motion"');
+    expect(publicOnboarding).toContain('"react-hook-form"');
+    expect(publicOnboarding).toContain('"registryDependencies"');
+    expect(publicOnboarding).toContain('\\"@/components/ui/stepper\\"');
+    expect(publicOnboarding).not.toContain("@francozeta/stepper");
+  });
+
   it("keeps recipes focused on stepper patterns instead of segmented tab-like lines", async () => {
     const patterns = await readText("content/docs/patterns.mdx");
     const examples = await readText("components/stepper-examples.tsx");

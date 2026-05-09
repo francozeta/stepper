@@ -6,6 +6,7 @@ import {
   StepperExample,
   StepperRoutePatternExample,
 } from "@/components/stepper-examples";
+import { StepperOnboardingExample } from "@/components/stepper-onboarding";
 
 function fillWorkspaceFields() {
   const workspaceName = screen.getByLabelText("Workspace name");
@@ -17,7 +18,79 @@ function fillWorkspaceFields() {
   return { workspaceName, workspaceSlug };
 }
 
+function fillOnboardingWorkspaceFields() {
+  const workspaceName = screen.getByLabelText("Workspace name");
+  const workspaceSlug = screen.getByLabelText("Workspace slug");
+
+  fireEvent.change(workspaceName, { target: { value: "Acme" } });
+  fireEvent.change(workspaceSlug, { target: { value: "acme" } });
+
+  return { workspaceName, workspaceSlug };
+}
+
 describe("Stepper examples", () => {
+  it("blocks the onboarding flow and marks the current step as error when required fields are missing", async () => {
+    const user = userEvent.setup();
+
+    render(<StepperOnboardingExample />);
+
+    await user.click(screen.getByRole("button", { name: /Continue/ }));
+
+    expect(await screen.findByText("Enter a workspace name.")).toBeInTheDocument();
+    expect(screen.getByText("Step needs attention")).toBeInTheDocument();
+    expect(
+      screen
+        .getAllByText("Workspace")[0]
+        .closest('[data-slot="stepper-item"]')
+    ).toHaveAttribute("data-state", "error");
+    expect(screen.getByText("Name the workspace")).toBeInTheDocument();
+  });
+
+  it("unlocks onboarding steps only after each step validates", async () => {
+    const user = userEvent.setup();
+
+    render(<StepperOnboardingExample />);
+
+    fillOnboardingWorkspaceFields();
+
+    await user.click(screen.getByRole("button", { name: /Continue/ }));
+    await screen.findByText("Choose workspace defaults");
+
+    const workspaceStep = screen
+      .getAllByText("Workspace")[0]
+      .closest('[data-slot="stepper-item"]');
+    const teamStep = screen
+      .getAllByText("Team")[0]
+      .closest('[data-slot="stepper-item"]');
+
+    expect(workspaceStep).toHaveAttribute("data-state", "completed");
+    expect(teamStep).toHaveAttribute("data-state", "disabled");
+
+    await user.click(screen.getByRole("button", { name: /Continue/ }));
+    await screen.findByText("Invite the first teammate");
+
+    expect(teamStep).not.toHaveAttribute("data-state", "disabled");
+  });
+
+  it("submits the onboarding review after all step gates pass", async () => {
+    const user = userEvent.setup();
+
+    render(<StepperOnboardingExample />);
+
+    fillOnboardingWorkspaceFields();
+
+    await user.click(screen.getByRole("button", { name: /Continue/ }));
+    await screen.findByText("Choose workspace defaults");
+    await user.click(screen.getByRole("button", { name: /Continue/ }));
+    await screen.findByText("Invite the first teammate");
+    await user.click(screen.getByRole("button", { name: /Continue/ }));
+    await screen.findByText("Review setup");
+    await user.click(screen.getByRole("button", { name: /Create workspace/ }));
+
+    expect(await screen.findByText("Workspace created")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Created/ })).toBeDisabled();
+  });
+
   it("keeps the active workspace step visually current after returning from a completed step", async () => {
     const user = userEvent.setup();
 

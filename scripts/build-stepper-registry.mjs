@@ -94,6 +94,10 @@ async function buildStepperSource() {
   ].join("\n")}`;
 }
 
+async function buildStepperOnboardingSource() {
+  return readFile(path.join(root, "components/stepper-onboarding.tsx"), "utf8");
+}
+
 function buildRegistryItem() {
   return `${JSON.stringify(
     {
@@ -109,6 +113,52 @@ function buildRegistryItem() {
           path: "registry/default/ui/stepper.tsx",
           type: "registry:ui",
           target: "components/ui/stepper.tsx",
+        },
+      ],
+    },
+    null,
+    2
+  )}\n`;
+}
+
+function buildStepperOnboardingItem() {
+  return `${JSON.stringify(
+    {
+      $schema: "https://ui.shadcn.com/schema/registry-item.json",
+      name: "stepper-onboarding",
+      type: "registry:block",
+      title: "Stepper Onboarding",
+      description:
+        "A dev-ready SaaS onboarding block with Stepper, Zod, React Hook Form, Framer Motion, and shadcn/ui fields.",
+      dependencies: [
+        "@hookform/resolvers",
+        "@radix-ui/react-slot",
+        "framer-motion",
+        "lucide-react",
+        "react-hook-form",
+        "zod",
+      ],
+      registryDependencies: [
+        "alert",
+        "badge",
+        "button",
+        "card",
+        "field",
+        "input",
+        "progress",
+        "select",
+        "separator",
+      ],
+      files: [
+        {
+          path: "registry/default/ui/stepper.tsx",
+          type: "registry:ui",
+          target: "components/ui/stepper.tsx",
+        },
+        {
+          path: "registry/default/examples/stepper-onboarding.tsx",
+          type: "registry:component",
+          target: "components/stepper-onboarding.tsx",
         },
       ],
     },
@@ -170,11 +220,21 @@ async function writeOrCheck(filePath, content) {
 
 try {
   const registrySource = await buildStepperSource();
+  const stepperOnboardingSource = await buildStepperOnboardingSource();
   const registryItem = buildRegistryItem();
+  const stepperOnboardingItem = buildStepperOnboardingItem();
   const stepperDemoItem = buildStepperDemoItem();
 
   await writeOrCheck("registry/default/ui/stepper.tsx", registrySource);
   await writeOrCheck("registry/default/ui/stepper.json", registryItem);
+  await writeOrCheck(
+    "registry/default/examples/stepper-onboarding.tsx",
+    stepperOnboardingSource
+  );
+  await writeOrCheck(
+    "registry/default/examples/stepper-onboarding.json",
+    stepperOnboardingItem
+  );
   await writeOrCheck(
     "registry/default/examples/stepper-demo.json",
     stepperDemoItem

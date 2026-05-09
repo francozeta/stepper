@@ -5,6 +5,7 @@ const siteConfig = {
   url: "https://francozeta-stepper.vercel.app",
   repository: "https://github.com/francozeta/stepper",
   registryItem: "/stepper.json",
+  registryOnboardingItem: "/stepper-onboarding.json",
   registryDemoItem: "/stepper-demo.json",
 };
 
