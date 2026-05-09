@@ -1,0 +1,1 @@
+Stepper logo banner for the Stepper shadcn registry component
