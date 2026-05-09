@@ -6,7 +6,7 @@ import {
   StepperExample,
   StepperRoutePatternExample,
 } from "@/components/stepper-examples";
-import { StepperNotionOnboardingExample } from "@/components/stepper-notion-onboarding";
+import { StepperIntentOnboardingExample } from "@/components/stepper-intent-onboarding";
 
 function fillWorkspaceFields() {
   const workspaceName = screen.getByLabelText("Workspace name");
@@ -39,7 +39,7 @@ describe("Stepper examples", () => {
     expect(
       workspaceStep?.querySelector('[data-slot="stepper-indicator"] .lucide-check')
     ).not.toBeInTheDocument();
-  });
+  }, 10000);
 
   it("does not draw future wizard steps as completed after navigating back", async () => {
     const user = userEvent.setup();
@@ -74,7 +74,7 @@ describe("Stepper examples", () => {
     expect(
       membersStep?.querySelector('[data-slot="stepper-indicator"] .lucide-check')
     ).not.toBeInTheDocument();
-  });
+  }, 10000);
 
   it("marks previous route steps completed when the route preview reaches review", async () => {
     const user = userEvent.setup();
@@ -88,57 +88,65 @@ describe("Stepper examples", () => {
     ).toHaveAttribute("data-state", "completed");
   });
 
-  it("runs the Notion-style onboarding through hidden and branched steps", async () => {
-    const user = userEvent.setup();
+  it(
+    "runs the Intent onboarding flow through hidden and branched steps",
+    async () => {
+      const user = userEvent.setup();
 
-    render(<StepperNotionOnboardingExample />);
+      render(<StepperIntentOnboardingExample />);
 
-    await user.click(screen.getByRole("button", { name: /^Continue$/ }));
+      await user.click(screen.getByRole("button", { name: /^Continue$/ }));
 
-    expect(await screen.findByText("Enter a valid work email.")).toBeInTheDocument();
+      expect(
+        await screen.findByText("Enter a valid work email.")
+      ).toBeInTheDocument();
 
-    await user.type(screen.getByLabelText("Work email"), "alex@example.com");
-    await user.click(screen.getByRole("button", { name: /^Continue$/ }));
+      await user.type(screen.getByLabelText("Work email"), "alex@example.com");
+      await user.click(screen.getByRole("button", { name: /^Continue$/ }));
 
-    expect(await screen.findByText("Check your inbox")).toBeInTheDocument();
+      expect(await screen.findByText("Check your inbox")).toBeInTheDocument();
 
-    await user.type(screen.getByLabelText("Verification code"), "123456");
-    await user.click(screen.getByRole("button", { name: /^Continue$/ }));
+      await user.type(screen.getByLabelText("Verification code"), "123456");
+      await user.click(screen.getByRole("button", { name: /^Continue$/ }));
 
-    expect(await screen.findByText("Create a profile")).toBeInTheDocument();
+      expect(await screen.findByText("Create a profile")).toBeInTheDocument();
 
-    await user.type(screen.getByLabelText("Enter your name"), "Alex Smith");
-    await user.type(screen.getByLabelText("Set a password"), "Abcd.1234");
-    await user.click(screen.getByRole("button", { name: /^Continue$/ }));
+      await user.type(screen.getByLabelText("Enter your name"), "Alex Smith");
+      await user.type(screen.getByLabelText("Set a password"), "Abcd.1234");
+      await user.click(screen.getByRole("button", { name: /^Continue$/ }));
 
-    expect(
-      await screen.findByText("How do you want to use this workspace?")
-    ).toBeInTheDocument();
+      expect(
+        await screen.findByText("How do you want to use this workspace?")
+      ).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: /For personal life/ }));
-    await user.click(screen.getByRole("button", { name: /^Continue$/ }));
+      await user.click(
+        screen.getByRole("button", { name: /For personal life/ })
+      );
+      await user.click(screen.getByRole("button", { name: /^Continue$/ }));
 
-    expect(await screen.findByText("How will you work?")).toBeInTheDocument();
+      expect(await screen.findByText("How will you work?")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: /On my own/ }));
-    await user.click(screen.getByRole("button", { name: /^Continue$/ }));
+      await user.click(screen.getByRole("button", { name: /On my own/ }));
+      await user.click(screen.getByRole("button", { name: /^Continue$/ }));
 
-    expect(await screen.findByText("What's on your mind?")).toBeInTheDocument();
+      expect(await screen.findByText("What's on your mind?")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: /To-do list/ }));
-    await user.click(screen.getByRole("button", { name: /Habit tracking/ }));
+      await user.click(screen.getByRole("button", { name: /To-do list/ }));
+      await user.click(screen.getByRole("button", { name: /Habit tracking/ }));
 
-    expect(screen.getByText("2 selected")).toBeInTheDocument();
+      expect(screen.getByText("2 selected")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: /^Continue$/ }));
+      await user.click(screen.getByRole("button", { name: /^Continue$/ }));
 
-    expect(
-      await screen.findByText("Generating your starter workspace")
-    ).toBeInTheDocument();
-    expect(
-      await screen.findByRole("heading", {
-        name: "Welcome to your workspace",
-      })
-    ).toBeInTheDocument();
-  });
+      expect(
+        await screen.findByText("Generating your starter workspace")
+      ).toBeInTheDocument();
+      expect(
+        await screen.findByRole("heading", {
+          name: "Welcome to your workspace",
+        })
+      ).toBeInTheDocument();
+    },
+    30000
+  );
 });

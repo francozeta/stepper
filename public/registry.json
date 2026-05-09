@@ -37,13 +37,14 @@
       ]
     },
     {
-      "name": "stepper-notion-onboarding",
+      "name": "stepper-intent-onboarding",
       "type": "registry:block",
-      "title": "Stepper Notion Onboarding",
-      "description": "A Notion-inspired onboarding block with hidden Stepper state, intent routing, profile validation, interests, and async workspace generation.",
+      "title": "Stepper Intent Onboarding",
+      "description": "An intent-driven onboarding block with hidden Stepper state, intent routing, profile validation, interests, and async workspace generation.",
       "dependencies": [
         "@radix-ui/react-slot",
         "lucide-react",
+        "react-icons",
         "react-hook-form",
         "zod"
       ],
@@ -61,9 +62,9 @@
           "target": "components/ui/stepper.tsx"
         },
         {
-          "path": "registry/default/examples/stepper-notion-onboarding.tsx",
+          "path": "registry/default/examples/stepper-intent-onboarding.tsx",
           "type": "registry:component",
-          "target": "components/stepper-notion-onboarding.tsx"
+          "target": "components/stepper-intent-onboarding.tsx"
         }
       ]
     }

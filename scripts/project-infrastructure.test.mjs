@@ -68,8 +68,9 @@ describe("project infrastructure", () => {
           ]),
         }),
         expect.objectContaining({
-          name: "stepper-notion-onboarding",
+          name: "stepper-intent-onboarding",
           type: "registry:block",
+          dependencies: expect.arrayContaining(["react-icons"]),
           registryDependencies: expect.arrayContaining([
             "button",
             "checkbox",
@@ -79,8 +80,8 @@ describe("project infrastructure", () => {
           ]),
           files: expect.arrayContaining([
             expect.objectContaining({
-              path: "registry/default/examples/stepper-notion-onboarding.tsx",
-              target: "components/stepper-notion-onboarding.tsx",
+              path: "registry/default/examples/stepper-intent-onboarding.tsx",
+              target: "components/stepper-intent-onboarding.tsx",
             }),
           ]),
         }),

@@ -145,18 +145,19 @@ function buildStepperDemoItem() {
   )}\n`;
 }
 
-function buildStepperNotionOnboardingItem() {
+function buildStepperIntentOnboardingItem() {
   return `${JSON.stringify(
     {
       $schema: "https://ui.shadcn.com/schema/registry-item.json",
-      name: "stepper-notion-onboarding",
+      name: "stepper-intent-onboarding",
       type: "registry:block",
-      title: "Stepper Notion Onboarding",
+      title: "Stepper Intent Onboarding",
       description:
-        "A Notion-inspired onboarding block with hidden Stepper state, intent routing, profile validation, interests, and async workspace generation.",
+        "An intent-driven onboarding block with hidden Stepper state, intent routing, profile validation, interests, and async workspace generation.",
       dependencies: [
         "@radix-ui/react-slot",
         "lucide-react",
+        "react-icons",
         "react-hook-form",
         "zod",
       ],
@@ -174,9 +175,9 @@ function buildStepperNotionOnboardingItem() {
           target: "components/ui/stepper.tsx",
         },
         {
-          path: "registry/default/examples/stepper-notion-onboarding.tsx",
+          path: "registry/default/examples/stepper-intent-onboarding.tsx",
           type: "registry:component",
-          target: "components/stepper-notion-onboarding.tsx",
+          target: "components/stepper-intent-onboarding.tsx",
         },
       ],
     },
@@ -212,11 +213,11 @@ try {
   const registrySource = await buildStepperSource();
   const registryItem = buildRegistryItem();
   const stepperDemoItem = buildStepperDemoItem();
-  const stepperNotionOnboardingSource = await readFile(
-    path.join(root, "components/stepper-notion-onboarding.tsx"),
+  const stepperIntentOnboardingSource = await readFile(
+    path.join(root, "components/stepper-intent-onboarding.tsx"),
     "utf8"
   );
-  const stepperNotionOnboardingItem = buildStepperNotionOnboardingItem();
+  const stepperIntentOnboardingItem = buildStepperIntentOnboardingItem();
 
   await writeOrCheck("registry/default/ui/stepper.tsx", registrySource);
   await writeOrCheck("registry/default/ui/stepper.json", registryItem);
@@ -225,12 +226,12 @@ try {
     stepperDemoItem
   );
   await writeOrCheck(
-    "registry/default/examples/stepper-notion-onboarding.tsx",
-    stepperNotionOnboardingSource
+    "registry/default/examples/stepper-intent-onboarding.tsx",
+    stepperIntentOnboardingSource
   );
   await writeOrCheck(
-    "registry/default/examples/stepper-notion-onboarding.json",
-    stepperNotionOnboardingItem
+    "registry/default/examples/stepper-intent-onboarding.json",
+    stepperIntentOnboardingItem
   );
 
   console.log(

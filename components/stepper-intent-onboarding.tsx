@@ -32,6 +32,8 @@ import {
   type FieldPath,
   type UseFormRegisterReturn,
 } from "react-hook-form";
+import { FaApple, FaBuilding, FaKey, FaMicrosoft } from "react-icons/fa6";
+import { SiGoogle } from "react-icons/si";
 import { z } from "zod/v3";
 
 import { Button } from "@/components/ui/button";
@@ -80,7 +82,7 @@ const collaborationStepSchema = z.object({
   }),
 });
 
-const notionStepValues = [
+const onboardingStepValues = [
   "account",
   "verify",
   "profile",
@@ -91,7 +93,7 @@ const notionStepValues = [
   "workspace",
 ] as const;
 
-type NotionStep = (typeof notionStepValues)[number];
+type OnboardingStep = (typeof onboardingStepValues)[number];
 type IntentValue = z.infer<typeof intentStepSchema>["intent"];
 type CollaborationValue = z.infer<
   typeof collaborationStepSchema
@@ -108,7 +110,7 @@ type InterestValue =
   | "hobbies"
   | "habits";
 
-type NotionOnboardingValues = {
+type IntentOnboardingValues = {
   email: string;
   code: string;
   name: string;
@@ -120,11 +122,11 @@ type NotionOnboardingValues = {
 };
 
 type StepDefinition = {
-  value: NotionStep;
+  value: OnboardingStep;
   label: string;
 };
 
-const notionSteps = [
+const onboardingSteps = [
   { value: "account", label: "Create account" },
   { value: "verify", label: "Verify email" },
   { value: "profile", label: "Create profile" },
@@ -207,16 +209,16 @@ const stepFields = {
   interests: [],
   generating: [],
   workspace: [],
-} satisfies Record<NotionStep, FieldPath<NotionOnboardingValues>[]>;
+} satisfies Record<OnboardingStep, FieldPath<IntentOnboardingValues>[]>;
 
-function StepperNotionOnboardingExample() {
-  const [step, setStep] = React.useState<NotionStep>("account");
+function StepperIntentOnboardingExample() {
+  const [step, setStep] = React.useState<OnboardingStep>("account");
   const [completedSteps, setCompletedSteps] = React.useState<
-    Partial<Record<NotionStep, boolean>>
+    Partial<Record<OnboardingStep, boolean>>
   >({});
   const [isGenerating, setIsGenerating] = React.useState(false);
   const generationTimeoutRef = React.useRef<number | null>(null);
-  const form = useForm<NotionOnboardingValues>({
+  const form = useForm<IntentOnboardingValues>({
     mode: "onChange",
     defaultValues: {
       email: "",
@@ -230,7 +232,7 @@ function StepperNotionOnboardingExample() {
     },
   });
   const watchedValues = useWatch({ control: form.control });
-  const values = React.useMemo<NotionOnboardingValues>(
+  const values = React.useMemo<IntentOnboardingValues>(
     () => ({
       email: watchedValues.email ?? "",
       code: watchedValues.code ?? "",
@@ -378,12 +380,12 @@ function StepperNotionOnboardingExample() {
   return (
     <Stepper
       value={step}
-      onValueChange={(nextStep) => setStep(nextStep as NotionStep)}
-      className="min-w-0 gap-0 overflow-hidden rounded-xl bg-[#fbfbfa] text-[#2f2f2f] ring-1 ring-black/10"
+      onValueChange={(nextStep) => setStep(nextStep as OnboardingStep)}
+      className="min-w-0 gap-0 overflow-hidden rounded-xl border border-border bg-background text-foreground shadow-sm"
     >
-      <div className="h-1 bg-black/10">
+      <div className="h-1 bg-muted">
         <div
-          className="h-full bg-[#2f2f2f] transition-[width] duration-300 ease-out"
+          className="h-full bg-foreground transition-[width] duration-300 ease-out"
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -478,7 +480,7 @@ function StepperNotionOnboardingExample() {
               onContinue={() => void continueFromStep()}
               onSkip={skipInterests}
             />
-            <MindIllustration />
+            <WorkspaceBlueprint selectedInterests={values.interests} />
           </SplitStage>
         </StepperContent>
 
@@ -500,15 +502,15 @@ function HiddenStepList({
   completedSteps,
   values,
 }: {
-  completedSteps: Partial<Record<NotionStep, boolean>>;
-  values: NotionOnboardingValues;
+  completedSteps: Partial<Record<OnboardingStep, boolean>>;
+  values: IntentOnboardingValues;
 }) {
   return (
     <StepperList
-      aria-label="Notion-style onboarding steps"
+      aria-label="Intent onboarding flow steps"
       className="sr-only !w-px !gap-0 !overflow-hidden !pb-0 data-[orientation=horizontal]:!w-px data-[orientation=horizontal]:!gap-0 data-[orientation=horizontal]:!overflow-hidden data-[orientation=horizontal]:!pb-0"
     >
-      {notionSteps.map((item) => (
+      {onboardingSteps.map((item) => (
         <StepperItem
           key={item.value}
           value={item.value}
@@ -530,13 +532,13 @@ function OnboardingTopBar({
   onBack: () => void;
 }) {
   return (
-    <div className="flex h-16 items-center justify-between px-4 text-sm text-[#6b6b67] sm:px-6">
+    <div className="flex h-16 items-center justify-between px-4 text-sm text-muted-foreground sm:px-6">
       <div className="flex items-center gap-4">
         <Button
           type="button"
           variant="ghost"
           size="icon"
-          className="size-8 rounded-md text-[#6b6b67] hover:bg-black/5 hover:text-[#2f2f2f]"
+          className="size-8 rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
           disabled={!canGoBack}
           onClick={onBack}
           aria-label="Go back"
@@ -544,18 +546,18 @@ function OnboardingTopBar({
           <ArrowLeft className="size-4" />
         </Button>
         <div className="flex items-center gap-2">
-          <NotionMark />
-          <Separator orientation="vertical" className="h-5 bg-black/10" />
+          <StepperMark />
+          <Separator orientation="vertical" className="h-5 bg-border" />
           <button
             type="button"
-            className="inline-flex items-center gap-1 rounded-md px-1.5 py-1 hover:bg-black/5"
+            className="inline-flex items-center gap-1 rounded-md px-1.5 py-1 hover:bg-muted hover:text-foreground"
           >
             English (US)
             <ChevronDown className="size-3.5" />
           </button>
         </div>
       </div>
-      <CircleHelp className="size-4 text-[#9b9a97]" />
+      <CircleHelp className="size-4 text-muted-foreground" />
     </div>
   );
 }
@@ -610,34 +612,34 @@ function AuthPanel({
         ))}
       </div>
 
-      <Separator className="my-7 bg-black/10" />
+      <Separator className="my-7 bg-border" />
 
       <Field data-invalid={Boolean(error)}>
-        <FieldLabel htmlFor="notion-email" className="text-[#6b6b67]">
+        <FieldLabel htmlFor="intent-email" className="text-muted-foreground">
           Work email
         </FieldLabel>
         <div className="relative">
           <Input
-            id="notion-email"
+            id="intent-email"
             type="email"
             placeholder="Enter your email address..."
             autoComplete="email"
             aria-invalid={Boolean(error)}
-            className="h-11 rounded-md border-[#d9d8d4] bg-white pr-10 text-base shadow-none focus-visible:ring-[#2f80ed]"
+            className="h-11 rounded-md border-border bg-background pr-10 text-base shadow-none focus-visible:ring-ring"
             {...registerEmail}
           />
           {email ? (
-            <span className="absolute top-1/2 right-3 -translate-y-1/2 rounded-full bg-[#d9d8d4] p-0.5 text-white">
+            <span className="absolute top-1/2 right-3 -translate-y-1/2 rounded-full bg-foreground p-0.5 text-background">
               <Check className="size-3" />
             </span>
           ) : (
-            <Mail className="absolute top-1/2 right-3 size-4 -translate-y-1/2 text-[#9b9a97]" />
+            <Mail className="absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted-foreground" />
           )}
         </div>
         {error ? (
           <FieldError>{error}</FieldError>
         ) : (
-          <FieldDescription className="text-[#9b9a97]">
+          <FieldDescription className="text-muted-foreground">
             Use an organization email to easily collaborate with teammates.
           </FieldDescription>
         )}
@@ -647,13 +649,13 @@ function AuthPanel({
         Continue
       </PrimaryAction>
 
-      <p className="mt-7 text-sm leading-6 text-[#8f8e8a]">
+      <p className="mt-7 text-sm leading-6 text-muted-foreground">
         By continuing, you acknowledge that you understand and agree to the{" "}
-        <span className="underline decoration-[#b8b7b2] underline-offset-2">
+        <span className="underline decoration-border underline-offset-2">
           Terms & Conditions
         </span>{" "}
         and{" "}
-        <span className="underline decoration-[#b8b7b2] underline-offset-2">
+        <span className="underline decoration-border underline-offset-2">
           Privacy Policy
         </span>
         .
@@ -680,27 +682,27 @@ function VerifyPanel({
         description="Check your inbox"
       />
 
-      <div className="mt-9 rounded-lg border border-black/10 bg-white p-3 text-sm text-[#6b6b67]">
+      <div className="mt-9 rounded-lg border border-border bg-muted/40 p-3 text-sm text-muted-foreground">
         We sent a verification code to{" "}
-        <span className="font-medium text-[#2f2f2f]">{email}</span>.
+        <span className="font-medium text-foreground">{email}</span>.
       </div>
 
       <Field data-invalid={Boolean(error)} className="mt-5">
-        <FieldLabel htmlFor="notion-code" className="text-[#6b6b67]">
+        <FieldLabel htmlFor="intent-code" className="text-muted-foreground">
           Verification code
         </FieldLabel>
         <Input
-          id="notion-code"
+          id="intent-code"
           inputMode="numeric"
           placeholder="Enter code"
           aria-invalid={Boolean(error)}
-          className="h-11 rounded-md border-[#d9d8d4] bg-white text-base tracking-[0.18em] shadow-none focus-visible:ring-[#2f80ed]"
+          className="h-11 rounded-md border-border bg-background text-base tracking-[0.18em] shadow-none focus-visible:ring-ring"
           {...registerCode}
         />
         {error ? (
           <FieldError>{error}</FieldError>
         ) : (
-          <FieldDescription className="text-[#9b9a97]">
+          <FieldDescription className="text-muted-foreground">
             Use 123456 for this demo.
           </FieldDescription>
         )}
@@ -709,7 +711,9 @@ function VerifyPanel({
       <PrimaryAction className="mt-7" onClick={onContinue}>
         Continue
       </PrimaryAction>
-      <p className="mt-4 text-center text-sm text-[#8f8e8a]">Resend in 25s</p>
+      <p className="mt-4 text-center text-sm text-muted-foreground">
+        Resend in 25s
+      </p>
     </div>
   );
 }
@@ -723,7 +727,7 @@ function ProfilePanel({
   onMarketingChange,
   onContinue,
 }: {
-  values: NotionOnboardingValues;
+  values: IntentOnboardingValues;
   errors: { name?: string; password?: string };
   registerName: UseFormRegisterReturn<"name">;
   registerPassword: UseFormRegisterReturn<"password">;
@@ -739,11 +743,14 @@ function ProfilePanel({
         align="center"
       />
 
-      <div className="mt-12 flex flex-col items-center gap-3 text-sm text-[#6b6b67]">
-        <div className="grid size-20 place-items-center rounded-full border border-black/10 bg-white text-xl font-semibold text-[#2f2f2f]">
+      <div className="mt-12 flex flex-col items-center gap-3 text-sm text-muted-foreground">
+        <div className="grid size-20 place-items-center rounded-full border border-border bg-muted/50 text-xl font-semibold text-foreground">
           {getInitials(values.name || values.email)}
         </div>
-        <button type="button" className="inline-flex items-center gap-1 hover:text-[#2f2f2f]">
+        <button
+          type="button"
+          className="inline-flex items-center gap-1 hover:text-foreground"
+        >
           <ImagePlus className="size-4" />
           Add a photo
         </button>
@@ -751,35 +758,35 @@ function ProfilePanel({
 
       <div className="mt-12 grid gap-5">
         <Field data-invalid={Boolean(errors.name)}>
-          <FieldLabel htmlFor="notion-name" className="text-[#6b6b67]">
+          <FieldLabel htmlFor="intent-name" className="text-muted-foreground">
             Enter your name
           </FieldLabel>
           <Input
-            id="notion-name"
+            id="intent-name"
             placeholder="Name"
             autoComplete="name"
             aria-invalid={Boolean(errors.name)}
-            className="h-11 rounded-md border-[#d9d8d4] bg-white text-base shadow-none focus-visible:ring-[#2f80ed]"
+            className="h-11 rounded-md border-border bg-background text-base shadow-none focus-visible:ring-ring"
             {...registerName}
           />
           {errors.name ? <FieldError>{errors.name}</FieldError> : null}
         </Field>
 
         <Field data-invalid={Boolean(errors.password)}>
-          <FieldLabel htmlFor="notion-password" className="text-[#6b6b67]">
+          <FieldLabel htmlFor="intent-password" className="text-muted-foreground">
             Set a password
           </FieldLabel>
           <div className="relative">
             <Input
-              id="notion-password"
+              id="intent-password"
               type="password"
               placeholder="Password"
               autoComplete="new-password"
               aria-invalid={Boolean(errors.password)}
-              className="h-11 rounded-md border-[#d9d8d4] bg-white pr-10 text-base shadow-none focus-visible:ring-[#2f80ed]"
+              className="h-11 rounded-md border-border bg-background pr-10 text-base shadow-none focus-visible:ring-ring"
               {...registerPassword}
             />
-            <KeyRound className="absolute top-1/2 right-3 size-4 -translate-y-1/2 text-[#9b9a97]" />
+            <KeyRound className="absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted-foreground" />
           </div>
           {errors.password ? (
             <FieldError>{errors.password}</FieldError>
@@ -791,11 +798,11 @@ function ProfilePanel({
         Continue
       </PrimaryAction>
 
-      <label className="mt-5 flex items-start gap-2 text-sm leading-5 text-[#8f8e8a]">
+      <label className="mt-5 flex items-start gap-2 text-sm leading-5 text-muted-foreground">
         <Checkbox
           checked={marketingOptOut}
           onCheckedChange={(checked) => onMarketingChange(checked === true)}
-          className="mt-0.5 border-black/25"
+          className="mt-0.5 border-border"
         />
         No, I do not want to receive marketing communications.
       </label>
@@ -903,15 +910,15 @@ function InterestsPanel({
   return (
     <div className="w-full max-w-[560px] justify-self-center lg:justify-self-start">
       <div className="mb-11">
-        <h2 className="text-3xl font-semibold tracking-tight text-[#2f2f2f]">
+        <h2 className="text-3xl font-semibold tracking-tight text-foreground">
           What&apos;s on your mind?
         </h2>
-        <p className="mt-2 text-3xl font-semibold tracking-tight text-[#aaa9a4]">
+        <p className="mt-2 text-3xl font-semibold tracking-tight text-muted-foreground">
           Select as many as you want.
         </p>
       </div>
 
-      <p className="mb-3 text-sm font-medium text-[#8f8e8a]">
+      <p className="mb-3 text-sm font-medium text-muted-foreground">
         {selectedInterests.length} selected
       </p>
 
@@ -931,7 +938,7 @@ function InterestsPanel({
       </PrimaryAction>
       <button
         type="button"
-        className="mt-5 block w-full max-w-[520px] rounded-md py-1 text-sm font-medium text-[#8f8e8a] hover:text-[#2f2f2f]"
+        className="mt-5 block w-full max-w-[520px] rounded-md py-1 text-sm font-medium text-muted-foreground hover:text-foreground"
         onClick={onSkip}
       >
         Skip for now
@@ -944,7 +951,7 @@ function GeneratingPanel({
   values,
   isGenerating,
 }: {
-  values: NotionOnboardingValues;
+  values: IntentOnboardingValues;
   isGenerating: boolean;
 }) {
   const items = [
@@ -955,27 +962,29 @@ function GeneratingPanel({
 
   return (
     <div className="w-full max-w-[500px] text-center">
-      <div className="mx-auto grid size-16 place-items-center rounded-2xl border border-black/10 bg-white shadow-sm">
-        <Sparkles className="size-7 text-[#2f80ed]" />
+      <div className="mx-auto grid size-16 place-items-center rounded-2xl border border-border bg-muted/40 shadow-sm">
+        <Sparkles className="size-7 text-foreground" />
       </div>
-      <h2 className="mt-7 text-3xl font-semibold tracking-tight text-[#2f2f2f]">
+      <h2 className="mt-7 text-3xl font-semibold tracking-tight text-foreground">
         Generating your starter workspace
       </h2>
-      <p className="mt-3 text-lg font-medium text-[#aaa9a4]">
-        {values.intent ? `Tuned for ${getIntentLabel(values.intent).toLowerCase()}.` : "Tuned for your workflow."}
+      <p className="mt-3 text-lg font-medium text-muted-foreground">
+        {values.intent
+          ? `Tuned for ${getIntentLabel(values.intent).toLowerCase()}.`
+          : "Tuned for your workflow."}
       </p>
 
-      <div className="mt-10 rounded-xl border border-black/10 bg-white p-4 text-left">
+      <div className="mt-10 rounded-xl border border-border bg-muted/30 p-4 text-left">
         {items.map((item, index) => (
           <div key={item} className="flex items-center gap-3 py-2">
-            <span className="grid size-7 place-items-center rounded-full bg-[#f1f1ef] text-[#6b6b67]">
+            <span className="grid size-7 place-items-center rounded-full bg-background text-muted-foreground">
               {index === items.length - 1 && isGenerating ? (
                 <LoaderCircle className="size-4 animate-spin" />
               ) : (
                 <Check className="size-4" />
               )}
             </span>
-            <span className="text-sm font-medium text-[#4f4f4b]">{item}</span>
+            <span className="text-sm font-medium text-foreground">{item}</span>
           </div>
         ))}
       </div>
@@ -983,37 +992,37 @@ function GeneratingPanel({
   );
 }
 
-function WorkspacePanel({ values }: { values: NotionOnboardingValues }) {
+function WorkspacePanel({ values }: { values: IntentOnboardingValues }) {
   const selectedLabels = values.interests
     .map((interest) => interestOptions.find((item) => item.value === interest)?.label)
     .filter(Boolean)
     .slice(0, 3);
 
   return (
-    <div className="grid min-h-[640px] flex-1 grid-cols-1 bg-white lg:grid-cols-[17rem_minmax(0,1fr)]">
-      <aside className="border-r border-black/10 bg-[#f7f7f5] px-3 py-4">
+    <div className="grid min-h-[640px] flex-1 grid-cols-1 bg-background lg:grid-cols-[17rem_minmax(0,1fr)]">
+      <aside className="border-r border-border bg-muted/40 px-3 py-4">
         <div className="mb-6 flex items-center justify-between gap-2 px-2">
           <div className="flex min-w-0 items-center gap-2">
-            <span className="grid size-6 place-items-center rounded bg-[#e6e5e1] text-xs font-semibold">
+            <span className="grid size-6 place-items-center rounded bg-background text-xs font-semibold text-foreground ring-1 ring-border">
               {getInitials(values.name || values.email)}
             </span>
-            <p className="truncate text-sm font-medium text-[#2f2f2f]">
+            <p className="truncate text-sm font-medium text-foreground">
               {values.name ? `${values.name}'s Workspace` : "Starter Workspace"}
             </p>
           </div>
-          <Sparkles className="size-4 text-[#8f8e8a]" />
+          <Sparkles className="size-4 text-muted-foreground" />
         </div>
 
-        <nav className="grid gap-1 text-sm text-[#6b6b67]">
+        <nav className="grid gap-1 text-sm text-muted-foreground">
           <SidebarItem icon={Search} label="Search" />
           <SidebarItem icon={Home} label="Home" />
           <SidebarItem icon={Mail} label="Inbox" />
         </nav>
 
-        <div className="mt-8 px-2 text-xs font-medium text-[#8f8e8a]">
+        <div className="mt-8 px-2 text-xs font-medium text-muted-foreground">
           Private
         </div>
-        <nav className="mt-2 grid gap-1 text-sm text-[#4f4f4b]">
+        <nav className="mt-2 grid gap-1 text-sm text-foreground">
           <SidebarItem icon={ListChecks} label="Weekly To-do List" />
           <SidebarItem icon={Sparkles} label="Welcome to your workspace" active />
           <SidebarItem icon={SquareCheckBig} label="Habit Tracker" />
@@ -1021,11 +1030,13 @@ function WorkspacePanel({ values }: { values: NotionOnboardingValues }) {
       </aside>
 
       <main className="flex min-w-0 flex-col">
-        <div className="flex h-14 items-center justify-between border-b border-black/5 px-5 text-sm text-[#8f8e8a]">
-          <span className="font-medium text-[#4f4f4b]">Welcome to your workspace</span>
+        <div className="flex h-14 items-center justify-between border-b border-border px-5 text-sm text-muted-foreground">
+          <span className="font-medium text-foreground">
+            Welcome to your workspace
+          </span>
           <div className="flex items-center gap-4">
             <span>Edited just now</span>
-            <button type="button" className="font-medium text-[#2f2f2f]">
+            <button type="button" className="font-medium text-foreground">
               Share
             </button>
           </div>
@@ -1033,15 +1044,15 @@ function WorkspacePanel({ values }: { values: NotionOnboardingValues }) {
 
         <div className="mx-auto w-full max-w-3xl px-6 py-20">
           <div className="mb-8 text-center">
-            <div className="mx-auto mb-7 grid size-20 place-items-center rounded-2xl bg-[#f1f1ef] text-4xl">
-              <Sparkles className="size-9 text-[#2f80ed]" />
+            <div className="mx-auto mb-7 grid size-20 place-items-center rounded-2xl border border-border bg-muted/50 text-4xl">
+              <Sparkles className="size-9 text-foreground" />
             </div>
-            <h2 className="text-5xl font-bold tracking-tight text-[#2f2f2f]">
+            <h2 className="text-5xl font-bold tracking-tight text-foreground">
               Welcome to your workspace
             </h2>
           </div>
 
-          <div className="mx-auto max-w-xl space-y-3 text-lg text-[#2f2f2f]">
+          <div className="mx-auto max-w-xl space-y-3 text-lg text-foreground">
             <ChecklistRow checked text="Create an account" />
             <ChecklistRow checked text="Choose your workspace intent" />
             <ChecklistRow
@@ -1056,7 +1067,7 @@ function WorkspacePanel({ values }: { values: NotionOnboardingValues }) {
             <ChecklistRow text="Invite teammates from the sidebar" />
           </div>
 
-          <div className="mx-auto mt-10 max-w-xl rounded-xl border border-dashed border-black/15 bg-[#fbfbfa] p-4 text-sm leading-6 text-[#6b6b67]">
+          <div className="mx-auto mt-10 max-w-xl rounded-xl border border-dashed border-border bg-muted/30 p-4 text-sm leading-6 text-muted-foreground">
             This final screen is still Stepper content. The user sees a normal
             workspace, while the primitive keeps the flow state available for
             completion, analytics, or resume logic.
@@ -1078,10 +1089,10 @@ function StageHeading({
 }) {
   return (
     <div className={cn(align === "center" && "text-center")}>
-      <h2 className="text-3xl font-semibold tracking-tight text-[#2f2f2f]">
+      <h2 className="text-3xl font-semibold tracking-tight text-foreground">
         {title}
       </h2>
-      <p className="mt-1 text-3xl font-semibold tracking-tight text-[#aaa9a4]">
+      <p className="mt-1 text-3xl font-semibold tracking-tight text-muted-foreground">
         {description}
       </p>
     </div>
@@ -1106,7 +1117,7 @@ function ProviderButton({
     <Button
       type="button"
       variant="outline"
-      className="relative h-11 justify-center rounded-md border-[#d9d8d4] bg-white text-base font-medium text-[#2f2f2f] shadow-[0_1px_0_rgba(0,0,0,0.04)] hover:bg-[#f7f7f5]"
+      className="relative h-11 justify-center rounded-md border-border bg-background text-base font-medium text-foreground shadow-[0_1px_0_rgba(0,0,0,0.04)] hover:bg-muted/60"
       onClick={onClick}
     >
       <ProviderGlyph provider={provider} />
@@ -1116,22 +1127,18 @@ function ProviderButton({
 }
 
 function ProviderGlyph({ provider }: { provider: string }) {
-  const glyph =
+  const Icon =
     provider === "Google"
-      ? "G"
+      ? SiGoogle
       : provider === "Apple"
-        ? "A"
+        ? FaApple
         : provider === "Microsoft"
-          ? "M"
+          ? FaMicrosoft
           : provider === "passkey"
-            ? "key"
-            : "SSO";
+            ? FaKey
+            : FaBuilding;
 
-  return (
-    <span className="absolute left-4 grid size-5 place-items-center rounded text-xs font-semibold text-[#2f2f2f]">
-      {glyph}
-    </span>
-  );
+  return <Icon className="absolute left-4 size-4 text-foreground" aria-hidden="true" />;
 }
 
 function PrimaryAction({
@@ -1147,7 +1154,7 @@ function PrimaryAction({
     <Button
       type="button"
       className={cn(
-        "h-11 w-full rounded-md bg-[#2f80ed] text-base font-semibold text-white shadow-none hover:bg-[#1f72df] focus-visible:ring-[#2f80ed]",
+        "h-11 w-full rounded-md bg-foreground text-base font-semibold text-background shadow-none hover:bg-foreground/90 focus-visible:ring-ring",
         className
       )}
       onClick={onClick}
@@ -1175,17 +1182,17 @@ function LargeOptionButton({
     <button
       type="button"
       className={cn(
-        "flex min-h-32 w-full items-center gap-7 rounded-xl border border-black/15 bg-white px-8 text-left transition-colors hover:border-black/30 hover:bg-[#f7f7f5]",
-        active && "border-[#2f80ed] bg-white ring-2 ring-[#2f80ed]/20"
+        "flex min-h-32 w-full items-center gap-7 rounded-xl border border-border bg-background px-8 text-left transition-colors hover:bg-muted/60",
+        active && "border-foreground bg-muted/30 ring-2 ring-foreground/10"
       )}
       onClick={onClick}
     >
-      <Icon className="size-12 shrink-0 text-[#4f4f4b]" />
+      <Icon className="size-12 shrink-0 text-foreground" />
       <span className="min-w-0">
-        <span className="block text-xl font-semibold text-[#4f4f4b]">
+        <span className="block text-xl font-semibold text-foreground">
           {title}
         </span>
-        <span className="mt-1 block text-base leading-6 text-[#8f8e8a]">
+        <span className="mt-1 block text-base leading-6 text-muted-foreground">
           {description}
         </span>
       </span>
@@ -1210,14 +1217,14 @@ function TileOptionButton({
     <button
       type="button"
       className={cn(
-        "flex min-h-56 flex-col items-center justify-center rounded-xl border border-black/15 bg-white p-7 text-center transition-colors hover:border-black/30 hover:bg-[#f7f7f5]",
-        active && "border-[#2f80ed] ring-2 ring-[#2f80ed]/20"
+        "flex min-h-56 flex-col items-center justify-center rounded-xl border border-border bg-background p-7 text-center transition-colors hover:bg-muted/60",
+        active && "border-foreground bg-muted/30 ring-2 ring-foreground/10"
       )}
       onClick={onClick}
     >
-      <Icon className="mb-6 size-16 text-[#4f4f4b]" />
-      <span className="text-xl font-semibold text-[#4f4f4b]">{title}</span>
-      <span className="mt-2 max-w-44 text-base leading-6 text-[#8f8e8a]">
+      <Icon className="mb-6 size-16 text-foreground" />
+      <span className="text-xl font-semibold text-foreground">{title}</span>
+      <span className="mt-2 max-w-44 text-base leading-6 text-muted-foreground">
         {description}
       </span>
     </button>
@@ -1239,8 +1246,8 @@ function InterestChip({
     <button
       type="button"
       className={cn(
-        "inline-flex h-12 items-center gap-3 rounded-lg border border-black/15 bg-white px-5 text-base font-semibold text-[#6b6b67] transition-colors hover:border-black/25 hover:bg-[#f7f7f5]",
-        active && "border-[#2f80ed] text-[#2f2f2f] ring-2 ring-[#2f80ed]/20"
+        "inline-flex h-12 items-center gap-3 rounded-lg border border-border bg-background px-5 text-base font-semibold text-muted-foreground transition-colors hover:bg-muted/60",
+        active && "border-foreground text-foreground ring-2 ring-foreground/10"
       )}
       onClick={onClick}
     >
@@ -1250,21 +1257,83 @@ function InterestChip({
   );
 }
 
-function MindIllustration() {
+function WorkspaceBlueprint({
+  selectedInterests,
+}: {
+  selectedInterests: InterestValue[];
+}) {
+  const labels =
+    selectedInterests.length > 0
+      ? selectedInterests
+          .map((interest) => interestOptions.find((item) => item.value === interest)?.label)
+          .filter(Boolean)
+          .slice(0, 3)
+      : ["Intent", "Checklist", "Starter pages"];
+
   return (
     <div className="relative hidden min-h-[560px] items-center justify-center lg:flex">
-      <div className="absolute right-[-18%] bottom-[-28%] size-[680px] rounded-full bg-black" />
-      <div className="relative z-10 w-[470px]">
-        <div className="absolute top-16 left-20 h-24 w-24 rounded-full border-[10px] border-[#2f80ed] bg-white" />
-        <div className="absolute top-36 right-20 h-20 w-20 rotate-12 bg-[#ffbf2e]" />
-        <div className="absolute right-2 bottom-20 h-24 w-24 rounded-full bg-[#2f80ed]" />
-        <div className="absolute bottom-40 left-2 h-20 w-20 rotate-45 bg-[#ff3b30]" />
-        <div className="mx-auto h-[420px] w-[260px] rounded-t-[130px] border-[9px] border-black bg-white">
-          <div className="mx-auto mt-20 h-24 w-36 rounded-full border-[7px] border-black bg-[#fbfbfa]" />
-          <div className="mx-auto mt-14 grid w-40 gap-3">
-            <span className="h-2 rounded-full bg-black" />
-            <span className="h-2 rounded-full bg-black" />
-            <span className="h-2 rounded-full bg-black" />
+      <div className="absolute inset-y-10 right-0 w-[86%] rounded-[2rem] border border-border bg-muted/30" />
+      <div className="relative w-[540px] rounded-2xl border border-border bg-background p-4 shadow-sm">
+        <div className="mb-4 flex items-center justify-between border-b border-border pb-3">
+          <div className="flex items-center gap-1.5">
+            <span className="size-2 rounded-full bg-foreground/30" />
+            <span className="size-2 rounded-full bg-foreground/20" />
+            <span className="size-2 rounded-full bg-foreground/10" />
+          </div>
+          <div className="h-2 w-24 rounded-full bg-muted" />
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-[8rem_minmax(0,1fr)]">
+          <aside className="rounded-xl border border-border bg-muted/40 p-3">
+            <div className="mb-4 h-6 w-20 rounded-md bg-background ring-1 ring-border" />
+            <div className="grid gap-2">
+              {["Home", "Inbox", "Roadmap"].map((item, index) => (
+                <div
+                  key={item}
+                  className={cn(
+                    "flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-muted-foreground",
+                    index === 0 && "bg-background text-foreground ring-1 ring-border"
+                  )}
+                >
+                  <span className="size-2 rounded-full bg-foreground/50" />
+                  {item}
+                </div>
+              ))}
+            </div>
+          </aside>
+
+          <div className="min-w-0 rounded-xl border border-border bg-background p-4">
+            <div className="mb-5 flex items-start justify-between gap-4">
+              <div>
+                <div className="mb-2 h-3 w-16 rounded-full bg-foreground" />
+                <div className="h-4 w-48 rounded-full bg-muted-foreground/30" />
+              </div>
+              <div className="grid size-9 place-items-center rounded-lg border border-border bg-muted/40">
+                <Sparkles className="size-4" />
+              </div>
+            </div>
+
+            <div className="grid gap-3">
+              {labels.map((label, index) => (
+                <div
+                  key={label}
+                  className="rounded-lg border border-border bg-muted/30 p-3"
+                >
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-xs font-medium text-foreground">
+                      {label}
+                    </span>
+                    <span className="text-[11px] text-muted-foreground">
+                      Step {index + 1}
+                    </span>
+                  </div>
+                  <div className="grid gap-1.5">
+                    <span className="h-1.5 rounded-full bg-foreground/20" />
+                    <span className="h-1.5 w-4/5 rounded-full bg-foreground/10" />
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -1285,7 +1354,7 @@ function SidebarItem({
     <div
       className={cn(
         "flex items-center gap-2 rounded-md px-2 py-1.5",
-        active && "bg-black/5 font-medium text-[#2f2f2f]"
+        active && "bg-background font-medium text-foreground ring-1 ring-border"
       )}
     >
       <Icon className="size-4 shrink-0" />
@@ -1299,28 +1368,30 @@ function ChecklistRow({ checked, text }: { checked?: boolean; text: string }) {
     <div className="flex items-center gap-3">
       <span
         className={cn(
-          "grid size-5 shrink-0 place-items-center border border-black/40",
-          checked && "border-[#2f80ed] bg-[#2f80ed] text-white"
+          "grid size-5 shrink-0 place-items-center border border-border",
+          checked && "border-foreground bg-foreground text-background"
         )}
       >
         {checked ? <Check className="size-4" /> : null}
       </span>
-      <span className={cn(checked && "text-[#8f8e8a] line-through")}>{text}</span>
+      <span className={cn(checked && "text-muted-foreground line-through")}>
+        {text}
+      </span>
     </div>
   );
 }
 
-function NotionMark() {
+function StepperMark() {
   return (
-    <span className="grid size-7 place-items-center rounded-md border border-black/20 bg-white text-base font-black text-[#2f2f2f] shadow-sm">
-      N
+    <span className="grid size-7 place-items-center rounded-md bg-foreground text-base font-black text-background shadow-sm">
+      S
     </span>
   );
 }
 
 function validateCurrentStep(
-  step: NotionStep,
-  form: ReturnType<typeof useForm<NotionOnboardingValues>>
+  step: OnboardingStep,
+  form: ReturnType<typeof useForm<IntentOnboardingValues>>
 ) {
   const values = form.getValues();
   const schema = getStepSchema(step);
@@ -1338,7 +1409,7 @@ function validateCurrentStep(
   }
 
   result.error.issues.forEach((issue) => {
-    const field = issue.path[0] as FieldPath<NotionOnboardingValues>;
+    const field = issue.path[0] as FieldPath<IntentOnboardingValues>;
 
     form.setError(field, { message: issue.message, type: "manual" });
   });
@@ -1346,7 +1417,7 @@ function validateCurrentStep(
   const firstIssue = result.error.issues[0];
 
   if (firstIssue) {
-    const firstField = firstIssue.path[0] as FieldPath<NotionOnboardingValues>;
+    const firstField = firstIssue.path[0] as FieldPath<IntentOnboardingValues>;
 
     form.setFocus(firstField);
   }
@@ -1354,7 +1425,7 @@ function validateCurrentStep(
   return false;
 }
 
-function getStepSchema(step: NotionStep) {
+function getStepSchema(step: OnboardingStep) {
   if (step === "account") return emailStepSchema;
   if (step === "verify") return verificationStepSchema;
   if (step === "profile") return profileStepSchema;
@@ -1364,32 +1435,32 @@ function getStepSchema(step: NotionStep) {
   return undefined;
 }
 
-function getVisibleSteps(values: NotionOnboardingValues) {
-  return notionStepValues.filter((step) => !isStepSkipped(step, values));
+function getVisibleSteps(values: IntentOnboardingValues) {
+  return onboardingStepValues.filter((step) => !isStepSkipped(step, values));
 }
 
-function getVisibleStepIndex(step: NotionStep, values: NotionOnboardingValues) {
+function getVisibleStepIndex(step: OnboardingStep, values: IntentOnboardingValues) {
   const visibleSteps = getVisibleSteps(values);
   const index = visibleSteps.indexOf(step);
 
   return index === -1 ? 0 : index;
 }
 
-function getNextStep(step: NotionStep, values: NotionOnboardingValues) {
+function getNextStep(step: OnboardingStep, values: IntentOnboardingValues) {
   const visibleSteps = getVisibleSteps(values);
   const currentIndex = visibleSteps.indexOf(step);
 
   return visibleSteps[currentIndex + 1];
 }
 
-function getPreviousStep(step: NotionStep, values: NotionOnboardingValues) {
+function getPreviousStep(step: OnboardingStep, values: IntentOnboardingValues) {
   const visibleSteps = getVisibleSteps(values);
   const currentIndex = visibleSteps.indexOf(step);
 
   return visibleSteps[currentIndex - 1];
 }
 
-function isStepSkipped(step: NotionStep, values: NotionOnboardingValues) {
+function isStepSkipped(step: OnboardingStep, values: IntentOnboardingValues) {
   return step === "collaboration" && values.intent !== "personal";
 }
 
@@ -1412,4 +1483,4 @@ function getIntentLabel(intent: IntentValue) {
   return intentOptions.find((option) => option.value === intent)?.title ?? intent;
 }
 
-export { StepperNotionOnboardingExample };
+export { StepperIntentOnboardingExample };
