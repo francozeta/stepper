@@ -115,9 +115,7 @@ describe("Stepper examples", () => {
       await user.type(screen.getByLabelText("Set a password"), "Abcd.1234");
       await user.click(screen.getByRole("button", { name: /^Continue$/ }));
 
-      expect(
-        await screen.findByText("How do you want to use this workspace?")
-      ).toBeInTheDocument();
+      expect(await screen.findByText("What are you setting up?")).toBeInTheDocument();
 
       await user.click(
         screen.getByRole("button", { name: /For personal life/ })
@@ -138,12 +136,10 @@ describe("Stepper examples", () => {
 
       await user.click(screen.getByRole("button", { name: /^Continue$/ }));
 
-      expect(
-        await screen.findByText("Generating your starter workspace")
-      ).toBeInTheDocument();
+      expect(await screen.findByText("Preparing your setup")).toBeInTheDocument();
       expect(
         await screen.findByRole("heading", {
-          name: "Welcome to your workspace",
+          name: "You're signed in",
         })
       ).toBeInTheDocument();
     },

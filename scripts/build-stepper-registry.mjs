@@ -153,7 +153,7 @@ function buildStepperIntentOnboardingItem() {
       type: "registry:block",
       title: "Stepper Intent Onboarding",
       description:
-        "An intent-driven onboarding block with hidden Stepper state, intent routing, profile validation, interests, and async workspace generation.",
+        "An intent-driven onboarding block with hidden Stepper state, intent routing, profile validation, interests, async setup, and a signed-in completion state.",
       dependencies: [
         "@radix-ui/react-slot",
         "lucide-react",

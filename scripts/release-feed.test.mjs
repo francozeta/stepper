@@ -107,7 +107,7 @@ describe("release and AI documentation surfaces", () => {
     expect(block).toContain("export { StepperIntentOnboardingExample }");
     expect(block).toContain('from "@/components/ui/stepper"');
     expect(block).toContain("HiddenStepList");
-    expect(block).toContain("Generating your starter workspace");
+    expect(block).toContain("Preparing your setup");
     expect(block).not.toContain("@francozeta/stepper");
     expect(publicBlock).toContain('"name": "stepper-intent-onboarding"');
     expect(publicBlock).toContain('"react-icons"');
