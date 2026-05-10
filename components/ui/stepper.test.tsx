@@ -448,7 +448,7 @@ describe("Stepper", () => {
           <StepperItem value="account">Account</StepperItem>
           <StepperItem value="payment" disabled>
             <StepperTrigger asChild>
-              <a href="/payment">Payment</a>
+              <a href="https://example.com/payment">Payment</a>
             </StepperTrigger>
           </StepperItem>
         </StepperList>

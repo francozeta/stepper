@@ -34,8 +34,8 @@ function PropsTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {rows.map((row) => (
-            <TableRow key={row.name}>
+          {rows.map((row, index) => (
+            <TableRow key={`${row.name}-${index}`}>
               <TableCell className="font-mono text-xs text-foreground">
                 {row.name}
               </TableCell>

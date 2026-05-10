@@ -21,6 +21,8 @@ describe("release and AI documentation surfaces", () => {
     const releases = await readText("lib/releases.ts");
 
     expect(changelog).toContain("<ChangelogList />");
+    expect(changelog).toContain("Release automation");
+    expect(changelog).toContain("/pulls");
     expect(changelog).not.toContain("releaseItems");
     expect(changelog).not.toContain("npm publishes");
     expect(changelog).not.toContain("package changes");
@@ -129,11 +131,13 @@ describe("release and AI documentation surfaces", () => {
 
   it("keeps docs navigation markdown-first and visually quiet", async () => {
     const actions = await readText("components/docs-page-actions.tsx");
-    const sidebar = await readText("components/docs-sidebar.tsx");
+    const sidebar = await readText("components/docs-sidebar-client.tsx");
+    const navigation = await readText("lib/docs-navigation.ts");
     const toc = await readText("components/docs-toc.tsx");
 
     expect(actions).toContain("fetch(markdownPath)");
     expect(actions).not.toContain("window.location.href");
+    expect(navigation).toContain("source.getPageTree()");
     expect(sidebar).toContain("shouldScaleBackground={false}");
     expect(sidebar).toContain("bg-gradient-to-r");
     expect(sidebar).not.toContain("border-dashed");

@@ -3,6 +3,8 @@ title: "Stepper"
 description: "A shadcn registry component for guided multi-step flows in React, Next.js, and Tailwind CSS projects."
 eyebrow: "components/ui"
 badge: "shadcn registry"
+navTitle: "Stepper"
+navIcon: "boxes"
 ---
 
 import Link from "next/link";
@@ -10,22 +12,36 @@ import { ArrowRight } from "lucide-react";
 
 import { DocsExample } from "@/components/docs-example";
 import { CodeBlock, FileTree, InfoGrid, Section } from "@/components/docs-content";
+import { PropsTable } from "@/components/props-table";
 import { StepperExample } from "@/components/stepper-examples";
 import { Button } from "@/components/ui/button";
 import {
+  accessibilityNotes,
+  contentProps,
+  gettingStartedSnippet,
+  itemProps,
+  navigationProps,
   registryInstallSnippet,
-  workspaceExampleCode,
+  rootProps,
+  sidebarCompositionTree,
+  stateSelectorsCode,
+  triggerProps,
+  useStepperRows,
+  useStepperSnippet,
+  usageSnippet,
   whyStepper,
+  worksWith,
+  workspaceExampleCode,
 } from "@/lib/docs";
 
 <Section
   title="Install"
-  description="Stepper is distributed through the shadcn registry. The CLI copies the component source into your app, so you own the code and can customize it directly."
+  description="Stepper is distributed through the shadcn registry. The CLI copies the primitive into your app, so the source belongs to your project."
 >
   <div className="grid gap-4">
     <CodeBlock
       code={registryInstallSnippet}
-      filename="registry"
+      filename="terminal"
       lang="bash"
       showLineNumbers={false}
       compact
@@ -47,29 +63,113 @@ import {
 </Section>
 
 <Section
+  title="Usage"
+  description="Use the primitive as uncontrolled UI state, or control it from app state when routing, validation, or async work decides the active step."
+>
+  <div className="grid gap-4">
+    <CodeBlock code={usageSnippet} filename="imports.tsx" />
+    <CodeBlock code={gettingStartedSnippet} filename="checkout-stepper.tsx" />
+  </div>
+</Section>
+
+<Section
   title="Preview"
-  description="A real workspace setup flow where the Stepper blocks progress, marks errors, and unlocks later steps as requirements are completed."
+  description="A real setup flow where the Stepper blocks progress, marks errors, and unlocks later steps as requirements are completed."
 >
   <DocsExample
     title="Create workspace"
-    description="The active step has a missing slug, preferences are locked, and invites only unlock after defaults are saved."
-    badge="Product flow"
+    description="Product setup with validation gates, completion state, and disabled future steps."
+    badge="Example"
     code={workspaceExampleCode}
     filename="workspace-setup.tsx"
+    showCode={false}
     preview={<StepperExample />}
   />
 </Section>
 
 <Section
-  title="Why another Stepper?"
-  description="Most steppers try to own the workflow. This one gives you composable UI primitives, while your app owns routing, validation, form state, persistence, and server actions."
+  title="API"
+  description="The core surface is intentionally small: a root provider, an ordered list, step items, content panels, navigation helpers, and one hook."
+>
+  <div className="grid gap-6">
+    <PropsTable rows={rootProps} />
+    <PropsTable rows={[...itemProps, ...triggerProps, ...contentProps]} />
+    <PropsTable rows={navigationProps} />
+  </div>
+</Section>
+
+<Section
+  title="Composition"
+  description="Stepper stays small so product teams can compose it into richer layouts, including sidebar-driven onboarding and dashboard setup flows."
+>
+  <CodeBlock
+    code={sidebarCompositionTree}
+    filename="sidebar-composition.txt"
+    lang="text"
+    showLineNumbers={false}
+  />
+</Section>
+
+<Section
+  title="useStepper"
+  description="Use the hook for custom footers, validation buttons, counters, or controls that live outside the visual list."
+>
+  <div className="grid gap-4">
+    <PropsTable rows={useStepperRows} />
+    <CodeBlock code={useStepperSnippet} filename="wizard-footer.tsx" />
+  </div>
+</Section>
+
+<Section
+  title="State and styling"
+  description="Stepper exposes predictable state attributes and uses semantic shadcn/ui theme tokens instead of hard-coded colors."
+>
+  <CodeBlock
+    code={stateSelectorsCode}
+    filename="state-selectors.css"
+    lang="css"
+  />
+</Section>
+
+<Section
+  title="Validation boundary"
+  description="Stepper reflects progress; your app owns form values, rules, submissions, routes, and persistence."
+>
+  <InfoGrid items={worksWith} />
+</Section>
+
+<Section
+  title="Blocks"
+  description="Blocks show how the same primitive models onboarding flows where the visible stepper can disappear behind intent choices, profile validation, async setup, and signed-in completion states."
+>
+  <div className="grid gap-4 rounded-lg border border-border bg-muted/20 p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+    <div className="min-w-0">
+      <div className="text-sm font-medium text-foreground">
+        Intent onboarding flow
+      </div>
+      <div className="mt-1 text-sm leading-6 text-muted-foreground">
+        A production-style block with Add Registry and Open in v0 actions, but no heavy code tab by default.
+      </div>
+    </div>
+    <Button asChild variant="outline" size="sm" className="w-fit">
+      <Link href="/examples">
+        View block
+        <ArrowRight data-icon="inline-end" />
+      </Link>
+    </Button>
+  </div>
+</Section>
+
+<Section
+  title="Accessibility"
+  description="Stepper uses progress-step semantics instead of tab semantics, so it can compose with forms, links, validation gates, and route changes."
+>
+  <InfoGrid items={accessibilityNotes} />
+</Section>
+
+<Section
+  title="Why Stepper?"
+  description="The primitive gives you structure without taking over the product flow."
 >
   <InfoGrid items={whyStepper} />
 </Section>
-
-<Button asChild size="lg" className="w-fit">
-  <Link href="/patterns">
-    View recipes
-    <ArrowRight data-icon="inline-end" />
-  </Link>
-</Button>

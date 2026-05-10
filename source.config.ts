@@ -11,6 +11,8 @@ export const docs = defineDocs({
       copyImport: z.string().optional(),
       copyLabel: z.string().optional(),
       eyebrow: z.string().optional(),
+      navIcon: z.string().optional(),
+      navTitle: z.string().optional(),
       rss: z.boolean().optional(),
     }),
   },

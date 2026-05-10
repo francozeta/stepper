@@ -262,6 +262,10 @@ function getDomToc(): TableOfContents {
   );
 
   sections.forEach((section) => {
+    if (section.matches('[data-slot="docs-example"]')) {
+      return;
+    }
+
     const heading = section.querySelector<HTMLElement>("h2, h3");
 
     if (heading) pushHeading(heading, `#${section.id}`);

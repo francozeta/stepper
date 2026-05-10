@@ -1,87 +1,6 @@
-import type { ComponentType } from "react";
-import {
-  BookOpen,
-  Boxes,
-  Code2,
-  FileCheck,
-  GalleryVerticalEnd,
-  Palette,
-  Route,
-  Rocket,
-} from "lucide-react";
-
 import packageJson from "@/package.json";
 
-type DocsNavItem = {
-  title: string;
-  href: string;
-  icon: ComponentType<{ className?: string }>;
-};
-
-type DocsNavGroup = {
-  title: string;
-  items: DocsNavItem[];
-};
-
 const registryVersion = packageJson.version;
-
-const docsNav: DocsNavGroup[] = [
-  {
-    title: "Basics",
-    items: [
-      {
-        title: "Overview",
-        href: "/",
-        icon: Boxes,
-      },
-      {
-        title: "Getting Started",
-        href: "/getting-started",
-        icon: BookOpen,
-      },
-    ],
-  },
-  {
-    title: "API",
-    items: [
-      {
-        title: "Stepper",
-        href: "/api",
-        icon: Code2,
-      },
-      {
-        title: "Examples",
-        href: "/examples",
-        icon: GalleryVerticalEnd,
-      },
-    ],
-  },
-  {
-    title: "Guides",
-    items: [
-      {
-        title: "Form Wizard",
-        href: "/forms",
-        icon: FileCheck,
-      },
-      {
-        title: "Recipes",
-        href: "/patterns",
-        icon: Route,
-      },
-      {
-        title: "Styling",
-        href: "/styling",
-        icon: Palette,
-      },
-      {
-        title: "Changelog",
-        href: "/changelog",
-        icon: Rocket,
-      },
-    ],
-  },
-];
 
 const quickFacts = [
   "Controlled and uncontrolled",
@@ -1063,6 +982,33 @@ const compositionCode = `<StepperItem value="shipping">
   </StepperTrigger>
 </StepperItem>`;
 
+const sidebarCompositionTree = `SidebarProvider
+├── Sidebar
+│   ├── SidebarHeader
+│   ├── SidebarContent
+│   │   ├── SidebarGroup
+│   │   │   ├── SidebarGroupLabel
+│   │   │   ├── SidebarGroupAction
+│   │   │   ├── SidebarGroupContent
+│   │   │   └── SidebarMenu
+│   │   │       ├── SidebarMenuItem
+│   │   │       │   ├── SidebarMenuButton
+│   │   │       │   ├── SidebarMenuAction
+│   │   │       │   └── SidebarMenuBadge
+│   │   │       └── SidebarMenuItem
+│   │   │           ├── SidebarMenuButton
+│   │   │           └── SidebarMenuSub
+│   │   │               ├── SidebarMenuSubItem
+│   │   │               └── SidebarMenuSubItem
+│   │   └── SidebarGroup
+│   │       └── SidebarMenu
+│   │           ├── SidebarMenuItem
+│   │           └── SidebarMenuItem
+│   ├── SidebarFooter
+│   └── SidebarRail
+├── SidebarInset
+└── SidebarTrigger`;
+
 const indicatorCode = `<StepperIndicator>
   <Check />
 </StepperIndicator>`;
@@ -1350,7 +1296,6 @@ export {
   controlledExampleCode,
   controlledSnippet,
   controlsOnlyRecipeSnippet,
-  docsNav,
   formWizardGuideSnippet,
   gettingStartedSnippet,
   indicatorCode,
@@ -1365,6 +1310,7 @@ export {
   releaseItems,
   rootProps,
   routeBasedPatternSnippet,
+  sidebarCompositionTree,
   stateSelectorsCode,
   statusExampleCode,
   themeTokensSnippet,
@@ -1378,5 +1324,3 @@ export {
   workspaceExampleCode,
   whyStepper,
 };
-
-export type { DocsNavGroup, DocsNavItem };

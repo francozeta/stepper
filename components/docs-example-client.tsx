@@ -83,9 +83,9 @@ function DocsExampleClient({
 
             <div className="min-w-0 px-1 sm:px-0">
               <div className="flex min-w-0 items-center gap-2">
-                <h2 className="truncate text-sm font-semibold text-foreground">
+                <h3 className="truncate text-sm font-semibold text-foreground">
                   {title}
-                </h2>
+                </h3>
                 {badge ? (
                   <Badge variant="secondary" className="font-mono text-[11px]">
                     {badge}

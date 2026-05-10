@@ -8,14 +8,14 @@ const __filename = fileURLToPath(import.meta.url);
 const root = path.resolve(path.dirname(__filename), "..");
 
 const docs = [
-  ["content/docs/index.mdx", "app/page.tsx"],
-  ["content/docs/getting-started.mdx", "app/getting-started/page.tsx"],
-  ["content/docs/api.mdx", "app/api/page.tsx"],
-  ["content/docs/examples.mdx", "app/examples/page.tsx"],
-  ["content/docs/forms.mdx", "app/forms/page.tsx"],
-  ["content/docs/patterns.mdx", "app/patterns/page.tsx"],
-  ["content/docs/styling.mdx", "app/styling/page.tsx"],
-  ["content/docs/changelog.mdx", "app/changelog/page.tsx"],
+  "content/docs/index.mdx",
+  "content/docs/getting-started.mdx",
+  "content/docs/api.mdx",
+  "content/docs/examples.mdx",
+  "content/docs/forms.mdx",
+  "content/docs/patterns.mdx",
+  "content/docs/styling.mdx",
+  "content/docs/changelog.mdx",
 ];
 
 async function readText(filePath) {
@@ -23,22 +23,44 @@ async function readText(filePath) {
 }
 
 describe("MDX docs content", () => {
-  it.each(docs)("%s backs %s", async (contentPath, routePath) => {
+  it.each(docs)("%s has required frontmatter", async (contentPath) => {
     const content = await readText(contentPath);
-    const route = await readText(routePath);
 
     expect(content).toContain("---");
     expect(content).toContain("title:");
+  });
+
+  it("renders all docs through the Fumadocs catch-all route", async () => {
+    const route = await readText("app/[[...slug]]/page.tsx");
+
+    expect(route).toContain("source.generateParams()");
     expect(route).toContain("MdxDocPage");
     expect(route).toContain("createDocMetadata");
   });
 
+  it("exposes Fumadocs search through the docs sidebar", async () => {
+    const route = await readText("app/api/search/route.ts");
+    const search = await readText("components/docs-search.tsx");
+    const sidebar = await readText("components/docs-sidebar-client.tsx");
+
+    expect(route).toContain("createFromSource(source)");
+    expect(search).toContain("useDocsSearch");
+    expect(search).toContain("Ctrl K");
+    expect(sidebar).toContain("DocsSearchDialog");
+    expect(sidebar).toContain("DocsSearchTrigger");
+  });
+
   it("documents Stepper ownership, controlled fallback, and composition boundaries", async () => {
+    const index = await readText("content/docs/index.mdx");
     const api = await readText("content/docs/api.mdx");
     const forms = await readText("content/docs/forms.mdx");
     const patterns = await readText("content/docs/patterns.mdx");
     const docsData = await readText("lib/docs.ts");
 
+    expect(index).toContain('title="API"');
+    expect(index).toContain('title="Composition"');
+    expect(index).toContain('title="Blocks"');
+    expect(index).toContain('title="Accessibility"');
     expect(api).toContain("Controlled fallback");
     expect(api).toContain("asChild requirements");
     expect(forms).toContain("Stepper represents UI state");
