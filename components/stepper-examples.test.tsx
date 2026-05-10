@@ -127,7 +127,7 @@ describe("Stepper examples", () => {
       await user.click(screen.getByRole("button", { name: /On my own/ }));
       await user.click(screen.getByRole("button", { name: /^Continue$/ }));
 
-      expect(await screen.findByText("What's on your mind?")).toBeInTheDocument();
+      expect(await screen.findByText("Choose starter goals")).toBeInTheDocument();
 
       await user.click(screen.getByRole("button", { name: /To-do list/ }));
       await user.click(screen.getByRole("button", { name: /Habit tracking/ }));

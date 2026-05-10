@@ -101,11 +101,9 @@ function useDocsTocState() {
     toc.findIndex((item) => item.url === activeUrl)
   );
   const activeItem = toc[activeIndex] ?? toc[0];
-  const progress = toc.length > 0 ? (activeIndex + 1) / toc.length : 0;
 
   return {
     activeItem,
-    progress,
   };
 }
 
@@ -116,17 +114,17 @@ function DocsTableOfContents() {
   if (toc.length === 0) return null;
 
   return (
-    <aside className="sticky top-8 hidden h-fit w-36 xl:block">
-      <div className="flex items-center gap-1.5 text-[0.7rem] font-medium text-muted-foreground">
+    <aside className="sticky top-8 hidden h-fit w-40 xl:block">
+      <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
         <List className="size-3" />
         On this page
       </div>
       <div
         ref={containerRef}
-        className="docs-scrollbar relative mt-3 max-h-[calc(100vh-6rem)] overflow-y-auto pl-2 before:absolute before:inset-y-0 before:left-0 before:w-px before:bg-gradient-to-b before:from-transparent before:via-border/80 before:to-transparent"
+        className="docs-scrollbar mt-4 max-h-[calc(100vh-6rem)] overflow-y-auto border-l border-border pl-4"
       >
         <ScrollProvider containerRef={containerRef}>
-          <nav aria-label="On this page" className="space-y-0.5">
+          <nav aria-label="On this page" className="grid gap-2">
             {toc.map((item) => (
               <TocLink key={item.url} item={item} />
             ))}
@@ -139,7 +137,7 @@ function DocsTableOfContents() {
 
 function DocsMobileTableOfContents() {
   const toc = useDocsToc();
-  const { activeItem, progress } = useDocsTocState();
+  const { activeItem } = useDocsTocState();
   const containerRef = React.useRef<HTMLDivElement>(null);
   const [open, setOpen] = React.useState(false);
 
@@ -159,7 +157,7 @@ function DocsMobileTableOfContents() {
         )}
         aria-label={open ? "Close page index" : "Open page index"}
       >
-        <ProgressCircle value={progress} />
+        <List className="size-4 shrink-0" aria-hidden="true" />
         <span className="grid min-w-0 flex-1 [grid-template-areas:'stack']">
           <span
             className={cn(
@@ -194,7 +192,7 @@ function DocsMobileTableOfContents() {
           <ScrollProvider containerRef={containerRef}>
             <nav
               aria-label="On this page"
-              className="relative py-1 pl-2 before:absolute before:inset-y-0 before:left-0 before:w-px before:bg-gradient-to-b before:from-transparent before:via-border/80 before:to-transparent"
+              className="grid gap-1 border-l border-border py-1 pl-3"
             >
               {toc.map((item) => (
                 <TocLink
@@ -226,62 +224,16 @@ function TocLink({
       href={item.url}
       onClick={onClick}
       className={cn(
-        "relative block rounded-sm text-muted-foreground transition-[background-color,color]",
-        "before:absolute before:bottom-1.5 before:left-0 before:top-1.5 before:w-px before:rounded-full before:bg-gradient-to-b before:from-foreground/0 before:via-foreground before:to-foreground/0 before:opacity-0 before:transition-opacity",
+        "block rounded-sm text-muted-foreground transition-[color]",
         "hover:text-foreground focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none",
-        "data-[active=true]:text-foreground data-[active=true]:before:opacity-100",
-        mobile ? "px-3 py-2 text-sm leading-5" : "px-3 py-1 text-xs leading-5"
+        "data-[active=true]:text-foreground",
+        mobile ? "py-2 text-sm leading-5" : "py-0.5 text-xs leading-5"
       )}
-      style={{ paddingLeft: `${1 + Math.max(0, item.depth - 2) * 0.75}rem` }}
+      style={{ paddingLeft: `${Math.max(0, item.depth - 2) * 0.75}rem` }}
     >
       {item.title}
     </TOCItem>
   );
-}
-
-function ProgressCircle({ value }: { value: number }) {
-  const size = 18;
-  const strokeWidth = 1.7;
-  const radius = size / 2 - strokeWidth;
-  const circumference = 2 * Math.PI * radius;
-  const progress = clamp(value, 0, 1) * circumference;
-
-  return (
-    <svg
-      role="progressbar"
-      aria-valuemin={0}
-      aria-valuemax={100}
-      aria-valuenow={Math.round(value * 100)}
-      viewBox={`0 0 ${size} ${size}`}
-      className="size-[18px] shrink-0 text-foreground"
-    >
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={radius}
-        fill="none"
-        strokeWidth={strokeWidth}
-        className="stroke-muted-foreground/25"
-      />
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={radius}
-        fill="none"
-        stroke="currentColor"
-        strokeDasharray={circumference}
-        strokeDashoffset={circumference - progress}
-        strokeLinecap="round"
-        strokeWidth={strokeWidth}
-        transform={`rotate(-90 ${size / 2} ${size / 2})`}
-        className="transition-[stroke-dashoffset] duration-[250ms] motion-reduce:transition-none"
-      />
-    </svg>
-  );
-}
-
-function clamp(value: number, min: number, max: number) {
-  return Math.min(Math.max(value, min), max);
 }
 
 function normalizeToc(toc: TableOfContents) {

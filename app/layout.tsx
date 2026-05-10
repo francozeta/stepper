@@ -4,7 +4,6 @@ import { Analytics } from "@vercel/analytics/next";
 import { DocsShell } from "@/components/docs-shell";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { siteConfig } from "@/lib/site";
-import { ThemeProvider } from "next-themes";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -66,15 +65,9 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
     >
       <body className="min-h-full font-sans">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem={false}
-        >
-          <TooltipProvider>
-            <DocsShell>{children}</DocsShell>
-          </TooltipProvider>
-        </ThemeProvider>
+        <TooltipProvider>
+          <DocsShell>{children}</DocsShell>
+        </TooltipProvider>
         <Analytics />
       </body>
     </html>

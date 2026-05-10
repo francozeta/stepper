@@ -83,6 +83,10 @@ describe("project infrastructure", () => {
               path: "registry/default/examples/stepper-intent-onboarding.tsx",
               target: "components/stepper-intent-onboarding.tsx",
             }),
+            expect.objectContaining({
+              path: "components/stepper-logo.tsx",
+              target: "components/stepper-logo.tsx",
+            }),
           ]),
         }),
       ])

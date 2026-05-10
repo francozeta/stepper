@@ -138,7 +138,8 @@ describe("release and AI documentation surfaces", () => {
     expect(sidebar).toContain("bg-gradient-to-r");
     expect(sidebar).not.toContain("border-dashed");
     expect(toc).toContain("MutationObserver");
-    expect(toc).toContain("bg-gradient-to-b");
+    expect(toc).toContain("border-l border-border");
+    expect(toc).not.toContain("bg-gradient-to-b");
     expect(toc).not.toContain("border-dashed");
   });
 });

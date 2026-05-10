@@ -179,6 +179,11 @@ function buildStepperIntentOnboardingItem() {
           type: "registry:component",
           target: "components/stepper-intent-onboarding.tsx",
         },
+        {
+          path: "components/stepper-logo.tsx",
+          type: "registry:component",
+          target: "components/stepper-logo.tsx",
+        },
       ],
     },
     null,

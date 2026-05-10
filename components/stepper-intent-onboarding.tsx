@@ -32,6 +32,7 @@ import {
 import { SiGoogle } from "react-icons/si";
 import { z } from "zod/v3";
 
+import { StepperLogo } from "@/components/stepper-logo";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -390,7 +391,7 @@ function StepperIntentOnboardingExample() {
         />
       </div>
 
-      <div className="flex min-h-[640px] flex-col">
+      <div className="flex min-h-[560px] flex-col">
         <HiddenStepList completedSteps={completedSteps} values={values} />
 
         <StepperContent value="account" className="border-0 bg-transparent p-0 shadow-none">
@@ -472,15 +473,14 @@ function StepperIntentOnboardingExample() {
         </StepperContent>
 
         <StepperContent value="interests" className="border-0 bg-transparent p-0 shadow-none">
-          <SplitStage>
+          <CenteredStage>
             <InterestsPanel
               selectedInterests={values.interests}
               onToggleInterest={toggleInterest}
               onContinue={() => void continueFromStep()}
               onSkip={skipInterests}
             />
-            <FlowBlueprint selectedInterests={values.interests} />
-          </SplitStage>
+          </CenteredStage>
         </StepperContent>
 
         <StepperContent value="generating" className="border-0 bg-transparent p-0 shadow-none">
@@ -525,19 +525,7 @@ function HiddenStepList({
 
 function CenteredStage({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-[640px] flex-1 items-start justify-center px-6 pb-12 pt-20 sm:pt-24">
-      {children}
-    </div>
-  );
-}
-
-function SplitStage({
-  children,
-}: {
-  children: [React.ReactNode, React.ReactNode];
-}) {
-  return (
-    <div className="grid min-h-[640px] flex-1 items-center gap-8 overflow-hidden px-6 pb-10 pt-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(360px,1.1fr)] lg:px-16">
+    <div className="flex min-h-[560px] flex-1 items-start justify-center px-5 pb-10 pt-14 sm:px-6 sm:pt-16">
       {children}
     </div>
   );
@@ -557,7 +545,7 @@ function AuthPanel({
   onGoogle: () => void;
 }) {
   return (
-    <div className="w-full max-w-[400px]">
+    <div className="w-full max-w-[380px]">
       <StageHeading
         title="Create your account"
         description="Start with a focused onboarding flow."
@@ -567,7 +555,7 @@ function AuthPanel({
 
       <ProviderButton onClick={onGoogle} />
 
-      <div className="my-6 flex items-center gap-3 text-xs font-medium text-muted-foreground">
+      <div className="my-5 flex items-center gap-3 text-xs font-medium text-muted-foreground">
         <Separator className="flex-1 bg-border" />
         or
         <Separator className="flex-1 bg-border" />
@@ -604,11 +592,11 @@ function AuthPanel({
         )}
       </Field>
 
-      <PrimaryAction className="mt-7" onClick={onContinue}>
+      <PrimaryAction className="mt-6" onClick={onContinue}>
         Continue
       </PrimaryAction>
 
-      <p className="mt-6 text-center text-xs leading-5 text-muted-foreground">
+      <p className="mt-5 text-center text-xs leading-5 text-muted-foreground">
         By continuing, you acknowledge that you understand and agree to the{" "}
         <span className="underline decoration-border underline-offset-2">
           Terms & Conditions
@@ -635,14 +623,14 @@ function VerifyPanel({
   onContinue: () => void;
 }) {
   return (
-    <div className="w-full max-w-[400px]">
+    <div className="w-full max-w-[380px]">
       <StageHeading
         title="Check your inbox"
         description="Use the code sent to your email."
         align="center"
       />
 
-      <div className="mt-9 rounded-lg border border-border bg-muted/40 p-3 text-sm text-muted-foreground">
+      <div className="mt-7 rounded-lg border border-border bg-muted/40 p-3 text-sm text-muted-foreground">
         We sent a verification code to{" "}
         <span className="font-medium text-foreground">{email}</span>.
       </div>
@@ -668,7 +656,7 @@ function VerifyPanel({
         )}
       </Field>
 
-      <PrimaryAction className="mt-7" onClick={onContinue}>
+      <PrimaryAction className="mt-6" onClick={onContinue}>
         Continue
       </PrimaryAction>
       <p className="mt-4 text-center text-sm text-muted-foreground">
@@ -696,15 +684,15 @@ function ProfilePanel({
   onContinue: () => void;
 }) {
   return (
-    <div className="w-full max-w-[400px]">
+    <div className="w-full max-w-[380px]">
       <StageHeading
         title="Create a profile"
         description="This is how you'll appear."
         align="center"
       />
 
-      <div className="mt-12 flex flex-col items-center gap-3 text-sm text-muted-foreground">
-        <div className="grid size-16 place-items-center rounded-full border border-border bg-muted/50 text-lg font-semibold text-foreground">
+      <div className="mt-9 flex flex-col items-center gap-3 text-sm text-muted-foreground">
+        <div className="grid size-14 place-items-center rounded-full border border-border bg-muted/50 text-base font-semibold text-foreground">
           {getInitials(values.name || values.email)}
         </div>
         <button
@@ -716,7 +704,7 @@ function ProfilePanel({
         </button>
       </div>
 
-      <div className="mt-12 grid gap-5">
+      <div className="mt-9 grid gap-4">
         <Field data-invalid={Boolean(errors.name)}>
           <FieldLabel htmlFor="intent-name" className="text-muted-foreground">
             Enter your name
@@ -754,11 +742,11 @@ function ProfilePanel({
         </Field>
       </div>
 
-      <PrimaryAction className="mt-12" onClick={onContinue}>
+      <PrimaryAction className="mt-9" onClick={onContinue}>
         Continue
       </PrimaryAction>
 
-      <label className="mt-5 flex items-start gap-2 text-sm leading-5 text-muted-foreground">
+      <label className="mt-4 flex items-start gap-2 text-xs leading-5 text-muted-foreground">
         <Checkbox
           checked={marketingOptOut}
           onCheckedChange={(checked) => onMarketingChange(checked === true)}
@@ -782,14 +770,14 @@ function IntentPanel({
   onContinue: () => void;
 }) {
   return (
-    <div className="w-full max-w-[560px]">
+    <div className="w-full max-w-[520px]">
       <StageHeading
         title="What are you setting up?"
         description="This helps customize your experience"
         align="center"
       />
 
-      <div className="mt-12 grid gap-3">
+      <div className="mt-8 grid gap-3">
         {intentOptions.map((option) => (
           <LargeOptionButton
             key={option.value}
@@ -806,7 +794,7 @@ function IntentPanel({
         <p className="mt-3 text-center text-sm text-destructive">{error}</p>
       ) : null}
 
-      <PrimaryAction className="mt-8" onClick={onContinue}>
+      <PrimaryAction className="mt-7" onClick={onContinue}>
         Continue
       </PrimaryAction>
     </div>
@@ -825,14 +813,14 @@ function CollaborationPanel({
   onContinue: () => void;
 }) {
   return (
-    <div className="w-full max-w-[540px]">
+    <div className="w-full max-w-[500px]">
       <StageHeading
         title="How will you work?"
         description="Pick the mode that best fits this setup"
         align="center"
       />
 
-      <div className="mt-12 grid gap-3 sm:grid-cols-2">
+      <div className="mt-8 grid gap-3 sm:grid-cols-2">
         {collaborationOptions.map((option) => (
           <TileOptionButton
             key={option.value}
@@ -849,7 +837,7 @@ function CollaborationPanel({
         <p className="mt-3 text-center text-sm text-destructive">{error}</p>
       ) : null}
 
-      <PrimaryAction className="mt-8" onClick={onContinue}>
+      <PrimaryAction className="mt-7" onClick={onContinue}>
         Continue
       </PrimaryAction>
     </div>
@@ -868,21 +856,18 @@ function InterestsPanel({
   onSkip: () => void;
 }) {
   return (
-    <div className="w-full max-w-[560px] justify-self-center lg:justify-self-start">
-      <div className="mb-11">
-        <h2 className="text-2xl font-semibold text-foreground sm:text-[1.7rem] sm:leading-8">
-          What&apos;s on your mind?
-        </h2>
-        <p className="mt-1.5 text-lg font-medium leading-7 text-muted-foreground sm:text-xl">
-          Select as many as you want.
-        </p>
-      </div>
+    <div className="w-full max-w-[520px] text-center">
+      <StageHeading
+        title="Choose starter goals"
+        description="Stepper will prepare the optional path after sign-in."
+        align="center"
+      />
 
-      <p className="mb-3 text-sm font-medium text-muted-foreground">
+      <p className="mb-3 mt-7 text-xs font-medium text-muted-foreground">
         {selectedInterests.length} selected
       </p>
 
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap justify-center gap-2.5">
         {interestOptions.map((option) => (
           <InterestChip
             key={option.value}
@@ -893,12 +878,12 @@ function InterestsPanel({
         ))}
       </div>
 
-      <PrimaryAction className="mt-16 max-w-[520px]" onClick={onContinue}>
+      <PrimaryAction className="mx-auto mt-10 max-w-[380px]" onClick={onContinue}>
         Continue
       </PrimaryAction>
       <button
         type="button"
-        className="mt-5 block w-full max-w-[520px] rounded-md py-1 text-sm font-medium text-muted-foreground hover:text-foreground"
+        className="mx-auto mt-4 block w-full max-w-[380px] rounded-md py-1 text-sm font-medium text-muted-foreground hover:text-foreground"
         onClick={onSkip}
       >
         Skip for now
@@ -921,11 +906,11 @@ function GeneratingPanel({
   ];
 
   return (
-    <div className="w-full max-w-[500px] text-center">
-      <div className="mx-auto grid size-16 place-items-center rounded-2xl border border-border bg-muted/40 shadow-sm">
-        <Sparkles className="size-7 text-foreground" />
+    <div className="w-full max-w-[460px] text-center">
+      <div className="mx-auto grid size-14 place-items-center rounded-xl border border-border bg-muted/40 shadow-sm">
+        <Sparkles className="size-6 text-foreground" />
       </div>
-      <h2 className="mt-7 text-2xl font-semibold text-foreground sm:text-[1.7rem] sm:leading-8">
+      <h2 className="mt-6 text-xl font-semibold tracking-tight text-foreground">
         Preparing your setup
       </h2>
       <p className="mt-3 text-sm font-medium text-muted-foreground">
@@ -934,7 +919,7 @@ function GeneratingPanel({
           : "Tuned for your workflow."}
       </p>
 
-      <div className="mt-10 rounded-xl border border-border bg-muted/30 p-4 text-left">
+      <div className="mt-8 rounded-xl border border-border bg-muted/30 p-4 text-left">
         {items.map((item, index) => (
           <div key={item} className="flex items-center gap-3 py-2">
             <span className="grid size-7 place-items-center rounded-full bg-background text-muted-foreground">
@@ -959,28 +944,47 @@ function SignedInPanel({
   values: IntentOnboardingValues;
   onRestart: () => void;
 }) {
-  return (
-    <div className="flex min-h-[640px] flex-1 items-center justify-center px-6 py-16">
-      <div className="w-full max-w-[430px] text-center">
-        <OnboardingLogo className="mx-auto mb-6" />
-        <h2 className="text-2xl font-semibold text-foreground sm:text-[1.7rem]">
-          You&apos;re signed in
-        </h2>
-        <p className="mt-2 text-sm leading-6 text-muted-foreground">
-          {values.email
-            ? `${values.email} completed the onboarding loop.`
-            : "The onboarding loop has completed."}
-        </p>
+  const selectedLabels = values.interests
+    .map(
+      (interest) =>
+        interestOptions.find((item) => item.value === interest)?.label
+    )
+    .filter(Boolean)
+    .slice(0, 2);
 
-        <div className="mt-8 rounded-xl border border-border bg-muted/30 p-4 text-left">
-          <ChecklistRow checked text="Account created" />
-          <ChecklistRow checked text="Intent captured" />
-          <ChecklistRow checked text="Flow state completed" />
+  return (
+    <div className="flex min-h-[560px] flex-1 items-center justify-center px-5 py-12 sm:px-6">
+      <div className="w-full max-w-[360px] overflow-hidden rounded-xl border border-border bg-card text-left">
+        <div className="grid h-28 place-items-center border-b border-border bg-background">
+          <OnboardingLogo className="size-12 text-foreground" />
         </div>
 
-        <PrimaryAction className="mt-8" onClick={onRestart}>
-          Run again
-        </PrimaryAction>
+        <div className="p-4 sm:p-5">
+          <h2 className="text-base font-semibold text-foreground">
+            You&apos;re signed in
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            Stepper completed the account, intent, and optional setup path
+            {values.email ? ` for ${values.email}` : ""}.
+          </p>
+
+          <div className="mt-5 grid gap-2 text-sm">
+            <ChecklistRow checked text="Account verified" />
+            <ChecklistRow checked text={getIntentSummary(values)} />
+            <ChecklistRow
+              checked
+              text={
+                selectedLabels.length > 0
+                  ? `Prepared ${selectedLabels.join(" and ")}`
+                  : "Skipped optional goals"
+              }
+            />
+          </div>
+
+          <PrimaryAction className="mt-6" onClick={onRestart}>
+            Run again
+          </PrimaryAction>
+        </div>
       </div>
     </div>
   );
@@ -999,11 +1003,11 @@ function StageHeading({
 }) {
   return (
     <div className={cn(align === "center" && "text-center")}>
-      {logo ? <OnboardingLogo className="mx-auto mb-6" /> : null}
-      <h2 className="text-2xl font-semibold text-foreground sm:text-[1.7rem] sm:leading-8">
+      {logo ? <OnboardingLogo className="mx-auto mb-5 size-10" /> : null}
+      <h2 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
         {title}
       </h2>
-      <p className="mt-1.5 text-lg font-medium leading-7 text-muted-foreground sm:text-xl">
+      <p className="mt-1.5 text-sm leading-6 text-muted-foreground">
         {description}
       </p>
     </div>
@@ -1011,31 +1015,7 @@ function StageHeading({
 }
 
 function OnboardingLogo({ className }: { className?: string }) {
-  return (
-    <span
-      className={cn(
-        "grid size-12 place-items-center rounded-xl border border-border bg-foreground text-background",
-        className
-      )}
-    >
-      <svg
-        viewBox="0 0 789.79 1058.83"
-        fill="currentColor"
-        className="h-7 w-5"
-        aria-hidden="true"
-        focusable="false"
-      >
-        <path d="M361.13,1058.28c28.61-24.08,55.58-46.86,82.62-69.55,41.82-35.09,83.8-69.99,125.49-105.23,39.2-33.13,57.7-75.81,57.69-126.9-.05-177.51-.02-355.01-.02-532.52v-9.26c10,3.28,18.99,5.96,27.69,9.36,1.36.53,1.99,4.36,2.02,6.68.17,14.17.25,28.35-.05,42.51-.11,5.26,1.68,7.95,6.82,9.47,15.55,4.58,30.97,9.59,47.4,14.73.21-2.91.48-5.06.49-7.22.1-14.17.02-28.35.23-42.52.15-10.07,3.69-12.79,13.08-9.76,17.45,5.63,34.83,11.45,52.15,17.48,9.32,3.24,12.66,8.43,12.67,18.46.03,35.78-.07,71.56.05,107.34.03,7.56-2.6,13.42-8.55,18.1-9.31,7.32-18.32,15.04-27.71,22.25-3.47,2.67-4.92,5.42-4.91,9.88.11,138.01.03,276.02.1,414.03.01,32.23-2.08,64.19-14.18,94.47-24.52,61.33-67.45,101.93-133.21,115.85-9.24,1.96-18.91,2.61-28.38,2.64-67.61.24-135.22.17-202.83.18-2.22,0-4.44-.24-8.67-.49ZM707.67,578.13c0-28.19.75-55.54-.53-82.79-.32-6.88-5.92-14.7-11.24-19.89-10.81-10.58-24.41-6.66-29.84,7.52-1.06,2.78-1.94,5.84-1.96,8.77-.15,24.56-.09,49.13-.09,74.2,14.53,4.06,28.94,8.09,43.64,12.2Z" />
-        <path d="M550.29,611.15h-140.74c-.15-3.18-.37-5.67-.37-8.15-.02-58.79.02-117.58-.07-176.37,0-4.36.43-7.09,5.61-8.45,58.86-15.42,117.64-31.12,176.45-46.74.42-.11.9-.01,2.63-.01,0,2.81,0,5.68,0,8.54-.03,125.94.18,251.88-.23,377.83-.13,40.79-16.04,74.87-47.7,101.19-78.26,65.05-156.45,130.16-234.85,195.04-3.21,2.66-8.17,4.4-12.36,4.49-21.32.45-42.66.21-66.02.21,3.09-2.75,4.81-4.38,6.64-5.88,71.94-58.84,143.89-117.65,215.82-176.5,19.42-15.89,38.64-32.02,58.12-47.83,25.37-20.58,37.33-47.15,37.14-79.7-.26-43.22-.07-86.44-.08-129.66,0-2.29,0-4.57,0-8Z" />
-        <path d="M560.11,210.07c0-7.96,0-15.13,0-22.31.01-55.3.02-110.61.03-165.91,0-13.02,7.86-22.02,19.1-21.85,11.18.17,18.62,8.67,18.62,21.58-.02,58.79,3.25,117.83-1.19,176.29-3.69,48.59-.74,96.93-2.82,145.33-.24,5.6-3.85,5.64-7.21,6.51-38.68,10.01-77.36,19.98-116.08,29.85-26.11,6.66-52.25,13.21-78.42,19.65-13.71,3.38-24.86-5.34-24.87-19.28-.03-34.86.01-69.71.07-104.57.02-12.2,5.31-18.61,17.17-21.91,16.55-4.6,33.02-9.5,49.53-14.27,12.34-3.56,18.24.81,18.31,13.64.07,11.85-.05,23.7.09,35.55.09,7.1,1.61,8.22,8.64,6.39,14.15-3.7,28.21-7.77,42.4-11.3,5.37-1.34,6.93-4.22,6.84-9.43-.26-14.4.02-28.81-.19-43.22-.1-6.94,2.65-10.63,9.69-11.98,13.22-2.53,26.31-5.68,40.3-8.76Z" />
-        <path d="M361.32,924.39c-47.66,5.68-95.31,11.36-143.75,17.13-.12,2.35-.34,4.79-.35,7.24-.04,23.47.13,46.94-.25,70.41-.05,3.11-2.01,7.08-4.39,9.12-10.77,9.2-21.85,18.06-33.17,26.57-2.88,2.16-7.06,3.65-10.65,3.67-49.49.29-98.99.3-148.49.31-13.39,0-20.24-6.84-20.25-20.15-.04-31.6-.03-63.21.03-94.81.03-13.68,7.96-21.79,21.61-21.78,95.97.05,191.94.2,287.91.31,17.15.02,34.3,0,51.45,0,.1.66.2,1.33.3,1.99Z" />
-        <path d="M179.64,881.76c0-27.43-.27-54.36.13-81.28.16-11.16,9.64-18.62,21.94-18.62,52.72.02,105.44.02,158.16.07,44.36.04,88.72.15,133.07.23,3.93,0,7.87,0,11.94,1.58-41.18,4.92-82.37,9.83-124.17,14.82v83.19h-201.07Z" />
-        <path d="M541.46,651.31v11.92h-63.14v83.22h-180.91c-.16-2.11-.45-4.12-.45-6.13-.03-21.82-.06-43.65.02-65.47.05-15.26,8.51-23.64,23.77-23.63,70.81.02,141.62.06,212.43.1,2.51,0,5.02,0,8.29,0Z" />
-        <path d="M789.79,68.43c-21.66,23.89-42.73,46.06-74.45,52.96-7.27,1.58-15.63,2.2-22.63.21-25.49-7.24-50.59-9.24-76.16,1.67-.36-2.34-.77-3.82-.79-5.3-.28-22.74-.36-45.48-.88-68.22-.11-4.86,1.6-6.76,6.03-8.28,34.87-11.94,67.86-10,98.71,11.86,19.17,13.58,40.53,19.02,63.96,15.43,1.5-.23,3.04-.17,6.2-.33Z" />
-        <path d="M230.89,504.03c27.49.25,49.21,22.49,48.96,50.14-.27,28.73-22.72,51.45-50.58,51.18-27.41-.27-49.86-23.56-49.59-51.46.26-27.63,23.35-50.1,51.22-49.85Z" />
-      </svg>
-    </span>
-  );
+  return <StepperLogo className={cn("size-10 text-foreground", className)} />;
 }
 
 function ProviderButton({ onClick }: { onClick: () => void }) {
@@ -1043,7 +1023,7 @@ function ProviderButton({ onClick }: { onClick: () => void }) {
     <Button
       type="button"
       variant="outline"
-      className="relative mt-8 h-10 w-full justify-center rounded-md border-border bg-background text-sm font-medium text-foreground shadow-none hover:bg-muted/60"
+      className="relative mt-7 h-9 w-full justify-center rounded-md border-border bg-background text-sm font-medium text-foreground shadow-none hover:bg-muted/60"
       onClick={onClick}
     >
       <SiGoogle className="absolute left-4 size-4 text-foreground" aria-hidden="true" />
@@ -1065,7 +1045,7 @@ function PrimaryAction({
     <Button
       type="button"
       className={cn(
-        "h-10 w-full rounded-md bg-foreground text-sm font-semibold text-background shadow-none hover:bg-foreground/90 focus-visible:ring-ring",
+        "h-9 w-full rounded-md bg-foreground text-sm font-semibold text-background shadow-none hover:bg-foreground/90 focus-visible:ring-ring",
         className
       )}
       onClick={onClick}
@@ -1093,14 +1073,14 @@ function LargeOptionButton({
     <button
       type="button"
       className={cn(
-        "flex min-h-24 w-full items-center gap-5 rounded-xl border border-border bg-background px-6 text-left transition-colors hover:bg-muted/60",
+        "flex min-h-20 w-full items-center gap-4 rounded-lg border border-border bg-background px-5 text-left transition-colors hover:bg-muted/60",
         active && "border-foreground bg-muted/30 ring-2 ring-foreground/10"
       )}
       onClick={onClick}
     >
-      <Icon className="size-8 shrink-0 text-foreground" />
+      <Icon className="size-7 shrink-0 text-foreground" />
       <span className="min-w-0">
-        <span className="block text-base font-semibold text-foreground">
+        <span className="block text-sm font-semibold text-foreground">
           {title}
         </span>
         <span className="mt-1 block text-sm leading-5 text-muted-foreground">
@@ -1128,14 +1108,14 @@ function TileOptionButton({
     <button
       type="button"
       className={cn(
-        "flex min-h-44 flex-col items-center justify-center rounded-xl border border-border bg-background p-6 text-center transition-colors hover:bg-muted/60",
+        "flex min-h-36 flex-col items-center justify-center rounded-lg border border-border bg-background p-5 text-center transition-colors hover:bg-muted/60",
         active && "border-foreground bg-muted/30 ring-2 ring-foreground/10"
       )}
       onClick={onClick}
     >
-      <Icon className="mb-5 size-10 text-foreground" />
-      <span className="text-base font-semibold text-foreground">{title}</span>
-      <span className="mt-2 max-w-44 text-sm leading-5 text-muted-foreground">
+      <Icon className="mb-4 size-8 text-foreground" />
+      <span className="text-sm font-semibold text-foreground">{title}</span>
+      <span className="mt-2 max-w-40 text-xs leading-5 text-muted-foreground">
         {description}
       </span>
     </button>
@@ -1157,98 +1137,14 @@ function InterestChip({
     <button
       type="button"
       className={cn(
-        "inline-flex h-10 items-center gap-2.5 rounded-lg border border-border bg-background px-4 text-sm font-semibold text-muted-foreground transition-colors hover:bg-muted/60",
+        "inline-flex h-9 items-center gap-2 rounded-lg border border-border bg-background px-3.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted/60",
         active && "border-foreground text-foreground ring-2 ring-foreground/10"
       )}
       onClick={onClick}
     >
-      {active ? <Check className="size-5" /> : <Icon className="size-5" />}
+      {active ? <Check className="size-4" /> : <Icon className="size-4" />}
       {option.label}
     </button>
-  );
-}
-
-function FlowBlueprint({
-  selectedInterests,
-}: {
-  selectedInterests: InterestValue[];
-}) {
-  const labels =
-    selectedInterests.length > 0
-      ? selectedInterests
-          .map((interest) => interestOptions.find((item) => item.value === interest)?.label)
-          .filter(Boolean)
-          .slice(0, 3)
-      : ["Account", "Intent", "Signed in"];
-
-  return (
-    <div className="relative hidden min-h-[560px] items-center justify-center lg:flex">
-      <div className="absolute inset-y-10 right-0 w-[86%] rounded-[2rem] border border-border bg-muted/30" />
-      <div className="relative w-[540px] rounded-2xl border border-border bg-background p-4 shadow-sm">
-        <div className="mb-4 flex items-center justify-between border-b border-border pb-3">
-          <div className="flex items-center gap-1.5">
-            <span className="size-2 rounded-full bg-foreground/30" />
-            <span className="size-2 rounded-full bg-foreground/20" />
-            <span className="size-2 rounded-full bg-foreground/10" />
-          </div>
-          <div className="h-2 w-24 rounded-full bg-muted" />
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-[8rem_minmax(0,1fr)]">
-          <aside className="rounded-xl border border-border bg-muted/40 p-3">
-            <div className="mb-4 h-6 w-20 rounded-md bg-background ring-1 ring-border" />
-            <div className="grid gap-2">
-              {["Account", "Profile", "Intent"].map((item, index) => (
-                <div
-                  key={item}
-                  className={cn(
-                    "flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-muted-foreground",
-                    index === 0 && "bg-background text-foreground ring-1 ring-border"
-                  )}
-                >
-                  <span className="size-2 rounded-full bg-foreground/50" />
-                  {item}
-                </div>
-              ))}
-            </div>
-          </aside>
-
-          <div className="min-w-0 rounded-xl border border-border bg-background p-4">
-            <div className="mb-5 flex items-start justify-between gap-4">
-              <div>
-                <div className="mb-2 h-3 w-16 rounded-full bg-foreground" />
-                <div className="h-4 w-48 rounded-full bg-muted-foreground/30" />
-              </div>
-              <div className="grid size-9 place-items-center rounded-lg border border-border bg-muted/40">
-                <Sparkles className="size-4" />
-              </div>
-            </div>
-
-            <div className="grid gap-3">
-              {labels.map((label, index) => (
-                <div
-                  key={label}
-                  className="rounded-lg border border-border bg-muted/30 p-3"
-                >
-                  <div className="mb-2 flex items-center justify-between">
-                    <span className="text-xs font-medium text-foreground">
-                      {label}
-                    </span>
-                    <span className="text-[11px] text-muted-foreground">
-                      Step {index + 1}
-                    </span>
-                  </div>
-                  <div className="grid gap-1.5">
-                    <span className="h-1.5 rounded-full bg-foreground/20" />
-                    <span className="h-1.5 w-4/5 rounded-full bg-foreground/10" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
   );
 }
 
@@ -1263,7 +1159,7 @@ function ChecklistRow({ checked, text }: { checked?: boolean; text: string }) {
       >
         {checked ? <Check className="size-4" /> : null}
       </span>
-      <span className={cn(checked && "text-muted-foreground line-through")}>
+      <span className={cn(checked && "text-muted-foreground")}>
         {text}
       </span>
     </div>
@@ -1355,6 +1251,16 @@ function getInitials(value: string) {
 
 function getIntentLabel(intent: IntentValue) {
   return intentOptions.find((option) => option.value === intent)?.title ?? intent;
+}
+
+function getIntentSummary(values: IntentOnboardingValues) {
+  if (!values.intent) {
+    return "Intent captured";
+  }
+
+  const label = getIntentLabel(values.intent).replace(/^For /, "");
+
+  return `Intent set for ${label.toLowerCase()}`;
 }
 
 export { StepperIntentOnboardingExample };
