@@ -38,36 +38,51 @@ function PageHeader({
   action,
 }: PageHeaderProps) {
   return (
-    <header className="grid max-w-4xl gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
+    <header className="grid max-w-4xl gap-6 border-b border-white/10 pb-7 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
       <div className="flex min-w-0 flex-col gap-4">
         {eyebrow ? (
-          <p className="font-mono text-xs font-medium text-muted-foreground">
-            {eyebrow}
-          </p>
+          <div className="flex items-center gap-2">
+            <span className="size-1.5 bg-zinc-700" aria-hidden="true" />
+            <p className="font-mono text-[0.68rem] font-medium uppercase tracking-[0.2em] text-zinc-600">
+              {eyebrow}
+            </p>
+          </div>
         ) : null}
         <div className="flex flex-col gap-3">
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+            <h1 className="docs-page-title text-balance font-normal text-zinc-50">
               {title}
             </h1>
             {badge ? (
-              <Badge variant="secondary" className="font-mono">
-                {badge}
+              <Badge variant="outline" className={getPageBadgeClassName(badge)}>
+                {getPageBadgeLabel(badge)}
               </Badge>
             ) : null}
           </div>
-          <p className="max-w-2xl text-pretty text-sm leading-6 text-muted-foreground sm:text-base">
+          <p className="max-w-2xl text-pretty text-sm leading-6 text-zinc-500 sm:text-base">
             {description}
           </p>
         </div>
       </div>
       {action ? (
-        <div className="flex shrink-0 flex-wrap gap-2 lg:justify-end lg:pt-6">
+        <div className="flex shrink-0 flex-wrap gap-2 lg:justify-end lg:pt-7">
           {action}
         </div>
       ) : null}
     </header>
   );
+}
+
+function getPageBadgeLabel(value: string) {
+  return value.toLowerCase() === "beta" ? "Beta" : value;
+}
+
+function getPageBadgeClassName(value: string) {
+  if (value.toLowerCase() === "beta") {
+    return "rounded-none border-amber-400/40 bg-amber-300 px-2 font-mono text-[0.65rem] uppercase tracking-[0.14em] text-zinc-950";
+  }
+
+  return "rounded-none border-white/10 bg-white/[0.035] font-mono text-zinc-500";
 }
 
 function Section({
@@ -88,14 +103,17 @@ function Section({
   return (
     <section
       id={sectionId}
-      className={cn("flex scroll-mt-24 flex-col gap-4", className)}
+      className={cn(
+        "flex scroll-mt-24 flex-col gap-4 border-t border-white/10 pt-6 first:border-t-0 first:pt-0",
+        className
+      )}
     >
       <div className="flex max-w-3xl flex-col gap-2">
-        <h2 className="text-balance text-xl font-semibold tracking-tight text-foreground">
+        <h2 className="text-balance text-xl font-medium tracking-normal text-zinc-100">
           {title}
         </h2>
         {description ? (
-          <p className="text-pretty text-sm leading-6 text-muted-foreground">
+          <p className="text-pretty text-sm leading-6 text-zinc-500">
             {description}
           </p>
         ) : null}
@@ -136,14 +154,14 @@ async function CodeBlock({
     <div
       data-slot="docs-code-block"
       className={cn(
-        "relative w-full min-w-0 overflow-hidden rounded-xl bg-card text-sm ring-1 ring-border/80",
+        "relative w-full min-w-0 overflow-hidden border border-white/10 bg-[#040404] text-sm",
         className
       )}
     >
       {filename ? (
-        <div className="flex min-h-10 items-center gap-2 border-b border-border/70 px-4 pr-12">
+        <div className="flex min-h-10 items-center gap-2 border-b border-white/10 px-4 pr-12">
           <CodeFileIcon filename={filename} lang={lang} />
-          <div className="min-w-0 truncate font-mono text-xs text-muted-foreground">
+          <div className="min-w-0 truncate font-mono text-xs text-zinc-500">
             {filename ?? lang}
           </div>
         </div>
@@ -155,7 +173,7 @@ async function CodeBlock({
           label="Copy code"
           iconOnly
           className={cn(
-            "absolute right-3 z-10 bg-card/80 backdrop-blur",
+            "absolute right-3 z-10 rounded-none bg-[#050505] text-zinc-500 hover:bg-white/[0.045] hover:text-zinc-100",
             filename ? "top-1" : "top-2.5"
           )}
         />
@@ -184,7 +202,7 @@ function CodeFileIcon({
   lang?: string;
 }) {
   const name = `${filename ?? ""} ${lang ?? ""}`.toLowerCase();
-  const className = "size-3.5 shrink-0 text-muted-foreground";
+  const className = "size-3.5 shrink-0 text-zinc-500";
   const Icon =
     name.includes("pnpm")
       ? SiPnpm
@@ -229,7 +247,7 @@ function FileTree({
     <div
       data-slot="docs-file-tree"
       className={cn(
-        "rounded-xl bg-card p-4 font-mono text-sm ring-1 ring-border/80",
+        "border border-white/10 bg-[#040404] p-4 font-mono text-sm text-zinc-300",
         className
       )}
     >
@@ -257,11 +275,11 @@ function FileTreeItems({
               className="flex min-h-7 items-center gap-2 text-foreground"
               style={{ paddingLeft: `${level * 1.25}rem` }}
             >
-              <Icon className="size-4 shrink-0 text-muted-foreground" />
+              <Icon className="size-4 shrink-0 text-zinc-500" />
               <span>{item.name}</span>
             </div>
             {item.children ? (
-              <div className="ml-2 border-l border-border/70 pl-1">
+              <div className="ml-2 border-l border-white/10 pl-1">
                 <FileTreeItems items={item.children} level={level + 1} />
               </div>
             ) : null}
@@ -296,20 +314,23 @@ function InfoGrid({
   items: Array<{ label: string; value: string; help?: string }>;
 }) {
   return (
-    <dl className="grid gap-3 sm:grid-cols-3">
-      {items.map((item) => (
+    <dl className="grid overflow-hidden border border-white/10 bg-[#040404] sm:grid-cols-3">
+      {items.map((item, index) => (
         <div
           key={item.label}
-          className="rounded-lg border border-border bg-muted/25 p-4"
+          className={cn(
+            "min-w-0 bg-white/[0.012] p-4",
+            index > 0 && "border-t border-white/10 sm:border-l sm:border-t-0"
+          )}
         >
-          <dt className="text-xs font-medium text-muted-foreground">
+          <dt className="text-xs font-medium text-zinc-600">
             {item.label}
           </dt>
-          <dd className="mt-2 text-sm font-medium text-foreground">
+          <dd className="mt-2 text-sm font-medium text-zinc-100">
             {item.value}
           </dd>
           {item.help ? (
-            <dd className="mt-1 text-xs leading-5 text-muted-foreground">
+            <dd className="mt-1 text-xs leading-5 text-zinc-600">
               {item.help}
             </dd>
           ) : null}

@@ -23,30 +23,30 @@ type StepperRelease = {
 const releases: StepperRelease[] = [
   {
     version: registryVersion,
-    date: "2026-05-02",
-    title: "Current registry release",
+    date: "2026-05-15",
+    title: "Beta registry release",
     summary:
-      "The current Stepper registry release tracks the latest release-please bump while keeping the docs focused on copied-source ownership, composition, and production verification.",
+      "The Stepper beta release focuses the public registry on the core primitive, polished docs, and production-ready source ownership.",
     sections: [
       {
         title: "Added",
         items: [
-          "Promoted the release-candidate hardening work into the current registry version.",
-          "Kept the public docs focused on the shadcn registry component instead of package-style distribution.",
+          "Added public item-level state with useStepperItem for custom composed indicators without duplicating active or completed state.",
+          "Added a focused beta badge across the docs surface and homepage.",
         ],
       },
       {
-        title: "Docs",
+        title: "Changed",
         items: [
-          "Derived the current changelog entry from the registry version so release-please bumps do not require a manual feed edit.",
-          "Clarified the path toward final production QA: install from /stepper.json, verify copied source, then publish usage guidance.",
+          "Reworked the docs navigation to keep unfinished examples and recipes marked as soon while the Stepper reference stays prominent.",
+          "Refined the documentation UI with sharper tabs, quieter scrollbars, cleaner sidebar states, and more consistent navigation buttons.",
         ],
       },
       {
         title: "Registry",
         items: [
-          "Validated that generated public registry artifacts remain up to date after the release bump.",
-          "Preserved flat registry URLs for shadcn CLI installs and compatibility rewrites.",
+          "Bumped the registry component version to the beta channel.",
+          "Regenerated and verified the flat public shadcn registry artifacts.",
         ],
       },
     ],
@@ -67,14 +67,14 @@ const releases: StepperRelease[] = [
       {
         title: "Added",
         items: [
-          "Promoted the release-candidate hardening work into the registry version.",
+          "Promoted the release-candidate hardening work into the registry channel.",
           "Kept the public docs focused on the shadcn registry component instead of package-style distribution.",
         ],
       },
       {
         title: "Docs",
         items: [
-          "Aligned the changelog with the release-please version bump.",
+          "Aligned the changelog with the release-please workflow.",
           "Clarified the path toward final production QA: install from /stepper.json, verify copied source, then publish usage guidance.",
         ],
       },
@@ -190,7 +190,7 @@ const releases: StepperRelease[] = [
       {
         title: "Changed",
         items: [
-          "Connected the docs version badge to the registry component version.",
+          "Connected the docs status badge to the registry workflow.",
           "Documented the registry flow as the primary source-ownership install path.",
         ],
       },
@@ -284,7 +284,7 @@ function getCurrentRelease() {
 }
 
 function getReleaseUrl(release: StepperRelease) {
-  return absoluteUrl(`/changelog#${getReleaseAnchor(release)}`);
+  return absoluteUrl(`/docs/changelog#${getReleaseAnchor(release)}`);
 }
 
 function getReleaseAnchor(release: StepperRelease) {

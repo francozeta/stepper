@@ -115,13 +115,13 @@ function DocsTableOfContents() {
 
   return (
     <aside className="sticky top-8 hidden h-fit w-40 xl:block">
-      <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+      <div className="flex items-center gap-1.5 font-mono text-[0.65rem] font-medium uppercase tracking-[0.18em] text-zinc-600">
         <List className="size-3" />
         On this page
       </div>
       <div
         ref={containerRef}
-        className="docs-scrollbar mt-4 max-h-[calc(100vh-6rem)] overflow-y-auto border-l border-border pl-4"
+        className="docs-scrollbar mt-4 max-h-[calc(100vh-6rem)] overflow-y-auto border-l border-border border-white/10 pl-4"
       >
         <ScrollProvider containerRef={containerRef}>
           <nav aria-label="On this page" className="grid gap-2">
@@ -147,12 +147,12 @@ function DocsMobileTableOfContents() {
     <Collapsible
       open={open}
       onOpenChange={setOpen}
-      className="sticky top-14 z-20 border-b border-border/80 bg-background/96 backdrop-blur supports-[backdrop-filter]:bg-background/86 md:top-0 xl:hidden"
+      className="sticky top-14 z-20 border-b border-white/10 bg-[#050505] md:top-0 xl:hidden"
     >
       <CollapsibleTrigger
         className={cn(
-          "flex min-h-11 w-full items-center gap-2.5 px-4 text-left text-sm text-muted-foreground outline-none sm:px-6 md:px-8",
-          "transition-[background-color,color] hover:bg-muted/40 hover:text-foreground",
+          "flex min-h-11 w-full items-center gap-2.5 px-4 text-left text-sm text-zinc-500 outline-none sm:px-6 md:px-8",
+          "transition-[background-color,color] hover:bg-white/[0.035] hover:text-zinc-100",
           "focus-visible:ring-ring/50 focus-visible:ring-[3px]"
         )}
         aria-label={open ? "Close page index" : "Open page index"}
@@ -162,7 +162,7 @@ function DocsMobileTableOfContents() {
           <span
             className={cn(
               "truncate [grid-area:stack] transition-[opacity,translate,color] duration-200",
-              open ? "translate-y-0 text-foreground" : "-translate-y-1 opacity-0"
+              open ? "translate-y-0 text-zinc-100" : "-translate-y-1 opacity-0"
             )}
           >
             On this page
@@ -192,7 +192,7 @@ function DocsMobileTableOfContents() {
           <ScrollProvider containerRef={containerRef}>
             <nav
               aria-label="On this page"
-              className="grid gap-1 border-l border-border py-1 pl-3"
+              className="grid gap-1 border-l border-border border-white/10 py-1 pl-3"
             >
               {toc.map((item) => (
                 <TocLink
@@ -224,9 +224,9 @@ function TocLink({
       href={item.url}
       onClick={onClick}
       className={cn(
-        "block rounded-sm text-muted-foreground transition-[color]",
-        "hover:text-foreground focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none",
-        "data-[active=true]:text-foreground",
+        "block rounded-none text-zinc-600 transition-[color]",
+        "hover:text-zinc-100 focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none",
+        "data-[active=true]:text-zinc-100",
         mobile ? "py-2 text-sm leading-5" : "py-0.5 text-xs leading-5"
       )}
       style={{ paddingLeft: `${Math.max(0, item.depth - 2) * 0.75}rem` }}

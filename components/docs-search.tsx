@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
-import { FileText, Hash, Search, Text, Zap } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { FileText, Hash, Search, Text } from "lucide-react";
 import { useDocsSearch } from "fumadocs-core/search/client";
 import type { SortedResult } from "fumadocs-core/search";
 
@@ -44,7 +44,7 @@ function DocsSearchTrigger({
         type="button"
         variant="ghost"
         size="icon-lg"
-        className={cn("size-10 rounded-lg text-muted-foreground", className)}
+        className={cn("size-10 rounded-none text-zinc-500 hover:bg-white/[0.045] hover:text-zinc-100", className)}
         onClick={onClick}
         aria-label="Search documentation"
       >
@@ -59,14 +59,14 @@ function DocsSearchTrigger({
       variant="outline"
       size="sm"
       className={cn(
-        "h-9 w-full justify-start gap-2 rounded-lg px-2 text-muted-foreground",
+        "h-9 w-full justify-start gap-2 rounded-none border-white/10 bg-[#070707] px-2 text-zinc-500 hover:bg-white/[0.035] hover:text-zinc-100",
         className
       )}
       onClick={onClick}
     >
       <Search data-icon="inline-start" />
       <span className="min-w-0 flex-1 truncate text-left">Search docs</span>
-      <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[0.65rem] font-medium text-muted-foreground">
+      <kbd className="border border-white/10 bg-white/[0.035] px-1.5 py-0.5 font-mono text-[0.65rem] font-medium text-zinc-600">
         Ctrl K
       </kbd>
     </Button>
@@ -79,13 +79,24 @@ function DocsSearchDialog({
   onOpenChange,
 }: DocsSearchDialogProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const { search, setSearch, query } = useDocsSearch({
     type: "fetch",
     delayMs: 120,
   });
   const trimmedSearch = search.trim();
-  const results = query.data !== "empty" ? query.data ?? [] : [];
-  const quickLinks = React.useMemo(() => getQuickLinks(navGroups), [navGroups]);
+  const results =
+    query.data !== "empty"
+      ? (query.data ?? []).filter((item) => !isDisabledDocsUrl(item.url))
+      : [];
+  const pageGroup = React.useMemo(
+    () => (open ? getCurrentPageLinks(pathname) : null),
+    [open, pathname]
+  );
+  const quickLinks = React.useMemo(
+    () => getQuickLinks(navGroups, pageGroup),
+    [navGroups, pageGroup]
+  );
 
   React.useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -110,11 +121,11 @@ function DocsSearchDialog({
       open={open}
       onOpenChange={onOpenChange}
       title="Search documentation"
-      description="Search Stepper docs, API, examples, blocks, and release notes."
-      className="top-[22%] max-w-[calc(100%-2rem)] border-border bg-card sm:max-w-2xl"
+      description="Search Stepper docs, API, guides, and release notes."
+      className="top-[18%] max-w-[calc(100%-2rem)] rounded-none border border-white/20 bg-[#050505] text-zinc-100 ring-1 ring-white/10 sm:max-w-2xl"
       showCloseButton
     >
-      <Command shouldFilter={false} className="rounded-xl bg-card">
+      <Command shouldFilter={false} className="rounded-none bg-[#050505]">
         <CommandInput
           value={search}
           onValueChange={setSearch}
@@ -151,15 +162,15 @@ function SearchResults({
 }) {
   if (error) {
     return (
-      <CommandEmpty className="text-muted-foreground">
-        Search is unavailable right now.
-      </CommandEmpty>
+          <CommandEmpty className="text-zinc-500">
+            Search is unavailable right now.
+          </CommandEmpty>
     );
   }
 
   if (isLoading) {
     return (
-      <CommandEmpty className="text-muted-foreground">
+      <CommandEmpty className="text-zinc-500">
         Searching documentation...
       </CommandEmpty>
     );
@@ -167,7 +178,7 @@ function SearchResults({
 
   if (results.length === 0) {
     return (
-      <CommandEmpty className="text-muted-foreground">
+      <CommandEmpty className="text-zinc-500">
         No results found.
       </CommandEmpty>
     );
@@ -185,20 +196,20 @@ function SearchResults({
             key={`${item.id}-${item.url}`}
             value={`${title} ${item.url}`}
             onSelect={() => onSelect(item.url)}
-            className="items-start gap-3 py-2"
+            className="items-start gap-3 py-2.5"
           >
-            <Icon className="mt-0.5 text-muted-foreground" />
+            <Icon className="mt-0.5 text-zinc-500" />
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-sm font-medium text-foreground">
+              <span className="block truncate text-sm font-medium text-zinc-100">
                 <MarkedText value={title} />
               </span>
               {crumbs?.length ? (
-                <span className="mt-0.5 block truncate text-xs text-muted-foreground">
+                <span className="mt-0.5 block truncate text-xs text-zinc-600">
                   {crumbs.join(" / ")}
                 </span>
               ) : null}
               {item.type === "text" && cleanText(item.content) !== cleanText(title) ? (
-                <span className="mt-1 line-clamp-2 text-xs leading-5 text-muted-foreground">
+                <span className="mt-1 line-clamp-2 text-xs leading-5 text-zinc-500">
                   <MarkedText value={item.content} />
                 </span>
               ) : null}
@@ -223,17 +234,23 @@ function QuickLinks({
         <React.Fragment key={group.title}>
           {index > 0 ? <CommandSeparator /> : null}
           <CommandGroup heading={group.title}>
-            {group.items.map((item) => (
-              <CommandItem
-                key={item.href}
-                value={`${item.title} ${item.href}`}
-                onSelect={() => onSelect(item.href)}
-              >
-                <Zap className="text-muted-foreground" />
-                <span>{item.title}</span>
-                <CommandShortcut>{item.href}</CommandShortcut>
-              </CommandItem>
-            ))}
+            {group.items
+              .filter((item) => item.status !== "soon")
+              .map((item) => (
+                <CommandItem
+                  key={item.href}
+                  value={`${item.title} ${item.href}`}
+                  onSelect={() => onSelect(item.href)}
+                >
+                  {item.href.includes("#") ? (
+                    <Hash className="text-zinc-500" />
+                  ) : (
+                    <FileText className="text-zinc-500" />
+                  )}
+                  <span>{item.title}</span>
+                  <CommandShortcut>{item.href}</CommandShortcut>
+                </CommandItem>
+              ))}
           </CommandGroup>
         </React.Fragment>
       ))}
@@ -241,19 +258,55 @@ function QuickLinks({
   );
 }
 
-function getQuickLinks(navGroups: DocsNavGroup[]): DocsNavGroup[] {
-  return [
-    ...navGroups,
-    {
-      title: "On this page",
-      items: [
-        { title: "Install", href: "/#install", icon: "book-open" },
-        { title: "API", href: "/#api", icon: "code" },
-        { title: "Composition", href: "/#composition", icon: "route" },
-        { title: "Blocks", href: "/#blocks", icon: "gallery" },
-      ],
-    },
-  ];
+function getQuickLinks(
+  navGroups: DocsNavGroup[],
+  pageGroup: DocsNavGroup | null
+): DocsNavGroup[] {
+  return pageGroup ? [...navGroups, pageGroup] : navGroups;
+}
+
+function getCurrentPageLinks(pathname: string): DocsNavGroup | null {
+  if (typeof document === "undefined") {
+    return null;
+  }
+
+  const content = document.querySelector("[data-docs-content]");
+
+  if (!content) {
+    return null;
+  }
+
+  const items = Array.from(
+    content.querySelectorAll<HTMLElement>("section[id], h2[id], h3[id]")
+  )
+    .filter((element) => !element.matches('[data-slot="docs-example"]'))
+    .map((element) => {
+      const heading = element.matches("section")
+        ? element.querySelector<HTMLElement>("h2, h3")
+        : element;
+      const title = heading?.textContent?.trim();
+
+      if (!title || !element.id) {
+        return null;
+      }
+
+      return {
+        title,
+        href: `${pathname}#${element.id}`,
+        icon: "route" as const,
+      };
+    })
+    .filter((item): item is NonNullable<typeof item> => Boolean(item))
+    .slice(0, 8);
+
+  if (items.length === 0) {
+    return null;
+  }
+
+  return {
+    title: "On this page",
+    items,
+  };
 }
 
 function getResultIcon(type: SortedResult["type"]) {
@@ -305,6 +358,14 @@ function cleanText(value: string) {
 
 function sanitizeInlineText(value: string) {
   return value.replace(/<[^>]+>/g, "");
+}
+
+function isDisabledDocsUrl(url: string) {
+  return [
+    "/docs/examples",
+    "/docs/forms",
+    "/docs/patterns",
+  ].some((pathname) => url === pathname || url.startsWith(`${pathname}#`));
 }
 
 export { DocsSearchDialog, DocsSearchTrigger };

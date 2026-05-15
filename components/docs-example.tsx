@@ -52,7 +52,7 @@ async function DocsExample({
             code={source}
             filename={filename}
             lang={lang}
-            className="rounded-lg"
+            className="rounded-none"
           />
         ) : null
       }

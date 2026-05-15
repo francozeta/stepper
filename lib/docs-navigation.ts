@@ -17,6 +17,7 @@ type DocsNavItem = {
   title: string;
   href: string;
   icon: DocsNavIcon;
+  status?: "soon";
 };
 
 type DocsNavGroup = {
@@ -30,14 +31,15 @@ type NavFrontmatter = {
 };
 
 const fallbackIconByUrl: Record<string, DocsNavIcon> = {
-  "/": "boxes",
-  "/api": "code",
-  "/changelog": "rocket",
-  "/examples": "gallery",
-  "/forms": "file-check",
-  "/getting-started": "book-open",
-  "/patterns": "route",
-  "/styling": "palette",
+  "/docs": "book-open",
+  "/docs/api": "code",
+  "/docs/changelog": "rocket",
+  "/docs/examples": "gallery",
+  "/docs/forms": "file-check",
+  "/docs/installation": "boxes",
+  "/docs/patterns": "route",
+  "/docs/stepper": "boxes",
+  "/docs/styling": "palette",
 };
 
 function getDocsNavigation(): DocsNavGroup[] {
@@ -103,7 +105,16 @@ function getNavItem(node: PageTree.Item): DocsNavItem | null {
     title: data?.navTitle ?? textFromNode(node.name),
     href,
     icon: data?.navIcon ?? fallbackIconByUrl[href] ?? "book-open",
+    status: isSoonPage(href) ? "soon" : undefined,
   };
+}
+
+function isSoonPage(href: string) {
+  return (
+    href === "/docs/examples" ||
+    href === "/docs/forms" ||
+    href === "/docs/patterns"
+  );
 }
 
 function pushGroup(groups: DocsNavGroup[], group: DocsNavGroup) {

@@ -33,6 +33,7 @@ import { z } from "zod/v3";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Field,
   FieldDescription,
@@ -68,7 +69,9 @@ import {
   StepperNext,
   StepperPrevious,
   StepperTrigger,
+  useStepperItem,
 } from "@/components/ui/stepper";
+import { cn } from "@/lib/utils";
 
 const workspaceStepSchema = z.object({
   workspaceName: z.string().trim().min(2, "Enter a workspace name."),
@@ -173,10 +176,10 @@ type DemoStepProps = {
   title: string;
   description: string;
   icon: LucideIcon;
-  active?: boolean;
   completed?: boolean;
   disabled?: boolean;
   error?: boolean;
+  showLabels?: boolean;
 };
 
 function DemoStep({
@@ -184,40 +187,76 @@ function DemoStep({
   title,
   description,
   icon: Icon,
-  active,
   completed,
   disabled,
   error,
+  showLabels = true,
 }: DemoStepProps) {
-  const isCompleted = Boolean(completed && !active);
-
   return (
     <StepperItem
       value={value}
-      completed={isCompleted}
+      completed={completed}
+      defaultTrigger={false}
       disabled={disabled}
       error={error}
     >
-      <StepperTrigger>
-        <StepperIndicator>
-          {error ? (
-            <AlertCircle />
-          ) : disabled ? (
-            <Lock />
-          ) : isCompleted ? (
-            <Check />
-          ) : (
-            <Icon />
+      <DemoStepTrigger
+        title={title}
+        description={description}
+        icon={Icon}
+        error={error}
+        showLabels={showLabels}
+      />
+    </StepperItem>
+  );
+}
+
+type DemoStepTriggerProps = {
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  error?: boolean;
+  showLabels?: boolean;
+};
+
+function DemoStepTrigger({
+  title,
+  description,
+  icon: Icon,
+  error,
+  showLabels = true,
+}: DemoStepTriggerProps) {
+  const { disabled, stepPosition, stepState } = useStepperItem();
+  const isComplete = stepState === "completed" || stepPosition === "previous";
+  const isError = stepState === "error" || error;
+
+  return (
+    <StepperTrigger>
+      <StepperIndicator>
+        {isError ? (
+          <AlertCircle />
+        ) : disabled ? (
+          <Lock />
+        ) : isComplete ? (
+          <Check />
+        ) : (
+          <Icon />
+        )}
+      </StepperIndicator>
+      <span className="relative block min-h-10 min-w-0">
+        <span
+          className={cn(
+            "flex min-w-0 flex-col gap-1 transition-opacity duration-150",
+            !showLabels && "invisible opacity-0"
           )}
-        </StepperIndicator>
-        <span className="flex min-w-0 flex-col gap-1">
+        >
           <StepperLabel>{title}</StepperLabel>
           <StepperDescription className="hidden max-w-32 sm:block">
             {description}
           </StepperDescription>
         </span>
-      </StepperTrigger>
-    </StepperItem>
+      </span>
+    </StepperTrigger>
   );
 }
 
@@ -357,11 +396,17 @@ function StepperActions({
       ) : (
         <span />
       )}
-      <div className="flex gap-2 sm:justify-end">
-        <StepperPrevious>{previousLabel}</StepperPrevious>
+      <div className="flex items-center gap-2 sm:justify-end">
+        <StepperPrevious className="rounded-none border-white/10 bg-[#050505] text-zinc-500 hover:bg-white/[0.045] hover:text-zinc-100">
+          {previousLabel}
+        </StepperPrevious>
         {finalAction ??
           nextAction ?? (
-          <StepperNext disabled={nextDisabled} onClick={nextOnClick}>
+          <StepperNext
+            className="rounded-none bg-zinc-100 text-zinc-950 hover:bg-white hover:text-zinc-950"
+            disabled={nextDisabled}
+            onClick={nextOnClick}
+          >
             {nextLabel}
           </StepperNext>
         )}
@@ -527,7 +572,6 @@ function StepperExample() {
           title="Workspace"
           description={workspaceCompleted ? "Ready" : "Required"}
           icon={Building2}
-          active={value === "workspace"}
           completed={workspaceCompleted && isPastWizardStep("workspace")}
           error={Boolean(attemptedSteps.workspace && !workspaceValid)}
         />
@@ -536,7 +580,6 @@ function StepperExample() {
           title="Preferences"
           description={preferencesDisabled ? "Locked" : "Defaults"}
           icon={Settings2}
-          active={value === "preferences"}
           completed={preferencesCompleted && isPastWizardStep("preferences")}
           disabled={preferencesDisabled}
           error={Boolean(attemptedSteps.preferences && !preferencesValid)}
@@ -546,7 +589,6 @@ function StepperExample() {
           title="Members"
           description={membersDisabled ? "Locked" : "Optional"}
           icon={Users}
-          active={value === "members"}
           completed={membersCompleted && isPastWizardStep("members")}
           disabled={membersDisabled}
           error={Boolean(attemptedSteps.members && !membersValid)}
@@ -556,7 +598,6 @@ function StepperExample() {
           title="Review"
           description={reviewDisabled ? "Locked" : "Summary"}
           icon={Send}
-          active={value === "review"}
           disabled={reviewDisabled}
         />
       </StepperList>
@@ -798,74 +839,156 @@ function StepperExample() {
   );
 }
 
-function StepperCheckoutExample() {
+type StepperCheckoutExampleProps = {
+  compact?: boolean;
+};
+
+function StepperCheckoutExample({
+  compact = false,
+}: StepperCheckoutExampleProps = {}) {
+  type CheckoutStep = "cart" | "shipping" | "payment";
+  const [value, setValue] = React.useState<CheckoutStep>("cart");
+  const [showLabels, setShowLabels] = React.useState(true);
+  const isComplete = value === "payment";
+
   return (
-    <Stepper defaultValue="shipping" orientation="horizontal">
+    <Stepper
+      value={value}
+      onValueChange={(next) => setValue(next as CheckoutStep)}
+      orientation="horizontal"
+      className={cn(
+        "w-full",
+        compact && "mx-auto min-h-[12rem] max-w-3xl justify-center gap-4"
+      )}
+    >
       <StepperList>
         <DemoStep
           value="cart"
           title="Cart"
           description="Review items"
           icon={ShoppingCart}
-          completed
+          showLabels={showLabels}
         />
         <DemoStep
           value="shipping"
           title="Shipping"
           description="Delivery details"
           icon={Truck}
+          showLabels={showLabels}
         />
         <DemoStep
           value="payment"
           title="Payment"
-          description="Locked"
+          description="Secure checkout"
           icon={CreditCard}
-          disabled
+          showLabels={showLabels}
         />
       </StepperList>
 
-      <StepperContent value="cart">
-        <ExampleContent
-          eyebrow="Cart"
-          title="Review selected products"
-          description="Confirm the items in the order before choosing how they should be delivered."
-          icon={ShoppingCart}
-        >
-          <SummaryGrid
-            items={[
-              { label: "Items", value: "3 products", help: "Ready to ship" },
-              { label: "Subtotal", value: "$128.00", help: "Before tax" },
-              { label: "Discount", value: "-$12.00", help: "Spring offer" },
-            ]}
-          />
-        </ExampleContent>
-      </StepperContent>
-      <StepperContent value="shipping">
-        <ExampleContent
-          eyebrow="Shipping"
-          title="Confirm delivery details"
-          description="A horizontal stepper works well when users move through a short linear checkout."
-          icon={Truck}
-        >
-          <SummaryGrid
-            items={[
-              { label: "Recipient", value: "Avery Stone", help: "Primary" },
-              { label: "Method", value: "Express", help: "2 business days" },
-              { label: "Address", value: "Missing ZIP", help: "Required" },
-            ]}
-          />
-        </ExampleContent>
-      </StepperContent>
-      <StepperContent value="payment">
-        <ExampleContent
-          eyebrow="Payment"
-          title="Choose a payment method"
-          description="This step stays disabled until the required shipping details are complete."
-          icon={CreditCard}
-        />
-      </StepperContent>
+      {!compact ? (
+        <>
+          <StepperContent value="cart">
+            <ExampleContent
+              eyebrow="Cart"
+              title="Review selected products"
+              description="Confirm the items in the order before choosing how they should be delivered."
+              icon={ShoppingCart}
+            >
+              <SummaryGrid
+                items={[
+                  { label: "Items", value: "3 products", help: "Ready to ship" },
+                  { label: "Subtotal", value: "$128.00", help: "Before tax" },
+                  { label: "Discount", value: "-$12.00", help: "Spring offer" },
+                ]}
+              />
+            </ExampleContent>
+          </StepperContent>
+          <StepperContent value="shipping">
+            <ExampleContent
+              eyebrow="Shipping"
+              title="Confirm delivery details"
+              description="A horizontal stepper works well when users move through a short linear checkout."
+              icon={Truck}
+            >
+              <SummaryGrid
+                items={[
+                  { label: "Recipient", value: "Avery Stone", help: "Primary" },
+                  { label: "Method", value: "Express", help: "2 business days" },
+                  { label: "Address", value: "Missing ZIP", help: "Required" },
+                ]}
+              />
+            </ExampleContent>
+          </StepperContent>
+          <StepperContent value="payment">
+            <ExampleContent
+              eyebrow="Payment"
+              title="Choose a payment method"
+              description="Finish the flow with a clear final state instead of leaving the last step empty."
+              icon={CreditCard}
+            >
+              <SummaryGrid
+                items={[
+                  { label: "Card", value: "Visa ending 4242", help: "Default" },
+                  { label: "Billing", value: "Same address", help: "Verified" },
+                  { label: "Total", value: "$116.00", help: "Ready" },
+                ]}
+              />
+            </ExampleContent>
+          </StepperContent>
+        </>
+      ) : null}
 
-      <StepperActions note="Payment unlocks after the shipping address is complete." />
+      {compact ? (
+        <div className="flex items-center justify-center gap-2 border-t border-border pt-3">
+          <StepperPrevious className="rounded-none border-white/10 bg-[#050505] text-zinc-500 hover:bg-white/[0.045] hover:text-zinc-100">
+            <ArrowLeft data-icon="inline-start" />
+            Back
+          </StepperPrevious>
+          {isComplete ? (
+            <Button
+              type="button"
+              className="h-9 min-w-24 rounded-none bg-zinc-100 px-3 text-zinc-950 hover:bg-white hover:text-zinc-950"
+            >
+              Place order
+              <Check data-icon="inline-end" />
+            </Button>
+          ) : (
+            <StepperNext className="rounded-none bg-zinc-100 text-zinc-950 hover:bg-white hover:text-zinc-950">
+              Continue
+              <ArrowRight data-icon="inline-end" />
+            </StepperNext>
+          )}
+        </div>
+      ) : (
+        <StepperActions
+          note={
+            isComplete
+              ? "Ready to place the order."
+              : "Move step by step through the checkout flow."
+          }
+          finalAction={
+            isComplete ? (
+              <Button
+                type="button"
+                className="h-9 min-w-24 rounded-none bg-zinc-100 px-3 text-zinc-950 hover:bg-white hover:text-zinc-950"
+              >
+                Place order
+                <Check data-icon="inline-end" />
+              </Button>
+            ) : undefined
+          }
+        />
+      )}
+
+      <div className="flex justify-center border-t border-border pt-3">
+        <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-foreground">
+          <Checkbox
+            checked={showLabels}
+            onCheckedChange={(checked) => setShowLabels(checked === true)}
+          />
+          Show labels
+        </label>
+      </div>
     </Stepper>
   );
 }
@@ -1012,7 +1135,6 @@ function StepperControlledExample() {
           title="Details"
           description="Collect"
           icon={FileCheck}
-          active={value === "details"}
           completed={currentIndex > 0}
         />
         <DemoStep
@@ -1020,7 +1142,6 @@ function StepperControlledExample() {
           title="Review"
           description="Check"
           icon={AlertCircle}
-          active={value === "review"}
           completed={currentIndex > 1}
         />
         <DemoStep
@@ -1028,7 +1149,6 @@ function StepperControlledExample() {
           title="Confirm"
           description="Submit"
           icon={Check}
-          active={value === "confirm"}
         />
       </StepperList>
 
@@ -1120,6 +1240,7 @@ function StepperRoutePatternExample() {
               key={step.value}
               value={step.value}
               completed={isCompleted}
+              defaultTrigger={false}
             >
               <StepperTrigger asChild>
                 <a href={step.href}>

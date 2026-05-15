@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { DocsShell } from "@/components/docs-shell";
 import { createDocMetadata, MdxDocPage } from "@/components/mdx-doc-page";
 import { source } from "@/lib/source";
 
@@ -24,5 +25,9 @@ export async function generateMetadata({
 export default async function DocsPage({ params }: PageProps) {
   const { slug = [] } = await params;
 
-  return <MdxDocPage slug={slug} />;
+  return (
+    <DocsShell>
+      <MdxDocPage slug={slug} />
+    </DocsShell>
+  );
 }

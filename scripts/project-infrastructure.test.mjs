@@ -93,27 +93,60 @@ describe("project infrastructure", () => {
     );
   });
 
-  it("preserves Stepper primitive markers in the flattened registry output", async () => {
+  it("publishes the Stepper core as a single registry file", async () => {
+    const source = await readText("components/ui/stepper.tsx");
     const registrySource = await readText("registry/default/ui/stepper.tsx");
     const publicItem = await readJson("public/stepper.json");
     const publicSource = publicItem.files.find(
       (file) => file.target === "components/ui/stepper.tsx"
     )?.content;
 
-    expect(registrySource).toContain("__stepperPrimitive");
-    expect(registrySource).toContain("function markStepperPrimitive");
-    expect(registrySource).toContain(
-      "markStepperPrimitive(StepperItem, STEPPER_PRIMITIVES.item)"
-    );
-    expect(registrySource).toContain(
-      "markStepperPrimitive(StepperDescription, STEPPER_PRIMITIVES.description)"
-    );
-    expect(registrySource).toContain("getStepperPrimitiveName(primitive.type)");
-    expect(registrySource).toContain("getStepperPrimitiveName(primitive.render)");
-    expect(publicSource).toContain("__stepperPrimitive");
-    expect(publicSource).toContain(
-      "markStepperPrimitive(StepperSeparator, STEPPER_PRIMITIVES.separator)"
-    );
+    expect(registrySource).toBe(source);
+    expect(publicSource).toBe(source);
+    expect(registrySource).toContain("function Stepper(");
+    expect(registrySource).toContain("function StepperItem<");
+    expect(registrySource).toContain("export type {");
+    expect(registrySource).not.toContain("./stepper/");
+  });
+
+  it("keeps Stepper core free of recursive JSX step inference", async () => {
+    const stepperSource = await readText("components/ui/stepper.tsx");
+
+    expect(stepperSource).not.toContain("function collectSteps");
+    expect(stepperSource).not.toContain("function hasStepperPrimitiveChild");
+    expect(stepperSource).not.toContain("function resolveSteps");
+    expect(stepperSource).not.toContain("__stepperPrimitive");
+    expect(stepperSource).not.toContain("getStepperPrimitiveName");
+    expect(stepperSource).not.toContain("markStepperPrimitive");
+    expect(stepperSource).not.toContain("function shouldUseDefaultTrigger");
+    expect(stepperSource).not.toContain("type FallbackSyncState");
+    expect(stepperSource).not.toContain("function shouldSyncFallback");
+    expect(stepperSource).not.toContain("fallbackSyncState");
+  });
+
+  it("keeps the single-file Stepper core navigable", async () => {
+    const stepperSource = await readText("components/ui/stepper.tsx");
+
+    [
+      "// Types",
+      "// Helpers",
+      "// Context",
+      "// Internal Hooks",
+      "// Root",
+      "// List",
+      "// Item",
+      "// Trigger",
+      "// Content",
+      "// Navigation",
+      "// Exports",
+    ].forEach((section) => {
+      expect(stepperSource).toContain(section);
+    });
+
+    expect(stepperSource).toContain("function useRegisteredSteps");
+    expect(stepperSource).toContain("function useStepperSteps");
+    expect(stepperSource).toContain("function useStepperValue");
+    expect(stepperSource).toContain("function useNavigationButton");
   });
 
   it("automates registry version releases without npm publishing", async () => {

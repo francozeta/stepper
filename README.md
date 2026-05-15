@@ -47,8 +47,7 @@ Your app owns the workflow. Stepper reflects that workflow in the UI.
 
 ## Development
 
-The registry item is generated from the modular source in
-`components/ui/stepper/*`.
+The registry item is generated from `components/ui/stepper.tsx`.
 
 ```bash
 pnpm registry:build
@@ -72,8 +71,8 @@ Release Please opens release PRs from Conventional Commits on `main`.
 Merging that PR updates `package.json`, `CHANGELOG.md`, the Git tag, and the
 GitHub Release for the registry component.
 
-This repo does not publish to npm. The version tracks the public shadcn registry
-component only.
+This repo does not publish to npm. The version tracks the public beta shadcn
+registry component only.
 
 ## License
 

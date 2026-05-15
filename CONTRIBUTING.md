@@ -24,8 +24,8 @@ production build.
 
 ## Registry Changes
 
-The public registry output is generated from the source files in
-`components/ui/stepper/*` and `registry/default/*`.
+The public registry output is generated from `components/ui/stepper.tsx` and
+`registry/default/*`.
 
 When changing the Stepper component, examples, or registry metadata, run:
 

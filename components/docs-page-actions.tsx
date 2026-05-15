@@ -4,7 +4,6 @@ import { ChevronDown } from "lucide-react";
 
 import { CopyButton } from "@/components/copy-button";
 import { Button } from "@/components/ui/button";
-import { ButtonGroup } from "@/components/ui/button-group";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,7 +39,7 @@ function DocsPageActions({ slug = [], title }: DocsPageActionsProps) {
   };
 
   return (
-    <ButtonGroup>
+    <div role="group" className="flex w-fit items-stretch">
       <CopyButton
         value={copyMarkdown}
         label="Copy Page"
@@ -48,6 +47,7 @@ function DocsPageActions({ slug = [], title }: DocsPageActionsProps) {
         hideLabelOnMobile={false}
         variant="outline"
         size="sm"
+        className="rounded-none! border-white/10 bg-[#050505] text-zinc-300 hover:bg-white/[0.045] hover:text-zinc-100"
       />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -55,42 +55,58 @@ function DocsPageActions({ slug = [], title }: DocsPageActionsProps) {
             type="button"
             variant="outline"
             size="icon-sm"
+            className="rounded-none! border-l-0 border-white/10 bg-[#050505] text-zinc-500 hover:bg-white/[0.045] hover:text-zinc-100"
             aria-label="Open page actions"
           >
             <ChevronDown />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-auto">
-          <DropdownMenuItem asChild>
+        <DropdownMenuContent
+          align="end"
+          className="w-auto rounded-none border-white/10 bg-[#050505] text-zinc-300 shadow-none"
+        >
+          <DropdownMenuItem
+            asChild
+            className="rounded-none hover:bg-white/[0.045] focus:bg-white/[0.045] focus:text-zinc-100"
+          >
             <a href={markdownPath} target="_blank" rel="noreferrer">
-              <FaMarkdown className="size-4 text-muted-foreground" />
+              <FaMarkdown className="size-4 text-zinc-500" />
               View as Markdown
             </a>
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem asChild>
+          <DropdownMenuSeparator className="bg-white/10" />
+          <DropdownMenuItem
+            asChild
+            className="rounded-none hover:bg-white/[0.045] focus:bg-white/[0.045] focus:text-zinc-100"
+          >
             <a href={v0Url} target="_blank" rel="noreferrer">
               <span className="flex size-4 items-center justify-center font-mono text-[0.65rem] font-semibold">
-                <SiV0 className="size-4 text-muted-foreground" />
+                <SiV0 className="size-4 text-zinc-500" />
               </span>
               Open in v0
             </a>
           </DropdownMenuItem>
-          <DropdownMenuItem asChild>
+          <DropdownMenuItem
+            asChild
+            className="rounded-none hover:bg-white/[0.045] focus:bg-white/[0.045] focus:text-zinc-100"
+          >
             <a href={chatGptUrl} target="_blank" rel="noreferrer">
-              <BsOpenai className="size-4 text-muted-foreground" />
+              <BsOpenai className="size-4 text-zinc-500" />
               Open in ChatGPT
             </a>
           </DropdownMenuItem>
-          <DropdownMenuItem asChild>
+          <DropdownMenuItem
+            asChild
+            className="rounded-none hover:bg-white/[0.045] focus:bg-white/[0.045] focus:text-zinc-100"
+          >
             <a href={claudeUrl} target="_blank" rel="noreferrer">
-              <BsClaude className="size-4 text-muted-foreground" />
+              <BsClaude className="size-4 text-zinc-500" />
               Open in Claude
             </a>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-    </ButtonGroup>
+    </div>
   );
 }
 
