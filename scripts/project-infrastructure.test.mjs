@@ -15,6 +15,10 @@ async function readJson(filePath) {
   return JSON.parse(await readText(filePath));
 }
 
+function normalizeLineEndings(value) {
+  return value.replace(/\r\n/g, "\n");
+}
+
 describe("project infrastructure", () => {
   it("declares the registry workspace and Turbo task graph", async () => {
     const vercelIgnore = await readText(".vercelignore");
@@ -101,8 +105,12 @@ describe("project infrastructure", () => {
       (file) => file.target === "components/ui/stepper.tsx"
     )?.content;
 
-    expect(registrySource).toBe(source);
-    expect(publicSource).toBe(source);
+    expect(normalizeLineEndings(registrySource)).toBe(
+      normalizeLineEndings(source)
+    );
+    expect(normalizeLineEndings(publicSource)).toBe(
+      normalizeLineEndings(source)
+    );
     expect(registrySource).toContain("function Stepper(");
     expect(registrySource).toContain("function StepperItem<");
     expect(registrySource).toContain("export type {");
@@ -152,6 +160,7 @@ describe("project infrastructure", () => {
   it("automates registry version releases without npm publishing", async () => {
     const packageJson = await readJson("package.json");
     const releaseWorkflow = await readText(".github/workflows/release-please.yml");
+    const releaseTagWorkflow = await readText(".github/workflows/release-tag.yml");
     const verifyWorkflow = await readText(".github/workflows/verify.yml");
     const releaseConfig = await readJson("release-please-config.json");
     const releaseManifest = await readJson(".release-please-manifest.json");
@@ -163,6 +172,10 @@ describe("project infrastructure", () => {
     );
     expect(releaseWorkflow).not.toContain("NPM_TOKEN");
     expect(releaseWorkflow).not.toContain("npm publish");
+    expect(releaseTagWorkflow).toContain('tags:');
+    expect(releaseTagWorkflow).toContain('"v*.*.*-*"');
+    expect(releaseTagWorkflow).toContain("gh release create");
+    expect(releaseTagWorkflow).toContain("--prerelease");
     expect(verifyWorkflow).toContain("actions/checkout@v6");
     expect(verifyWorkflow).toContain("pnpm/action-setup@v6");
     expect(verifyWorkflow).toContain("actions/setup-node@v6");
@@ -170,6 +183,9 @@ describe("project infrastructure", () => {
 
     expect(releaseConfig).toMatchObject({
       "release-type": "node",
+      versioning: "prerelease",
+      prerelease: true,
+      "prerelease-type": "beta",
       "include-component-in-tag": false,
       "include-v-in-tag": true,
       packages: {

@@ -9,8 +9,14 @@ const checkMode = process.argv.includes("--check");
 
 const stepperSourceFile = "components/ui/stepper.tsx";
 
+function normalizeLineEndings(content) {
+  return content.replace(/\r\n/g, "\n");
+}
+
 async function buildStepperSource() {
-  const source = await readFile(path.join(root, stepperSourceFile), "utf8");
+  const source = normalizeLineEndings(
+    await readFile(path.join(root, stepperSourceFile), "utf8")
+  );
 
   return source.endsWith("\n") ? source : `${source}\n`;
 }
@@ -124,7 +130,7 @@ async function writeOrCheck(filePath, content) {
       throw new Error(`${filePath} is missing. Run pnpm registry:build.`);
     }
 
-    if (currentContent !== content) {
+    if (normalizeLineEndings(currentContent) !== content) {
       throw new Error(`${filePath} is out of date. Run pnpm registry:build.`);
     }
 
@@ -139,9 +145,11 @@ try {
   const registrySource = await buildStepperSource();
   const registryItem = buildRegistryItem();
   const stepperDemoItem = buildStepperDemoItem();
-  const stepperIntentOnboardingSource = await readFile(
-    path.join(root, "components/stepper-intent-onboarding.tsx"),
-    "utf8"
+  const stepperIntentOnboardingSource = normalizeLineEndings(
+    await readFile(
+      path.join(root, "components/stepper-intent-onboarding.tsx"),
+      "utf8"
+    )
   );
   const stepperIntentOnboardingItem = buildStepperIntentOnboardingItem();
 
