@@ -173,9 +173,11 @@ describe("project infrastructure", () => {
     expect(releaseWorkflow).not.toContain("NPM_TOKEN");
     expect(releaseWorkflow).not.toContain("npm publish");
     expect(releaseTagWorkflow).toContain('tags:');
+    expect(releaseTagWorkflow).toContain("branches:");
     expect(releaseTagWorkflow).toContain('"v*.*.*-*"');
     expect(releaseTagWorkflow).toContain("gh release create");
-    expect(releaseTagWorkflow).toContain("--prerelease");
+    expect(releaseTagWorkflow).toContain("prerelease=false");
+    expect(releaseTagWorkflow).toContain("make_latest=true");
     expect(verifyWorkflow).toContain("actions/checkout@v6");
     expect(verifyWorkflow).toContain("pnpm/action-setup@v6");
     expect(verifyWorkflow).toContain("actions/setup-node@v6");
