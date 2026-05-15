@@ -1,12 +1,5 @@
 # Changelog
 
-## [0.9.0-beta.1](https://github.com/francozeta/stepper/compare/v0.9.0-beta.0...v0.9.0-beta.1) (2026-05-15)
-
-
-### Continuous Integration
-
-* promote beta release as latest ([ee3123d](https://github.com/francozeta/stepper/commit/ee3123df9c3d3d7fb0bf3d49ebd61ab3ab196c6a))
-
 ## [0.8.0](https://github.com/francozeta/stepper/compare/v0.7.2...v0.8.0) (2026-05-04)
 
 

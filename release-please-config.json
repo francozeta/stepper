@@ -37,10 +37,6 @@
       "section": "Build System"
     },
     {
-      "type": "ci",
-      "section": "Continuous Integration"
-    },
-    {
       "type": "chore",
       "section": "Maintenance",
       "hidden": true
