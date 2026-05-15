@@ -130,6 +130,10 @@ describe("project infrastructure", () => {
     expect(stepperSource).not.toContain("type FallbackSyncState");
     expect(stepperSource).not.toContain("function shouldSyncFallback");
     expect(stepperSource).not.toContain("fallbackSyncState");
+    expect(stepperSource).not.toContain("compareDocumentPosition");
+    expect(stepperSource).not.toContain("function sortRegisteredSteps");
+    expect(stepperSource).not.toContain("function areRegisteredStepsEqual");
+    expect(stepperSource).not.toContain("stepOrderRef");
   });
 
   it("keeps the single-file Stepper core navigable", async () => {

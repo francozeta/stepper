@@ -218,6 +218,10 @@ function getStepperMarkdown() {
     "",
     codeBlock("text", stepperCompositionTree),
     "",
+    "## Order model",
+    "",
+    "Composed mode registers `StepperItem` primitives in mount order for simple JSX flows. Pass `steps` when a flow is dynamic, conditional, routed, or rendered from data so the order stays explicit.",
+    "",
     "## API Reference",
     "",
     ...apiComponents.map(

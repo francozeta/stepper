@@ -1134,7 +1134,7 @@ const rootProps = [
   {
     name: "steps",
     type: "{ value: string; disabled?: boolean }[]",
-    description: "Optional explicit step list for headless composition. When provided, Stepper uses it instead of registered StepperItem order.",
+    description: "Optional explicit step list for headless, dynamic, or conditional flows. When provided, Stepper uses it instead of composed StepperItem registration order.",
   },
 ];
 
