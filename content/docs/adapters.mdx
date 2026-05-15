@@ -1,0 +1,48 @@
+---
+title: "Adapters"
+description: "Pick the layer that should own form state, validation, animation, or external workflow state around the Stepper primitive."
+eyebrow: "adapters"
+badge: "beta"
+navTitle: "Adapters"
+navIcon: "route"
+---
+
+import { AdapterGrid } from "@/components/adapter-grid";
+import { InfoGrid, Section } from "@/components/docs-content";
+
+<Section
+  title="Pick your adapter"
+  description="Stepper stays focused on progress, state, and accessibility. Adapters connect that primitive to the workflow layer your app already uses."
+>
+  <AdapterGrid />
+</Section>
+
+<Section
+  title="Adapter boundary"
+  description="The adapter should sit around Stepper, not inside it. That keeps the registry component editable and lets each stack stay optional."
+>
+  <InfoGrid
+    items={[
+      {
+        label: "Stepper",
+        value: "progress contract",
+        help: "Owns active step, item state, navigation helpers, ARIA, and composition.",
+      },
+      {
+        label: "Adapter",
+        value: "workflow glue",
+        help: "Maps form state, validation, animation, or store state onto the Stepper API.",
+      },
+      {
+        label: "App",
+        value: "business rules",
+        help: "Owns persistence, routing, backend submission, and product-specific decisions.",
+      },
+    ]}
+  />
+</Section>
+
+<Section
+  title="First adapter"
+  description="React Hook Form is the first real adapter because multi-step flows usually need persistent field values before they need extra visual effects."
+/>

@@ -64,6 +64,24 @@ const markdownDocs: MarkdownDoc[] = [
     body: getApiMarkdown,
   },
   {
+    slug: "adapters",
+    href: "/docs/adapters",
+    title: "Adapters",
+    description:
+      "Pick the integration layer that should own form state, validation, animation, or external workflow state around Stepper.",
+    file: "adapters.mdx",
+    body: getAdaptersMarkdown,
+  },
+  {
+    slug: "adapters/react-hook-form",
+    href: "/docs/adapters/react-hook-form",
+    title: "React Hook Form",
+    description:
+      "Use React Hook Form as the state layer for persistent multi-step inputs while Stepper owns progress and navigation.",
+    file: "adapters/react-hook-form.mdx",
+    body: getReactHookFormAdapterMarkdown,
+  },
+  {
     slug: "examples",
     href: "/docs/examples",
     title: "Examples",
@@ -212,6 +230,10 @@ function getStepperMarkdown() {
     "",
     codeBlock("tsx", stepperUsageSnippet),
     "",
+    "## Examples",
+    "",
+    "### Checkout flow",
+    "",
     codeBlock("tsx", checkoutExampleCode),
     "",
     "## Composition",
@@ -228,6 +250,151 @@ function getStepperMarkdown() {
       (component) =>
         `- \`${component.name}\` (${component.element}): ${component.description}`
     ),
+  ].join("\n");
+}
+
+const reactHookFormAdapterSnippet = `"use client";
+
+import * as React from "react";
+import { FormProvider, useForm, type FieldPath } from "react-hook-form";
+
+import {
+  Stepper,
+  StepperContent,
+  StepperItem,
+  StepperList,
+  StepperNext,
+  StepperPrevious,
+} from "@/components/ui/stepper";
+
+type StepValue = "cart" | "shipping" | "payment";
+
+type CheckoutValues = {
+  email: string;
+  address: string;
+  cardNumber: string;
+};
+
+const steps = [
+  { value: "cart" },
+  { value: "shipping" },
+  { value: "payment" },
+] as const;
+
+const fieldsByStep = {
+  cart: ["email"],
+  shipping: ["address"],
+  payment: ["cardNumber"],
+} satisfies Record<StepValue, FieldPath<CheckoutValues>[]>;
+
+export function CheckoutForm() {
+  const [step, setStep] = React.useState<StepValue>("cart");
+  const form = useForm<CheckoutValues>({
+    defaultValues: {
+      email: "",
+      address: "",
+      cardNumber: "",
+    },
+  });
+
+  async function canContinue() {
+    return form.trigger(fieldsByStep[step]);
+  }
+
+  async function submitCheckout(values: CheckoutValues) {
+    await fetch("/api/checkout", {
+      method: "POST",
+      body: JSON.stringify(values),
+    });
+  }
+
+  return (
+    <FormProvider {...form}>
+      <form onSubmit={form.handleSubmit(submitCheckout)}>
+        <Stepper value={step} onValueChange={setStep} steps={steps}>
+          <StepperList>
+            <StepperItem value="cart">Cart</StepperItem>
+            <StepperItem value="shipping">Shipping</StepperItem>
+            <StepperItem value="payment">Payment</StepperItem>
+          </StepperList>
+
+          <StepperContent value="cart" keepMounted>
+            {/* Cart fields */}
+          </StepperContent>
+          <StepperContent value="shipping" keepMounted>
+            {/* Shipping fields */}
+          </StepperContent>
+          <StepperContent value="payment" keepMounted>
+            {/* Payment fields */}
+          </StepperContent>
+
+          <div className="flex justify-end gap-2">
+            <StepperPrevious />
+            <StepperNext onBeforeNext={canContinue} />
+          </div>
+        </Stepper>
+      </form>
+    </FormProvider>
+  );
+}`;
+
+function getAdaptersMarkdown() {
+  return [
+    "## Pick your adapter",
+    "",
+    "Stepper stays focused on progress, state, and accessibility. Adapters connect that primitive to the workflow layer your app already uses.",
+    "",
+    "- React Hook Form: ready first, for persistent field state across steps.",
+    "- Zod: coming soon, for schema gates before backend handoff.",
+    "- Zustand: coming soon, for external flow state.",
+    "- Framer Motion: coming soon, for transitions and presence.",
+    "- TanStack: coming soon, for server-backed form, query, and mutation flows.",
+    "",
+    "## Adapter boundary",
+    "",
+    "- Stepper: active step, item state, navigation helpers, ARIA, and composition.",
+    "- Adapter: maps form state, validation, animation, or store state onto the Stepper API.",
+    "- App: persistence, routing, backend submission, and product decisions.",
+    "",
+    "## First adapter",
+    "",
+    "React Hook Form is the first real adapter because multi-step flows usually need persistent field values before they need extra visual effects.",
+  ].join("\n");
+}
+
+function getReactHookFormAdapterMarkdown() {
+  return [
+    "## Adapter role",
+    "",
+    "React Hook Form owns field values and form lifecycle. Stepper receives the active step and exposes next/previous controls.",
+    "",
+    "- Form: keeps values mounted across steps and prepares the final payload.",
+    "- Stepper: reflects where the user is and moves only when the adapter allows it.",
+    "- Backend: receives one validated payload instead of scattered step-local data.",
+    "",
+    "## State model",
+    "",
+    "Keep Stepper controlled by local flow state, and keep the form provider above the step content so values are not lost when panels unmount.",
+    "",
+    codeBlock("tsx", reactHookFormAdapterSnippet),
+    "",
+    "## Validation boundary",
+    "",
+    "Use `onBeforeNext` for step-level validation. The guard can be async, so it works with React Hook Form `trigger`, remote checks, and save-before-continue flows.",
+    "",
+    codeBlock(
+      "ts",
+      `async function canContinue() {
+  const fields = fieldsByStep[step];
+  const isValid = await form.trigger(fields);
+
+  return isValid;
+}`
+    ),
+    "",
+    "## Production note",
+    "",
+    "Use `keepMounted` for fields that must preserve local state, or keep field state in React Hook Form with stable `defaultValues`. Submit the final payload from the form, not from each `StepperContent` panel.",
   ].join("\n");
 }
 

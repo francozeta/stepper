@@ -6,9 +6,10 @@
     "stepper",
     "api",
     "examples",
+    "---Adapters---",
+    "adapters",
+    "adapters/react-hook-form",
     "---Guides---",
-    "forms",
-    "patterns",
     "styling",
     "---Updates---",
     "changelog"

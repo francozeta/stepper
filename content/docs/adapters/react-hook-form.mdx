@@ -1,0 +1,152 @@
+---
+title: "React Hook Form"
+description: "Use React Hook Form as the state layer for persistent multi-step inputs while Stepper owns progress and navigation."
+eyebrow: "adapter"
+badge: "beta"
+navTitle: "React Hook Form"
+navIcon: "file-check"
+---
+
+import { CodeBlock, InfoGrid, Section } from "@/components/docs-content";
+
+<Section
+  title="Adapter role"
+  description="React Hook Form should own field values and form lifecycle. Stepper should only receive the active step and expose the next/previous controls."
+>
+  <InfoGrid
+    items={[
+      {
+        label: "Form",
+        value: "field state",
+        help: "Keeps values mounted across steps and prepares the final payload.",
+      },
+      {
+        label: "Stepper",
+        value: "progress state",
+        help: "Reflects where the user is and moves only when the adapter allows it.",
+      },
+      {
+        label: "Backend",
+        value: "final submit",
+        help: "Receives one validated payload instead of scattered step-local data.",
+      },
+    ]}
+  />
+</Section>
+
+<Section
+  title="State model"
+  description="Keep Stepper controlled by local flow state, and keep the form provider above the step content so values are not lost when panels unmount."
+>
+  <CodeBlock
+    filename="checkout-form.tsx"
+    code={`"use client";
+
+import * as React from "react";
+import { FormProvider, useForm, type FieldPath } from "react-hook-form";
+
+import {
+  Stepper,
+  StepperContent,
+  StepperItem,
+  StepperList,
+  StepperNext,
+  StepperPrevious,
+} from "@/components/ui/stepper";
+
+type StepValue = "cart" | "shipping" | "payment";
+
+type CheckoutValues = {
+  email: string;
+  address: string;
+  cardNumber: string;
+};
+
+const steps = [
+  { value: "cart" },
+  { value: "shipping" },
+  { value: "payment" },
+] as const;
+
+const fieldsByStep = {
+  cart: ["email"],
+  shipping: ["address"],
+  payment: ["cardNumber"],
+} satisfies Record<StepValue, FieldPath<CheckoutValues>[]>;
+
+export function CheckoutForm() {
+  const [step, setStep] = React.useState<StepValue>("cart");
+  const form = useForm<CheckoutValues>({
+    defaultValues: {
+      email: "",
+      address: "",
+      cardNumber: "",
+    },
+  });
+
+  async function canContinue() {
+    return form.trigger(fieldsByStep[step]);
+  }
+
+  async function submitCheckout(values: CheckoutValues) {
+    await fetch("/api/checkout", {
+      method: "POST",
+      body: JSON.stringify(values),
+    });
+  }
+
+  return (
+    <FormProvider {...form}>
+      <form onSubmit={form.handleSubmit(submitCheckout)}>
+        <Stepper
+          value={step}
+          onValueChange={setStep}
+          steps={steps}
+        >
+          <StepperList>
+            <StepperItem value="cart">Cart</StepperItem>
+            <StepperItem value="shipping">Shipping</StepperItem>
+            <StepperItem value="payment">Payment</StepperItem>
+          </StepperList>
+
+          <StepperContent value="cart" keepMounted>
+            {/* Cart fields */}
+          </StepperContent>
+          <StepperContent value="shipping" keepMounted>
+            {/* Shipping fields */}
+          </StepperContent>
+          <StepperContent value="payment" keepMounted>
+            {/* Payment fields */}
+          </StepperContent>
+
+          <div className="flex justify-end gap-2">
+            <StepperPrevious />
+            <StepperNext onBeforeNext={canContinue} />
+          </div>
+        </Stepper>
+      </form>
+    </FormProvider>
+  );
+}`}
+  />
+</Section>
+
+<Section
+  title="Validation boundary"
+  description="Use onBeforeNext for step-level validation. The guard can be async, so it works with React Hook Form trigger, remote checks, and save-before-continue flows."
+>
+  <CodeBlock
+    filename="step-validation.ts"
+    code={`async function canContinue() {
+  const fields = fieldsByStep[step];
+  const isValid = await form.trigger(fields);
+
+  return isValid;
+}`}
+  />
+</Section>
+
+<Section
+  title="Production note"
+  description="Use keepMounted for fields that must preserve local state, or keep the field state in React Hook Form with stable defaultValues. Submit the final payload from the form, not from each StepperContent panel."
+/>
