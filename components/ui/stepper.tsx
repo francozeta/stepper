@@ -35,8 +35,6 @@ type StepperStepsValue<TSteps extends readonly StepperStepInput[]> =
 type RegisteredStep<TValue extends StepperValue = StepperValue> =
   StepperStep<TValue> & {
     id: string;
-    element: HTMLLIElement | null;
-    order: number;
   };
 
 type StepperNavigationGuard = () => boolean | Promise<boolean>;
@@ -71,7 +69,7 @@ type StepperItemApi<TValue extends StepperValue = StepperValue> = {
 type StepperContextValue<TValue extends StepperValue = StepperValue> =
   StepperApi<TValue> & {
     isExplicitMode: boolean;
-    registerStep: (step: Omit<RegisteredStep, "order">) => void;
+    registerStep: (step: RegisteredStep) => void;
     unregisterStep: (id: string) => void;
     getTriggerId: (value: TValue) => string;
     getContentId: (value: TValue) => string;
@@ -245,53 +243,6 @@ function getPreviousEnabledStep<TValue extends StepperValue>(
     .find((step) => !step.disabled);
 }
 
-function sortRegisteredSteps(steps: RegisteredStep[]) {
-  return [...steps].sort((firstStep, secondStep) => {
-    const firstElement = firstStep.element;
-    const secondElement = secondStep.element;
-
-    if (
-      firstElement &&
-      secondElement &&
-      firstElement !== secondElement &&
-      typeof Node !== "undefined"
-    ) {
-      const position = firstElement.compareDocumentPosition(secondElement);
-
-      if (position & Node.DOCUMENT_POSITION_FOLLOWING) {
-        return -1;
-      }
-
-      if (position & Node.DOCUMENT_POSITION_PRECEDING) {
-        return 1;
-      }
-    }
-
-    return firstStep.order - secondStep.order;
-  });
-}
-
-function areRegisteredStepsEqual(
-  firstSteps: RegisteredStep[],
-  secondSteps: RegisteredStep[]
-) {
-  if (firstSteps.length !== secondSteps.length) {
-    return false;
-  }
-
-  return firstSteps.every((step, index) => {
-    const nextStep = secondSteps[index];
-
-    return (
-      step.id === nextStep.id &&
-      step.value === nextStep.value &&
-      step.disabled === nextStep.disabled &&
-      step.element === nextStep.element &&
-      step.order === nextStep.order
-    );
-  });
-}
-
 function getKeyboardNavigationStepValue<TValue extends StepperValue>({
   key,
   orientation,
@@ -391,36 +342,32 @@ function useRegisteredSteps() {
   const [registeredSteps, setRegisteredSteps] = React.useState<
     RegisteredStep[]
   >([]);
-  const stepOrderRef = React.useRef(0);
 
-  const registerStep = React.useCallback(
-    (step: Omit<RegisteredStep, "order">) => {
-      setRegisteredSteps((currentSteps) => {
-        if (currentSteps.length === 0) {
-          stepOrderRef.current = 0;
-        }
+  const registerStep = React.useCallback((step: RegisteredStep) => {
+    setRegisteredSteps((currentSteps) => {
+      const existingStepIndex = currentSteps.findIndex(
+        (currentStep) => currentStep.id === step.id
+      );
 
-        const existingStep = currentSteps.find(
-          (currentStep) => currentStep.id === step.id
-        );
-        const nextStepRecord: RegisteredStep = {
-          ...step,
-          order: existingStep?.order ?? stepOrderRef.current++,
-        };
-        const nextSteps = sortRegisteredSteps([
-          ...currentSteps.filter(
-            (currentStep) => currentStep.id !== step.id
-          ),
-          nextStepRecord,
-        ]);
+      if (existingStepIndex === -1) {
+        return [...currentSteps, step];
+      }
 
-        return areRegisteredStepsEqual(currentSteps, nextSteps)
-          ? currentSteps
-          : nextSteps;
-      });
-    },
-    []
-  );
+      const existingStep = currentSteps[existingStepIndex];
+
+      if (
+        existingStep.value === step.value &&
+        existingStep.disabled === step.disabled
+      ) {
+        return currentSteps;
+      }
+
+      const nextSteps = [...currentSteps];
+      nextSteps[existingStepIndex] = step;
+
+      return nextSteps;
+    });
+  }, []);
 
   const unregisterStep = React.useCallback((stepId: string) => {
     setRegisteredSteps((currentSteps) =>
@@ -809,7 +756,6 @@ function StepperItem<TValue extends StepperValue = StepperValue>({
     getContentId,
   } = useStepperContext("StepperItem");
   const registrationId = React.useId();
-  const itemRef = React.useRef<HTMLLIElement>(null);
   const isInsideStepperList = useStepperListContext();
   const index = getStepIndex(value);
   const step = getStepByValue(steps, value);
@@ -848,7 +794,6 @@ function StepperItem<TValue extends StepperValue = StepperValue>({
       id: registrationId,
       value,
       disabled,
-      element: itemRef.current,
     });
 
     return () => unregisterStep(registrationId);
@@ -887,7 +832,7 @@ function StepperItem<TValue extends StepperValue = StepperValue>({
 
     const timeout = window.setTimeout(() => {
       warnDev(
-        `StepperItem with value "${value}" could not be found in the Stepper order. Check that it is rendered inside StepperList and not hidden behind an unsupported wrapper.`
+        `StepperItem with value "${value}" could not be found in the Stepper order. Check that it is rendered inside StepperList. For dynamic or conditional step order, pass an explicit steps prop to Stepper.`
       );
     }, 0);
 
@@ -923,7 +868,6 @@ function StepperItem<TValue extends StepperValue = StepperValue>({
 
   return (
     <li
-      ref={itemRef}
       data-slot="stepper-item"
       data-orientation={orientation}
       data-state={stepState}
