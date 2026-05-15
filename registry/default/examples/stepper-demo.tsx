@@ -77,6 +77,8 @@ export default function StepperDemo() {
               key={step.value}
               value={step.value}
               completed={index < 1}
+              defaultTrigger={false}
+              separator={false}
             >
               <StepperTrigger>
                 <StepperIndicator />

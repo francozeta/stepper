@@ -83,6 +83,47 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  --animate-first: move-vertical 28s ease infinite;
+  --animate-second: move-in-circle 24s reverse infinite;
+  --animate-third: move-in-circle 32s linear infinite;
+  --animate-fourth: move-horizontal 30s ease infinite;
+  --animate-fifth: move-in-circle 22s ease infinite;
+}
+
+@keyframes move-horizontal {
+  0%,
+  100% {
+    transform: translateX(-18%);
+  }
+
+  50% {
+    transform: translateX(18%);
+  }
+}
+
+@keyframes move-in-circle {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  50% {
+    transform: rotate(180deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes move-vertical {
+  0%,
+  100% {
+    transform: translateY(-12%);
+  }
+
+  50% {
+    transform: translateY(12%);
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -123,6 +164,91 @@
 
 body {
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+.stepper-home-title {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2.625rem, 9vw, 4rem);
+  line-height: 0.9;
+}
+
+.docs-page-title {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2.5rem, 6vw, 4.25rem);
+  line-height: 0.92;
+}
+
+.stepper-home-frame {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.stepper-home-side-pattern {
+  --grid-line-color: rgba(255, 255, 255, 0.105);
+  display: none;
+  height: 100%;
+  border-inline: 1px solid rgba(255, 255, 255, 0.13);
+  background-color: #050505;
+  background-image: repeating-linear-gradient(
+    315deg,
+    var(--grid-line-color) 0,
+    var(--grid-line-color) 1px,
+    transparent 0,
+    transparent 50%
+  );
+  background-attachment: fixed;
+  background-size: 10px 10px;
+}
+
+.stepper-docs-side-pattern {
+  --grid-line-color: rgba(255, 255, 255, 0.085);
+  min-height: 100%;
+  border-inline: 1px solid var(--grid-line-color);
+  background-color: #050505;
+  background-image: repeating-linear-gradient(
+    315deg,
+    var(--grid-line-color) 0,
+    var(--grid-line-color) 1px,
+    transparent 0,
+    transparent 50%
+  );
+  background-attachment: fixed;
+  background-size: 10px 10px;
+}
+
+@media (min-width: 640px) {
+  .stepper-home-frame {
+    grid-template-columns: 2.25rem minmax(0, 1fr) 2.25rem;
+  }
+
+  .stepper-home-side-pattern {
+    display: block;
+  }
+}
+
+* {
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+  scrollbar-width: thin;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.28);
+  background-clip: content-box;
 }
 
 .docs-scrollbar {

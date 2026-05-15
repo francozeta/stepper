@@ -35,10 +35,10 @@ describe("release and AI documentation surfaces", () => {
     const changelogList = await readText("components/changelog-list.tsx");
     const releases = await readText("lib/releases.ts");
 
-    expect(packageJson.version).toMatch(/^\d+\.\d+\.\d+$/);
+    expect(packageJson.version).toMatch(/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/);
     expect(releases).toContain("version: registryVersion");
     expect(releases).toContain("/releases/tag/v${registryVersion}");
-    expect(changelogList).toContain("current");
+    expect(changelogList).toContain("beta");
   });
 
   it("keeps public docs registry-only", async () => {
@@ -46,7 +46,7 @@ describe("release and AI documentation surfaces", () => {
       [
         "README.md",
         "content/docs/index.mdx",
-        "content/docs/getting-started.mdx",
+        "content/docs/installation.mdx",
         "content/docs/styling.mdx",
         "lib/docs-markdown.ts",
       ].map((filePath) => readText(filePath))
@@ -139,7 +139,8 @@ describe("release and AI documentation surfaces", () => {
     expect(actions).not.toContain("window.location.href");
     expect(navigation).toContain("source.getPageTree()");
     expect(sidebar).toContain("shouldScaleBackground={false}");
-    expect(sidebar).toContain("bg-gradient-to-r");
+    expect(sidebar).toContain("after:bg-white/10");
+    expect(sidebar).not.toContain("after:bg-gradient-to-r");
     expect(sidebar).not.toContain("border-dashed");
     expect(toc).toContain("MutationObserver");
     expect(toc).toContain("border-l border-border");

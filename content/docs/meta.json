@@ -2,7 +2,14 @@
   "pages": [
     "---Core---",
     "index",
+    "installation",
+    "stepper",
+    "api",
     "examples",
+    "---Guides---",
+    "forms",
+    "patterns",
+    "styling",
     "---Updates---",
     "changelog"
   ]

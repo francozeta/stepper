@@ -1,6 +1,6 @@
 import * as React from "react";
 import Link from "next/link";
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { axe } from "jest-axe";
 import { describe, expect, it, vi } from "vitest";
@@ -17,6 +17,7 @@ import {
   StepperPrevious,
   StepperTrigger,
   useStepper,
+  useStepperItem,
   type StepperItemProps,
 } from "@/components/ui/stepper";
 
@@ -48,6 +49,10 @@ function BasicStepper({
       <StepperContent value="payment">Payment content</StepperContent>
     </Stepper>
   );
+}
+
+async function waitForSettledEffects() {
+  await new Promise((resolve) => setTimeout(resolve, 20));
 }
 
 describe("Stepper", () => {
@@ -109,16 +114,57 @@ describe("Stepper", () => {
     ).toHaveTextContent("3");
   });
 
-  it("falls back to the first enabled step when the controlled value is missing", async () => {
+  it("exposes item state for custom composed indicators", async () => {
+    function ItemState() {
+      const { index, isActive, stepPosition, stepState, value } =
+        useStepperItem();
+
+      return (
+        <span data-testid={`item-state-${value}`}>
+          {index}:{stepPosition}:{stepState}:{String(isActive)}
+        </span>
+      );
+    }
+
+    render(
+      <Stepper defaultValue="profile">
+        <StepperList>
+          <StepperItem value="account" defaultTrigger={false}>
+            <ItemState />
+          </StepperItem>
+          <StepperItem value="profile" defaultTrigger={false}>
+            <ItemState />
+          </StepperItem>
+          <StepperItem value="payment" defaultTrigger={false}>
+            <ItemState />
+          </StepperItem>
+        </StepperList>
+      </Stepper>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("item-state-account")).toHaveTextContent(
+        "0:previous:inactive:false"
+      );
+      expect(screen.getByTestId("item-state-profile")).toHaveTextContent(
+        "1:current:active:true"
+      );
+      expect(screen.getByTestId("item-state-payment")).toHaveTextContent(
+        "2:next:inactive:false"
+      );
+    });
+  });
+
+  it("falls back to the first enabled step without syncing a missing controlled value", async () => {
     const onValueChange = vi.fn();
 
     render(<BasicStepper value="missing" onValueChange={onValueChange} />);
 
     expect(screen.getByText("Account content")).toBeVisible();
 
-    await waitFor(() => {
-      expect(onValueChange).toHaveBeenCalledWith("account");
-    });
+    await waitForSettledEffects();
+
+    expect(onValueChange).not.toHaveBeenCalled();
   });
 
   it("falls back to the first enabled step when defaultValue is missing", () => {
@@ -130,7 +176,7 @@ describe("Stepper", () => {
     ).toHaveAttribute("aria-current", "step");
   });
 
-  it("syncs a controlled value away from a step that becomes disabled", async () => {
+  it("falls back visually when a controlled step becomes disabled", async () => {
     const user = userEvent.setup();
 
     function ControlledStepper() {
@@ -164,12 +210,14 @@ describe("Stepper", () => {
     await user.click(screen.getByRole("button", { name: "Disable profile" }));
 
     await waitFor(() => {
-      expect(screen.getByTestId("current-value")).toHaveTextContent("account");
+      expect(screen.getByText("Account content")).toBeVisible();
     });
-    expect(screen.getByText("Account content")).toBeVisible();
+    await waitForSettledEffects();
+
+    expect(screen.getByTestId("current-value")).toHaveTextContent("profile");
   });
 
-  it("syncs a controlled value away from a wrapped step that becomes disabled", async () => {
+  it("falls back visually when a wrapped controlled step becomes disabled", async () => {
     const user = userEvent.setup();
 
     const WrappedStep = React.memo(function WrappedStep(
@@ -211,10 +259,13 @@ describe("Stepper", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId("wrapped-current-value")).toHaveTextContent(
-        "account"
-      );
+      expect(screen.getByText("Account content")).toBeVisible();
     });
+    await waitForSettledEffects();
+
+    expect(screen.getByTestId("wrapped-current-value")).toHaveTextContent(
+      "profile"
+    );
   });
 
   it("can select a wrapped step in the same update that enables it", async () => {
@@ -418,11 +469,48 @@ describe("Stepper", () => {
     warn.mockRestore();
   });
 
+  it("does not count StepperItems rendered outside StepperList", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    function StepperStatus() {
+      const { totalSteps } = useStepper();
+
+      return <output data-testid="outside-list-total">{totalSteps}</output>;
+    }
+
+    render(
+      <Stepper defaultValue="account">
+        <StepperList>
+          <StepperItem value="account">Account</StepperItem>
+        </StepperList>
+
+        <StepperItem value="account">Outside duplicate</StepperItem>
+        <StepperStatus />
+      </Stepper>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("outside-list-total")).toHaveTextContent("1");
+    });
+    await waitFor(() => {
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringContaining(
+          'StepperItem with value "account" must be rendered inside StepperList'
+        )
+      );
+    });
+    expect(warn).not.toHaveBeenCalledWith(
+      expect.stringContaining('StepperItem value "account" is duplicated')
+    );
+
+    warn.mockRestore();
+  });
+
   it("does not render a fallback trigger when primitives are nested inside wrappers", () => {
     render(
       <Stepper defaultValue="account">
         <StepperList>
-          <StepperItem value="account">
+          <StepperItem value="account" defaultTrigger={false}>
             <div>
               <StepperTrigger>
                 <StepperIndicator />
@@ -446,7 +534,7 @@ describe("Stepper", () => {
       <Stepper defaultValue="account">
         <StepperList>
           <StepperItem value="account">Account</StepperItem>
-          <StepperItem value="payment" disabled>
+          <StepperItem value="payment" defaultTrigger={false} disabled>
             <StepperTrigger asChild>
               <a href="https://example.com/payment">Payment</a>
             </StepperTrigger>
@@ -476,7 +564,7 @@ describe("Stepper", () => {
       <Stepper defaultValue="account">
         <StepperList>
           <StepperItem value="account">Account</StepperItem>
-          <StepperItem value="payment" disabled>
+          <StepperItem value="payment" defaultTrigger={false} disabled>
             <StepperTrigger asChild>
               <Link href="/payment">Payment</Link>
             </StepperTrigger>
@@ -512,7 +600,7 @@ describe("Stepper", () => {
     render(
       <Stepper defaultValue="workspace" orientation="vertical">
         <StepperList>
-          <StepperItem value="workspace">
+          <StepperItem value="workspace" defaultTrigger={false}>
             <StepperTrigger>
               <StepperIndicator />
               <span>
@@ -649,6 +737,142 @@ describe("Stepper", () => {
     );
   });
 
+  it("supports an explicit steps prop for headless composition", async () => {
+    const user = userEvent.setup();
+
+    function StepperStatus() {
+      const { value, steps, totalSteps, canGoNext, goNext } = useStepper();
+
+      return (
+        <div>
+          <output data-testid="headless-value">{value}</output>
+          <output data-testid="headless-total">{totalSteps}</output>
+          <output data-testid="headless-steps">
+            {steps
+              .map((step) => `${step.value}:${step.disabled ? "off" : "on"}`)
+              .join(",")}
+          </output>
+          <button type="button" disabled={!canGoNext} onClick={goNext}>
+            Continue
+          </button>
+        </div>
+      );
+    }
+
+    render(
+      <Stepper
+        defaultValue="account"
+        steps={[
+          { value: "account" },
+          { value: "profile" },
+          { value: "payment", disabled: true },
+        ]}
+      >
+        <StepperContent value="account">Account content</StepperContent>
+        <StepperContent value="profile">Profile content</StepperContent>
+        <StepperContent value="payment">Payment content</StepperContent>
+
+        <StepperStatus />
+      </Stepper>
+    );
+
+    expect(screen.getByTestId("headless-value")).toHaveTextContent("account");
+    expect(screen.getByTestId("headless-total")).toHaveTextContent("3");
+    expect(screen.getByTestId("headless-steps")).toHaveTextContent(
+      "account:on,profile:on,payment:off"
+    );
+
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+
+    expect(screen.getByTestId("headless-value")).toHaveTextContent("profile");
+    expect(screen.getByText("Profile content")).toBeVisible();
+    expect(screen.getByRole("button", { name: "Continue" })).toBeDisabled();
+  });
+
+  it("uses explicit steps as the source of truth over rendered item props", async () => {
+    const user = userEvent.setup();
+
+    function StepperStatus() {
+      const { steps, canGoNext } = useStepper();
+
+      return (
+        <>
+          <output data-testid="explicit-steps">
+            {steps
+              .map((step) => `${step.value}:${step.disabled ? "off" : "on"}`)
+              .join(",")}
+          </output>
+          <output data-testid="explicit-can-go-next">
+            {String(canGoNext)}
+          </output>
+        </>
+      );
+    }
+
+    render(
+      <Stepper
+        defaultValue="account"
+        steps={[{ value: "account" }, { value: "profile" }]}
+      >
+        <StepperList>
+          <StepperItem value="account">Account</StepperItem>
+          <StepperItem value="profile" disabled>
+            Profile
+          </StepperItem>
+        </StepperList>
+
+        <StepperContent value="account">Account content</StepperContent>
+        <StepperContent value="profile">Profile content</StepperContent>
+
+        <StepperStatus />
+        <StepperNext>Continue</StepperNext>
+      </Stepper>
+    );
+
+    expect(screen.getByTestId("explicit-steps")).toHaveTextContent(
+      "account:on,profile:on"
+    );
+    expect(screen.getByTestId("explicit-can-go-next")).toHaveTextContent(
+      "true"
+    );
+
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+
+    expect(screen.getByText("Profile content")).toBeVisible();
+  });
+
+  it("keeps inactive content mounted with keepMounted", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <Stepper defaultValue="account">
+        <StepperList>
+          <StepperItem value="account">Account</StepperItem>
+          <StepperItem value="profile">Profile</StepperItem>
+        </StepperList>
+
+        <StepperContent value="account" keepMounted>
+          Account content
+        </StepperContent>
+        <StepperContent value="profile" keepMounted>
+          Profile content
+        </StepperContent>
+
+        <StepperNext>Continue</StepperNext>
+      </Stepper>
+    );
+
+    const profileContent = screen.getByText("Profile content");
+    const profilePanel = profileContent.closest('[data-slot="stepper-content"]');
+
+    expect(profileContent).toBeInTheDocument();
+    expect(profilePanel).toHaveAttribute("hidden");
+
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+
+    expect(profilePanel).not.toHaveAttribute("hidden");
+  });
+
   it("runs an async guard before moving to the next step", async () => {
     const user = userEvent.setup();
     const onBeforeNext = vi.fn().mockResolvedValue(false);
@@ -672,6 +896,43 @@ describe("Stepper", () => {
     expect(onBeforeNext).toHaveBeenCalledOnce();
     expect(screen.getByText("Account content")).toBeVisible();
     expect(screen.queryByText("Profile content")).not.toBeInTheDocument();
+  });
+
+  it("runs an async next guard once for rapid repeated clicks", async () => {
+    let resolveGuard: ((value: boolean) => void) | undefined;
+    const onBeforeNext = vi.fn(
+      () =>
+        new Promise<boolean>((resolve) => {
+          resolveGuard = resolve;
+        })
+    );
+
+    render(
+      <Stepper defaultValue="account">
+        <StepperList>
+          <StepperItem value="account">Account</StepperItem>
+          <StepperItem value="profile">Profile</StepperItem>
+        </StepperList>
+
+        <StepperContent value="account">Account content</StepperContent>
+        <StepperContent value="profile">Profile content</StepperContent>
+
+        <StepperNext onBeforeNext={onBeforeNext}>Continue</StepperNext>
+      </Stepper>
+    );
+
+    const button = screen.getByRole("button", { name: "Continue" });
+
+    fireEvent.click(button);
+    fireEvent.click(button);
+
+    expect(onBeforeNext).toHaveBeenCalledOnce();
+
+    resolveGuard?.(true);
+
+    await waitFor(() => {
+      expect(screen.getByText("Profile content")).toBeVisible();
+    });
   });
 
   it("moves focus between triggers with keyboard navigation without changing the current step", async () => {
@@ -711,13 +972,13 @@ describe("Stepper", () => {
     const { container } = render(
       <Stepper defaultValue="account">
         <StepperList>
-          <StepperItem value="account">
+          <StepperItem value="account" defaultTrigger={false}>
             <StepperTrigger>
               <StepperIndicator />
               <StepperLabel>Account</StepperLabel>
             </StepperTrigger>
           </StepperItem>
-          <StepperItem value="profile">
+          <StepperItem value="profile" defaultTrigger={false}>
             <StepperTrigger>
               <StepperIndicator />
               <StepperLabel>Profile</StepperLabel>
@@ -730,6 +991,31 @@ describe("Stepper", () => {
     expect(
       container.querySelectorAll('[data-slot="stepper-separator"]')
     ).toHaveLength(1);
+  });
+
+  it("lets consumers opt out of the default separator explicitly", () => {
+    const { container } = render(
+      <Stepper defaultValue="account">
+        <StepperList>
+          <StepperItem value="account" defaultTrigger={false} separator={false}>
+            <StepperTrigger>
+              <StepperIndicator />
+              <StepperLabel>Account</StepperLabel>
+            </StepperTrigger>
+          </StepperItem>
+          <StepperItem value="profile" defaultTrigger={false}>
+            <StepperTrigger>
+              <StepperIndicator />
+              <StepperLabel>Profile</StepperLabel>
+            </StepperTrigger>
+          </StepperItem>
+        </StepperList>
+      </Stepper>
+    );
+
+    expect(
+      container.querySelectorAll('[data-slot="stepper-separator"]')
+    ).toHaveLength(0);
   });
 
   it("handles a stepper where every step is disabled", () => {

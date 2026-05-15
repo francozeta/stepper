@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
-import { DocsShell } from "@/components/docs-shell";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { siteConfig } from "@/lib/site";
 import "./globals.css";
@@ -66,7 +65,7 @@ export default function RootLayout({
     >
       <body className="min-h-full font-sans">
         <TooltipProvider>
-          <DocsShell>{children}</DocsShell>
+          {children}
         </TooltipProvider>
         <Analytics />
       </body>

@@ -13,7 +13,7 @@ const quickFacts = [
 ];
 
 const releaseItems = [
-  "The registry output is generated from components/ui/stepper/*.",
+  "The registry output is generated from components/ui/stepper.tsx.",
   "GitHub Actions verifies the registry, docs, tests, and production build.",
   "The public install command copies @stepper/stepper from the official shadcn registry namespace.",
   "The component is copied into the user's app instead of installed as a runtime dependency.",
@@ -82,6 +82,49 @@ const usageSnippet = `import {
 } from "@/components/ui/stepper";`;
 
 const registryInstallSnippet = `pnpm dlx shadcn@latest add @stepper/stepper`;
+
+const registryInstallCommands = {
+  pnpm: registryInstallSnippet,
+  npm: "npx shadcn@latest add @stepper/stepper",
+  yarn: "yarn dlx shadcn@latest add @stepper/stepper",
+  bun: "bunx shadcn@latest add @stepper/stepper",
+};
+
+const stepperUsageSnippet = `import {
+  Stepper,
+  StepperContent,
+  StepperDescription,
+  StepperIndicator,
+  StepperItem,
+  StepperLabel,
+  StepperList,
+  StepperNext,
+  StepperPrevious,
+  StepperTrigger,
+  useStepperItem,
+} from "@/components/ui/stepper";`;
+
+const stepperBasicSnippet = `<Stepper defaultValue="profile">
+  <StepperList>
+    <StepperItem value="account" completed>
+      <StepperIndicator />
+      <StepperLabel>Step 1</StepperLabel>
+    </StepperItem>
+    <StepperItem value="profile">
+      <StepperIndicator />
+      <StepperLabel>Step 2</StepperLabel>
+    </StepperItem>
+    <StepperItem value="review">
+      <StepperIndicator />
+      <StepperLabel>Step 3</StepperLabel>
+    </StepperItem>
+  </StepperList>
+
+  <div className="mt-6 flex justify-center gap-2">
+    <StepperPrevious>Previous</StepperPrevious>
+    <StepperNext>Next</StepperNext>
+  </div>
+</Stepper>`;
 
 const whyStepper = [
   {
@@ -333,6 +376,7 @@ export function SetupRoutes({
               key={step.value}
               value={step.value}
               completed={completed}
+              defaultTrigger={false}
               disabled={disabled}
             >
               <StepperTrigger asChild>
@@ -643,6 +687,7 @@ export function WorkspaceSetup() {
         <StepperItem
           value="workspace"
           completed={completed.workspace}
+          defaultTrigger={false}
           error={attempted.workspace && !completed.workspace}
         >
           <StepperTrigger>
@@ -650,19 +695,19 @@ export function WorkspaceSetup() {
             <StepperLabel>Workspace</StepperLabel>
           </StepperTrigger>
         </StepperItem>
-        <StepperItem value="preferences" completed={completed.preferences} disabled={!completed.workspace}>
+        <StepperItem value="preferences" completed={completed.preferences} defaultTrigger={false} disabled={!completed.workspace}>
           <StepperTrigger>
             <StepperIndicator>{completed.workspace ? <Settings2 /> : <Lock />}</StepperIndicator>
             <StepperLabel>Preferences</StepperLabel>
           </StepperTrigger>
         </StepperItem>
-        <StepperItem value="members" completed={completed.members} disabled={!completed.preferences}>
+        <StepperItem value="members" completed={completed.members} defaultTrigger={false} disabled={!completed.preferences}>
           <StepperTrigger>
             <StepperIndicator>{completed.preferences ? <Users /> : <Lock />}</StepperIndicator>
             <StepperLabel>Members</StepperLabel>
           </StepperTrigger>
         </StepperItem>
-        <StepperItem value="review" disabled={!completed.members}>
+        <StepperItem value="review" defaultTrigger={false} disabled={!completed.members}>
           <StepperTrigger>
             <StepperIndicator><Send /></StepperIndicator>
             <StepperLabel>Review</StepperLabel>
@@ -760,11 +805,13 @@ export function WorkspaceSetup() {
   );
 }`;
 
-const checkoutExampleCode = `import { Check, CreditCard, Truck } from "lucide-react";
+const checkoutExampleCode = `import * as React from "react";
+import { Check, CreditCard, ShoppingCart, Truck } from "lucide-react";
 
 import {
   Stepper,
   StepperContent,
+  StepperDescription,
   StepperIndicator,
   StepperItem,
   StepperLabel,
@@ -772,36 +819,41 @@ import {
   StepperNext,
   StepperPrevious,
   StepperTrigger,
+  useStepperItem,
 } from "@/components/ui/stepper";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+
+type StepValue = "cart" | "shipping" | "payment";
 
 export function CheckoutFlow() {
+  const [value, setValue] = React.useState<StepValue>("cart");
+  const [showLabels, setShowLabels] = React.useState(true);
+
   return (
-    <Stepper defaultValue="shipping">
+    <Stepper value={value} onValueChange={(next) => setValue(next as StepValue)}>
       <StepperList>
-        <StepperItem value="cart" completed>
-          <StepperTrigger>
-            <StepperIndicator>
-              <Check />
-            </StepperIndicator>
-            <StepperLabel>Cart</StepperLabel>
-          </StepperTrigger>
-        </StepperItem>
-        <StepperItem value="shipping">
-          <StepperTrigger>
-            <StepperIndicator>
-              <Truck />
-            </StepperIndicator>
-            <StepperLabel>Shipping</StepperLabel>
-          </StepperTrigger>
-        </StepperItem>
-        <StepperItem value="payment" disabled>
-          <StepperTrigger>
-            <StepperIndicator>
-              <CreditCard />
-            </StepperIndicator>
-            <StepperLabel>Payment</StepperLabel>
-          </StepperTrigger>
-        </StepperItem>
+        <CheckoutStep
+          value="cart"
+          title="Cart"
+          description="Review items"
+          icon={ShoppingCart}
+          showLabels={showLabels}
+        />
+        <CheckoutStep
+          value="shipping"
+          title="Shipping"
+          description="Delivery details"
+          icon={Truck}
+          showLabels={showLabels}
+        />
+        <CheckoutStep
+          value="payment"
+          title="Payment"
+          description="Secure checkout"
+          icon={CreditCard}
+          showLabels={showLabels}
+        />
       </StepperList>
 
       <StepperContent value="cart">Review selected products.</StepperContent>
@@ -810,9 +862,60 @@ export function CheckoutFlow() {
 
       <div className="mt-6 flex justify-between">
         <StepperPrevious />
-        <StepperNext />
+        {value === "payment" ? (
+          <Button type="button">Place order</Button>
+        ) : (
+          <StepperNext />
+        )}
       </div>
+
+      <label className="mt-4 flex items-center justify-center gap-2 border-t pt-4">
+        <Checkbox
+          checked={showLabels}
+          onCheckedChange={(checked) => setShowLabels(checked === true)}
+        />
+        Show labels
+      </label>
     </Stepper>
+  );
+}
+
+function CheckoutStep({
+  value,
+  title,
+  description,
+  icon: Icon,
+  showLabels,
+}: {
+  value: StepValue;
+  title: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+  showLabels: boolean;
+}) {
+  const { stepPosition, stepState } = useStepperItem<StepValue>();
+  const isComplete = stepState === "completed" || stepPosition === "previous";
+
+  return (
+    <StepperItem value={value} defaultTrigger={false}>
+      <StepperTrigger>
+        <StepperIndicator>
+          {isComplete ? <Check /> : <Icon />}
+        </StepperIndicator>
+        <span className="relative block min-h-10 min-w-0">
+          <span
+            className={
+              showLabels
+                ? "flex min-w-0 flex-col gap-1"
+                : "invisible flex min-w-0 flex-col gap-1 opacity-0"
+            }
+          >
+            <StepperLabel>{title}</StepperLabel>
+            <StepperDescription>{description}</StepperDescription>
+          </span>
+        </span>
+      </StepperTrigger>
+    </StepperItem>
   );
 }`;
 
@@ -833,7 +936,7 @@ export function WorkspaceOnboarding() {
   return (
     <Stepper defaultValue="workspace" orientation="vertical">
       <StepperList>
-        <StepperItem value="profile" completed>
+        <StepperItem value="profile" completed defaultTrigger={false}>
           <StepperTrigger>
             <StepperIndicator>
               <Check />
@@ -844,7 +947,7 @@ export function WorkspaceOnboarding() {
             </span>
           </StepperTrigger>
         </StepperItem>
-        <StepperItem value="workspace">
+        <StepperItem value="workspace" defaultTrigger={false}>
           <StepperTrigger>
             <StepperIndicator>
               <Building2 />
@@ -855,7 +958,7 @@ export function WorkspaceOnboarding() {
             </span>
           </StepperTrigger>
         </StepperItem>
-        <StepperItem value="invite" disabled>
+        <StepperItem value="invite" defaultTrigger={false} disabled>
           <StepperTrigger>
             <StepperIndicator>
               <Users />
@@ -891,7 +994,7 @@ export function StepperWithStates() {
   return (
     <Stepper defaultValue="shipping">
       <StepperList>
-        <StepperItem value="account" completed>
+        <StepperItem value="account" completed defaultTrigger={false}>
           <StepperTrigger>
             <StepperIndicator>
               <Check />
@@ -899,7 +1002,7 @@ export function StepperWithStates() {
             <StepperLabel>Account</StepperLabel>
           </StepperTrigger>
         </StepperItem>
-        <StepperItem value="shipping" error>
+        <StepperItem value="shipping" defaultTrigger={false} error>
           <StepperTrigger>
             <StepperIndicator>
               <AlertCircle />
@@ -907,7 +1010,7 @@ export function StepperWithStates() {
             <StepperLabel>Shipping</StepperLabel>
           </StepperTrigger>
         </StepperItem>
-        <StepperItem value="payment" disabled>
+        <StepperItem value="payment" defaultTrigger={false} disabled>
           <StepperTrigger>
             <StepperIndicator>
               <Lock />
@@ -972,7 +1075,7 @@ const stateSelectorsCode = `[data-slot="stepper-item"][data-state="active"]
 [data-slot="stepper-content"][data-state="active"]
 [data-slot="stepper-content"][data-state="inactive"]`;
 
-const compositionCode = `<StepperItem value="shipping">
+const compositionCode = `<StepperItem value="shipping" defaultTrigger={false}>
   <StepperTrigger>
     <StepperIndicator />
     <span className="flex flex-col gap-1">
@@ -982,32 +1085,25 @@ const compositionCode = `<StepperItem value="shipping">
   </StepperTrigger>
 </StepperItem>`;
 
-const sidebarCompositionTree = `SidebarProvider
-├── Sidebar
-│   ├── SidebarHeader
-│   ├── SidebarContent
-│   │   ├── SidebarGroup
-│   │   │   ├── SidebarGroupLabel
-│   │   │   ├── SidebarGroupAction
-│   │   │   ├── SidebarGroupContent
-│   │   │   └── SidebarMenu
-│   │   │       ├── SidebarMenuItem
-│   │   │       │   ├── SidebarMenuButton
-│   │   │       │   ├── SidebarMenuAction
-│   │   │       │   └── SidebarMenuBadge
-│   │   │       └── SidebarMenuItem
-│   │   │           ├── SidebarMenuButton
-│   │   │           └── SidebarMenuSub
-│   │   │               ├── SidebarMenuSubItem
-│   │   │               └── SidebarMenuSubItem
-│   │   └── SidebarGroup
-│   │       └── SidebarMenu
-│   │           ├── SidebarMenuItem
-│   │           └── SidebarMenuItem
-│   ├── SidebarFooter
-│   └── SidebarRail
-├── SidebarInset
-└── SidebarTrigger`;
+const stepperCompositionTree = `Stepper
+├── StepperList
+│   ├── StepperItem
+│   │   ├── StepperTrigger
+│   │   │   ├── StepperIndicator
+│   │   │   ├── StepperLabel
+│   │   │   └── StepperDescription
+│   │   └── StepperSeparator
+│   └── StepperItem
+├── StepperContent
+├── StepperPrevious
+└── StepperNext`;
+
+const stepperHeadlessCompositionTree = `Stepper
+├── StepperList className="sr-only"
+│   └── StepperItem
+├── CustomStepNavigation
+├── StepperContent
+└── CustomFooter using useStepper()`;
 
 const indicatorCode = `<StepperIndicator>
   <Check />
@@ -1035,6 +1131,29 @@ const rootProps = [
     defaultValue: '"horizontal"',
     description: "Controls list layout and connector direction.",
   },
+  {
+    name: "steps",
+    type: "{ value: string; disabled?: boolean }[]",
+    description: "Optional explicit step list for headless composition. When provided, Stepper uses it instead of registered StepperItem order.",
+  },
+];
+
+const flowArchitecture = [
+  {
+    label: "App state",
+    value: "source of truth",
+    help: "Routes, forms, server data, and persistence decide what the flow means.",
+  },
+  {
+    label: "Stepper",
+    value: "progress layer",
+    help: "Registers steps, normalizes navigation, exposes ARIA, and reflects state.",
+  },
+  {
+    label: "Adapters",
+    value: "integration edge",
+    help: "React Hook Form, Zod, Zustand, and animation layers connect around the primitive.",
+  },
 ];
 
 const listProps = [
@@ -1059,6 +1178,12 @@ const itemProps = [
     description: "Marks a step as completed and updates data-state.",
   },
   {
+    name: "defaultTrigger",
+    type: "boolean",
+    defaultValue: "true",
+    description: "Controls whether StepperItem renders the default trigger markup. Set it to false when composing your own StepperTrigger.",
+  },
+  {
     name: "disabled",
     type: "boolean",
     defaultValue: "false",
@@ -1069,6 +1194,12 @@ const itemProps = [
     type: "boolean",
     defaultValue: "false",
     description: "Marks a step as needing attention and exposes data-state=\"error\".",
+  },
+  {
+    name: "separator",
+    type: "boolean",
+    defaultValue: "true",
+    description: "Controls the default connector separator after this item. Set to false when rendering a custom StepperSeparator.",
   },
 ];
 
@@ -1082,7 +1213,13 @@ const contentProps = [
     name: "forceMount",
     type: "boolean",
     defaultValue: "false",
-    description: "Keeps inactive content mounted and hidden for advanced composition.",
+    description: "Keeps inactive content mounted and hidden. Prefer keepMounted for form persistence semantics.",
+  },
+  {
+    name: "keepMounted",
+    type: "boolean",
+    defaultValue: "false",
+    description: "Semantic alias for forceMount, useful when preserving form or adapter state between steps.",
   },
   {
     name: "asChild",
@@ -1195,9 +1332,9 @@ const accessibilityNotes = [
 
 const registryNotes = [
   {
-    label: "Version",
-    value: `v${registryVersion}`,
-    help: "Versioned as the registry component, not as a runtime package.",
+    label: "Channel",
+    value: "Registry",
+    help: "Distributed as copied source through the shadcn registry, not as a runtime package.",
   },
   {
     label: "Core file",
@@ -1296,6 +1433,7 @@ export {
   controlledExampleCode,
   controlledSnippet,
   controlsOnlyRecipeSnippet,
+  flowArchitecture,
   formWizardGuideSnippet,
   gettingStartedSnippet,
   indicatorCode,
@@ -1304,13 +1442,17 @@ export {
   mobileDrawerPatternSnippet,
   navigationProps,
   registryVersion,
+  registryInstallCommands,
   registryInstallSnippet,
   registryNotes,
   quickFacts,
   releaseItems,
   rootProps,
   routeBasedPatternSnippet,
-  sidebarCompositionTree,
+  stepperBasicSnippet,
+  stepperCompositionTree,
+  stepperHeadlessCompositionTree,
+  stepperUsageSnippet,
   stateSelectorsCode,
   statusExampleCode,
   themeTokensSnippet,

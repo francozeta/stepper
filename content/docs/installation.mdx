@@ -1,15 +1,16 @@
 ---
-title: "Getting Started"
+title: "Installation"
 description: "Install Stepper through the shadcn registry and copy the component source into your app."
 eyebrow: "basics"
-navTitle: "Install"
+navTitle: "Installation"
 navIcon: "book-open"
 copyImport: "import { Stepper } from \"@/components/ui/stepper\";"
 copyLabel: "Copy import"
 copyCopiedLabel: "Import copied"
 ---
 
-import { CodeBlock, FileTree, Section } from "@/components/docs-content";
+import { CodeBlock, Section } from "@/components/docs-content";
+import { File, Files, Folder } from "@/components/files";
 import {
   controlledSnippet,
   gettingStartedSnippet,
@@ -34,19 +35,13 @@ import {
   title="What gets added"
   description="Stepper does not install as a runtime package. After installation, the source belongs to your project."
 >
-  <FileTree
-    items={[
-      {
-        name: "components",
-        children: [
-          {
-            name: "ui",
-            children: [{ name: "stepper.tsx" }],
-          },
-        ],
-      },
-    ]}
-  />
+  <Files>
+    <Folder name="components" defaultOpen>
+      <Folder name="ui" defaultOpen>
+        <File name="stepper.tsx" />
+      </Folder>
+    </Folder>
+  </Files>
   <CodeBlock
     code={usageSnippet}
     filename="app/page.tsx"

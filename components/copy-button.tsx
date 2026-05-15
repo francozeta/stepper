@@ -22,6 +22,8 @@ type CopyButtonProps = Omit<React.ComponentProps<typeof Button>, "value"> & {
   blockedLabel?: string;
   hideLabelOnMobile?: boolean;
   iconOnly?: boolean;
+  onCopySuccess?: (value: string) => void;
+  onCopyError?: (error: Error) => void;
 };
 
 function CopyButton({
@@ -34,6 +36,8 @@ function CopyButton({
   className,
   children,
   onClick,
+  onCopySuccess,
+  onCopyError,
   size,
   variant,
   ...props
@@ -65,6 +69,7 @@ function CopyButton({
     const text = await resolveCopyValue(value);
 
     if (!text) {
+      onCopyError?.(new Error("No copy value provided."));
       setTemporaryStatus("blocked");
       return;
     }
@@ -72,10 +77,12 @@ function CopyButton({
     const didCopy = await writeClipboardText(text);
 
     if (!didCopy) {
+      onCopyError?.(new Error("Clipboard write failed."));
       setTemporaryStatus("blocked");
       return;
     }
 
+    onCopySuccess?.(text);
     setTemporaryStatus("copied");
   }
 

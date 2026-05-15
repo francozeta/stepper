@@ -4,9 +4,13 @@ import path from "node:path";
 import {
   accessibilityNotes,
   apiComponents,
+  checkoutExampleCode,
   controlledSnippet,
+  flowArchitecture,
   gettingStartedSnippet,
   registryInstallSnippet,
+  stepperCompositionTree,
+  stepperUsageSnippet,
   usageSnippet,
   useStepperRows,
   worksWith,
@@ -26,25 +30,34 @@ type MarkdownDoc = {
 const markdownDocs: MarkdownDoc[] = [
   {
     slug: "index",
-    href: "/",
-    title: "Stepper",
+    href: "/docs",
+    title: "Introduction",
     description:
-      "Overview, registry install, preview, and positioning for the Stepper primitive.",
+      "Mental model, composition boundaries, preview, and positioning for the Stepper primitive.",
     file: "index.mdx",
     body: getOverviewMarkdown,
   },
   {
-    slug: "getting-started",
-    href: "/getting-started",
-    title: "Getting Started",
+    slug: "installation",
+    href: "/docs/installation",
+    title: "Installation",
     description:
       "Install Stepper through the shadcn registry and copy the source into your app.",
-    file: "getting-started.mdx",
+    file: "installation.mdx",
     body: getGettingStartedMarkdown,
   },
   {
+    slug: "stepper",
+    href: "/docs/stepper",
+    title: "Stepper",
+    description:
+      "Component reference for the Stepper primitive, including install, usage, composition, examples, and API.",
+    file: "stepper.mdx",
+    body: getStepperMarkdown,
+  },
+  {
     slug: "api",
-    href: "/api",
+    href: "/docs/api",
     title: "Stepper API",
     description: "Component API, props, hook shape, and composition notes.",
     file: "api.mdx",
@@ -52,7 +65,7 @@ const markdownDocs: MarkdownDoc[] = [
   },
   {
     slug: "examples",
-    href: "/examples",
+    href: "/docs/examples",
     title: "Examples",
     description:
       "Product examples for intent onboarding, checkout, onboarding, and status flows.",
@@ -60,28 +73,28 @@ const markdownDocs: MarkdownDoc[] = [
   },
   {
     slug: "forms",
-    href: "/forms",
+    href: "/docs/forms",
     title: "Form Wizard",
     description: "Compose Stepper with form validation and staged submission.",
     file: "forms.mdx",
   },
   {
     slug: "patterns",
-    href: "/patterns",
+    href: "/docs/patterns",
     title: "Recipes",
     description: "Route-based, mobile, controls-only, and compact patterns.",
     file: "patterns.mdx",
   },
   {
     slug: "styling",
-    href: "/styling",
+    href: "/docs/styling",
     title: "Styling",
     description: "State selectors, semantic tokens, and styling strategy.",
     file: "styling.mdx",
   },
   {
     slug: "changelog",
-    href: "/changelog",
+    href: "/docs/changelog",
     title: "Changelog",
     description: "Editorial release notes and public release feed.",
     file: "changelog.mdx",
@@ -171,23 +184,46 @@ async function getCleanSourceMarkdown(doc: MarkdownDoc) {
 
 function getOverviewMarkdown() {
   return [
-    "## Install",
+    "## Flow architecture",
     "",
-    "Stepper is distributed as a shadcn registry component. The CLI copies the component source into your app:",
+    "Stepper is the progress layer. Your app keeps the business rules, validation, routing, persistence, and async work.",
+    "",
+    ...flowArchitecture.map(
+      (item) => `- **${item.label}** (${item.value}): ${item.help}`
+    ),
+    "",
+    "## Composition patterns",
+    "",
+    codeBlock("text", stepperCompositionTree),
+    "",
+    "## Integration boundary",
+    "",
+    ...worksWith.map((item) => `- **${item.label}**: ${item.help}`),
+  ].join("\n");
+}
+
+function getStepperMarkdown() {
+  return [
+    "## Installation",
     "",
     codeBlock("bash", registryInstallSnippet),
     "",
-    "After installation, the component lives in your local app:",
+    "## Usage",
     "",
-    "- `components/ui/stepper.tsx`",
+    codeBlock("tsx", stepperUsageSnippet),
     "",
-    "## Import",
+    codeBlock("tsx", checkoutExampleCode),
     "",
-    codeBlock("tsx", usageSnippet),
+    "## Composition",
     "",
-    "## Philosophy",
+    codeBlock("text", stepperCompositionTree),
     "",
-    "Your app owns routing, validation, form state, persistence, and server actions. Stepper only represents that flow in the UI.",
+    "## API Reference",
+    "",
+    ...apiComponents.map(
+      (component) =>
+        `- \`${component.name}\` (${component.element}): ${component.description}`
+    ),
   ].join("\n");
 }
 
@@ -252,7 +288,7 @@ function getChangelogMarkdown() {
   return releases
     .map((release) =>
       [
-        `## ${release.date} - v${release.version} - ${release.title}`,
+        `## ${release.date} - ${release.title}`,
         "",
         release.summary,
         "",
