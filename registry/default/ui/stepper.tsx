@@ -57,6 +57,7 @@ type StepperItemApi<TValue extends StepperValue = StepperValue> = {
   value: TValue;
   index: number;
   disabled: boolean;
+  completed: boolean;
   isActive: boolean;
   stepState: StepperStepState;
   stepPosition: StepperStepPosition;
@@ -844,6 +845,7 @@ function StepperItem<TValue extends StepperValue = StepperValue>({
       value,
       index,
       disabled: isDisabled,
+      completed,
       isActive,
       stepState,
       stepPosition,
@@ -856,6 +858,7 @@ function StepperItem<TValue extends StepperValue = StepperValue>({
       value,
       index,
       isDisabled,
+      completed,
       isActive,
       stepState,
       stepPosition,
@@ -877,8 +880,8 @@ function StepperItem<TValue extends StepperValue = StepperValue>({
       data-completed={completed ? "" : undefined}
       className={cn(
         "group/stepper-item relative flex min-w-0",
-        "[--stepper-indicator-size:2.25rem] [--stepper-separator-offset:calc(var(--stepper-indicator-size)_/_2)] [--stepper-separator-y:calc(var(--stepper-indicator-size)_/_2)]",
-        "data-[orientation=horizontal]:min-w-28 data-[orientation=horizontal]:flex-1 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:items-center",
+        "[--stepper-indicator-size:1.75rem] [--stepper-separator-offset:calc(var(--stepper-indicator-size)_/_2)] [--stepper-separator-y:calc(var(--stepper-indicator-size)_/_2)] sm:[--stepper-indicator-size:2.25rem]",
+        "data-[orientation=horizontal]:min-w-16 data-[orientation=horizontal]:flex-1 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:items-center sm:data-[orientation=horizontal]:min-w-28",
         "data-[orientation=vertical]:items-start data-[orientation=vertical]:gap-3",
         className
       )}
@@ -1037,7 +1040,7 @@ function StepperIndicator({
           "group-data-[state=completed]:border-primary group-data-[state=completed]:bg-primary group-data-[state=completed]:text-primary-foreground",
           "group-data-[state=error]:border-destructive group-data-[state=error]:bg-destructive group-data-[state=error]:text-destructive-foreground",
           "group-data-[position=previous]:text-foreground",
-          "[&>svg]:size-4 [&>svg]:shrink-0",
+          "[&>svg]:size-3.5 [&>svg]:shrink-0 sm:[&>svg]:size-4",
           className
         )}
         {...props}
@@ -1055,7 +1058,7 @@ function StepperLabel({ className, ...props }: StepperLabelProps) {
     <span
       data-slot="stepper-label"
       className={cn(
-        "min-w-0 text-sm leading-tight font-medium",
+        "min-w-0 text-xs leading-tight font-medium sm:text-sm",
         orientation === "horizontal" && "max-w-40 text-balance",
         className
       )}
@@ -1091,9 +1094,9 @@ function StepperSeparator({ className, ...props }: StepperSeparatorProps) {
         "overflow-hidden bg-muted-foreground/25 after:absolute after:inset-0 after:bg-primary after:content-['']",
         "after:transition-transform after:duration-[220ms] after:ease-out motion-reduce:after:transition-none",
         orientation === "horizontal" &&
-          "absolute left-[calc(50%_+_var(--stepper-separator-offset))] right-[calc(-50%_+_var(--stepper-separator-offset))] top-(--stepper-separator-y) h-px after:origin-left after:scale-x-0 group-data-[position=previous]/stepper-item:after:scale-x-100 group-data-[state=completed]/stepper-item:after:scale-x-100",
+          "absolute left-[calc(50%_+_var(--stepper-separator-offset))] right-[calc(-50%_+_var(--stepper-separator-offset))] top-(--stepper-separator-y) h-px after:origin-left after:scale-x-0 group-data-[completed]/stepper-item:after:scale-x-100 group-data-[position=previous]/stepper-item:after:scale-x-100 group-data-[state=completed]/stepper-item:after:scale-x-100",
         orientation === "vertical" &&
-          "absolute left-[calc(var(--stepper-indicator-size)_/_2)] top-[calc(var(--stepper-indicator-size)_+_0.5rem)] h-[calc(100%_-_var(--stepper-indicator-size)_+_0.75rem)] w-px after:origin-top after:scale-y-0 group-data-[position=previous]/stepper-item:after:scale-y-100 group-data-[state=completed]/stepper-item:after:scale-y-100",
+          "absolute left-[calc(var(--stepper-indicator-size)_/_2)] top-[calc(var(--stepper-indicator-size)_+_0.5rem)] h-[calc(100%_-_var(--stepper-indicator-size)_+_0.75rem)] w-px after:origin-top after:scale-y-0 group-data-[completed]/stepper-item:after:scale-y-100 group-data-[position=previous]/stepper-item:after:scale-y-100 group-data-[state=completed]/stepper-item:after:scale-y-100",
         className
       )}
       {...props}

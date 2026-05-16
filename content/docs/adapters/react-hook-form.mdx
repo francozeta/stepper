@@ -21,7 +21,7 @@ import { reactHookFormAdapterPreviewCode } from "@/lib/docs";
       {
         label: "Form",
         value: "field state",
-        help: "Keeps values mounted across steps and prepares the final payload.",
+        help: "Keeps values mounted across steps and prepares the order details.",
       },
       {
         label: "Stepper",
@@ -29,9 +29,9 @@ import { reactHookFormAdapterPreviewCode } from "@/lib/docs";
         help: "Reflects where the user is and moves only when the adapter allows it.",
       },
       {
-        label: "Backend",
-        value: "final submit",
-        help: "Receives one validated payload instead of scattered step-local data.",
+        label: "Checkout",
+        value: "final order",
+        help: "Submits one validated order instead of scattered step-local state.",
       },
     ]}
   />
@@ -39,7 +39,7 @@ import { reactHookFormAdapterPreviewCode } from "@/lib/docs";
 
 <Section
   title="Preview"
-  description="A small checkout adapter where React Hook Form owns the field payload and Stepper owns progress, navigation, and accessibility."
+  description="A small checkout adapter with real form state, step validation, and an order summary that survives step changes."
 >
   <DocsExample
     title="Persistent checkout"
@@ -79,5 +79,5 @@ import { reactHookFormAdapterPreviewCode } from "@/lib/docs";
 
 <Section
   title="Production note"
-  description="Use keepMounted for fields that must preserve local state, or keep the field state in React Hook Form with stable defaultValues. Submit the final payload from the form, not from each StepperContent panel."
+  description="Use keepMounted for fields that must preserve local state, or keep the field state in React Hook Form with stable defaultValues. Place the order from the form, not from each StepperContent panel."
 />

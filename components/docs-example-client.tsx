@@ -59,12 +59,15 @@ function DocsExampleClient({
     <section
       id={id}
       data-slot="docs-example"
-      className={cn("flex min-w-0 scroll-mt-24 flex-col gap-3", className)}
+      className={cn(
+        "flex w-full min-w-0 max-w-full scroll-mt-24 flex-col gap-3",
+        className
+      )}
     >
       <Tabs
         value={tab}
         onValueChange={(value) => setTab(value as "preview" | "code")}
-        className="min-w-0 gap-0 overflow-hidden rounded-none border border-white/10 bg-[#050505]"
+        className="w-full min-w-0 max-w-full gap-0 overflow-hidden rounded-none border border-white/10 bg-[#050505]"
       >
         <div className="flex min-w-0 flex-col gap-2 border-b border-white/10 bg-[#050505] px-2 py-1.5 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:items-center">

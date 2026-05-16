@@ -62,7 +62,7 @@ const adapterSteps = [
   {
     value: "payment",
     label: "Payment",
-    description: "Backend handoff",
+    description: "Secure checkout",
     icon: CreditCard,
   },
 ] as const;
@@ -115,7 +115,7 @@ function StepperReactHookFormAdapterPreview() {
 
   return (
     <form
-      className="mx-auto w-full max-w-4xl"
+      className="mx-0 w-full max-w-[calc(100vw-4rem)] sm:mx-auto sm:max-w-4xl"
       onSubmit={(event) => void submitCheckout(event)}
     >
       <Stepper
@@ -162,7 +162,7 @@ function StepperReactHookFormAdapterPreview() {
               className="border-0 bg-transparent p-0 shadow-none"
             >
               <PreviewPanel
-                description="Validate the user contact step before the flow can move forward."
+                description="Add the receipt email before moving into delivery details."
                 icon={Mail}
                 title="Contact details"
               >
@@ -183,7 +183,7 @@ function StepperReactHookFormAdapterPreview() {
                       })}
                     />
                     <FieldDescription>
-                      The email stays in React Hook Form, not in Stepper.
+                      Used for the order receipt and delivery updates.
                     </FieldDescription>
                     <FieldError errors={[form.formState.errors.email]} />
                   </Field>
@@ -197,9 +197,9 @@ function StepperReactHookFormAdapterPreview() {
               className="border-0 bg-transparent p-0 shadow-none"
             >
               <PreviewPanel
-                description="The shipping panel can unmount visually while its fields stay registered."
+                description="Confirm where the order should be delivered."
                 icon={MapPin}
-                title="Shipping route"
+                title="Delivery address"
               >
                 <FieldGroup className="grid gap-3 sm:grid-cols-2">
                   <Field
@@ -250,17 +250,15 @@ function StepperReactHookFormAdapterPreview() {
               className="border-0 bg-transparent p-0 shadow-none"
             >
               <PreviewPanel
-                description="Submit one final payload after all step boundaries have passed."
+                description="Review the saved payment reference before placing the order."
                 icon={PackageCheck}
-                title="Payment handoff"
+                title="Payment method"
               >
                 <FieldGroup className="gap-3">
                   <Field
                     data-invalid={Boolean(form.formState.errors.cardNumber)}
                   >
-                    <FieldLabel htmlFor="adapter-card">
-                      Card reference
-                    </FieldLabel>
+                    <FieldLabel htmlFor="adapter-card">Card ending</FieldLabel>
                     <Input
                       id="adapter-card"
                       inputMode="numeric"
@@ -276,7 +274,7 @@ function StepperReactHookFormAdapterPreview() {
                       })}
                     />
                     <FieldDescription>
-                      In production this would become your checkout submit.
+                      This checkout preview uses a saved payment method.
                     </FieldDescription>
                     <FieldError errors={[form.formState.errors.cardNumber]} />
                   </Field>
@@ -289,17 +287,20 @@ function StepperReactHookFormAdapterPreview() {
             <div className="space-y-3">
               <div>
                 <p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-zinc-600">
-                  Live values
+                  Order details
                 </p>
                 <p className="mt-1 text-xs leading-5 text-zinc-500">
-                  RHF owns the payload while Stepper owns progress.
+                  Details stay saved while the customer moves between steps.
                 </p>
               </div>
               <div className="space-y-2 border-t border-white/10 pt-3">
-                <PayloadRow label="email" value={values.email} />
-                <PayloadRow label="address" value={values.shippingAddress} />
+                <PayloadRow label="receipt" value={values.email} />
+                <PayloadRow label="deliver to" value={values.shippingAddress} />
                 <PayloadRow label="city" value={values.city} />
-                <PayloadRow label="card" value={maskCard(values.cardNumber)} />
+                <PayloadRow
+                  label="payment"
+                  value={maskCard(values.cardNumber)}
+                />
               </div>
             </div>
 
@@ -312,16 +313,16 @@ function StepperReactHookFormAdapterPreview() {
               )}
             >
               {submittedValues
-                ? "Payload ready for the backend."
-                : "Continue through each boundary, then submit."}
+                ? "Order placed. Receipt is ready."
+                : "Review each step before placing the order."}
             </div>
           </aside>
         </div>
 
         <div className="flex flex-col gap-3 border-t border-white/10 pt-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs leading-5 text-zinc-500">
-            Values persist across panels with <code>keepMounted</code> and
-            React Hook Form.
+            Checkout details stay saved while the customer moves through the
+            flow.
           </p>
           <div className="flex justify-center gap-2 sm:justify-end">
             <StepperPrevious className="border-white/10 bg-[#050505] text-zinc-500 hover:bg-white/[0.045] hover:text-zinc-100">
@@ -332,7 +333,7 @@ function StepperReactHookFormAdapterPreview() {
                 type="submit"
                 className="h-9 min-w-28 rounded-none bg-zinc-100 px-3 text-zinc-950 hover:bg-white hover:text-zinc-950"
               >
-                Submit
+                Place order
                 <Check data-icon="inline-end" />
               </Button>
             ) : (
@@ -359,16 +360,17 @@ function AdapterStepTrigger({
   description: string;
   icon: LucideIcon;
 }) {
-  const { disabled, stepPosition, stepState } = useStepperItem();
-  const isComplete = stepState === "completed" || stepPosition === "previous";
+  const { completed, disabled, stepPosition, stepState } = useStepperItem();
+  const isComplete =
+    completed || stepState === "completed" || stepPosition === "previous";
 
   return (
-    <StepperTrigger>
+    <StepperTrigger className="gap-1 sm:gap-2">
       <StepperIndicator className="rounded-none border-white/10 bg-[#050505] group-data-[state=active]:bg-zinc-100 group-data-[state=active]:text-zinc-950 group-data-[state=completed]:bg-zinc-100 group-data-[state=completed]:text-zinc-950">
         {disabled ? <Lock /> : isComplete ? <Check /> : <Icon />}
       </StepperIndicator>
       <span className="flex min-w-0 flex-col gap-1">
-        <StepperLabel>{label}</StepperLabel>
+        <StepperLabel className="text-xs sm:text-sm">{label}</StepperLabel>
         <StepperDescription className="hidden max-w-32 sm:block">
           {description}
         </StepperDescription>
