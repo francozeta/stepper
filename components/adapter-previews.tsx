@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import * as React from "react";
 import {
   Check,
@@ -35,7 +36,6 @@ import {
   StepperTrigger,
   useStepperItem,
 } from "@/components/ui/stepper";
-import { cn } from "@/lib/utils";
 
 type AdapterStep = "contact" | "shipping" | "payment";
 
@@ -304,18 +304,7 @@ function StepperReactHookFormAdapterPreview() {
               </div>
             </div>
 
-            <div
-              className={cn(
-                "border border-white/10 p-3 text-xs leading-5",
-                submittedValues
-                  ? "bg-zinc-100 text-zinc-950"
-                  : "bg-[#050505] text-zinc-500"
-              )}
-            >
-              {submittedValues
-                ? "Order placed. Receipt is ready."
-                : "Review each step before placing the order."}
-            </div>
+            <ReceiptStatus submitted={Boolean(submittedValues)} />
           </aside>
         </div>
 
@@ -348,6 +337,31 @@ function StepperReactHookFormAdapterPreview() {
         </div>
       </Stepper>
     </form>
+  );
+}
+
+function ReceiptStatus({ submitted }: { submitted: boolean }) {
+  if (!submitted) {
+    return (
+      <div className="border border-white/10 bg-[#050505] p-3 text-xs leading-5 text-zinc-500">
+        Review each step before placing the order.
+      </div>
+    );
+  }
+
+  return (
+    <div className="border border-zinc-200 bg-zinc-50 p-2 text-zinc-950">
+      <p className="mb-2 font-mono text-[0.6rem] uppercase tracking-[0.14em]">
+        Order placed. Receipt is ready.
+      </p>
+      <Image
+        src="/receipt-barcode.png"
+        alt="Receipt barcode"
+        width={420}
+        height={96}
+        className="h-12 w-full object-cover object-[center_52%]"
+      />
+    </div>
   );
 }
 
