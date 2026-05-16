@@ -342,23 +342,15 @@ function StepperReactHookFormAdapterPreview() {
 function ReceiptStatus({ submitted }: { submitted: boolean }) {
   if (!submitted) {
     return (
-      <div className="border border-white/10 bg-[#050505] p-3 text-xs leading-5 text-zinc-500">
+      <div className="mt-4 border border-white/10 bg-[#050505] p-3 text-xs leading-5 text-zinc-500">
         Review before placing.
       </div>
     );
   }
 
   return (
-    <div className="border border-white/10 bg-white/[0.025] p-3">
-      <div className="flex items-center justify-between gap-3">
-        <p className="font-mono text-[0.6rem] uppercase tracking-[0.16em] text-zinc-600">
-          Receipt ready
-        </p>
-        <span className="grid size-5 shrink-0 place-items-center bg-zinc-100 text-zinc-950">
-          <Check className="size-3" aria-hidden="true" />
-        </span>
-      </div>
-      <p className="mt-2 text-xs leading-5 text-zinc-300">Order placed.</p>
+    <div className="mt-4 border border-zinc-200 bg-zinc-100 p-3 text-xs leading-5 text-zinc-950">
+      Order placed. Receipt is ready.
     </div>
   );
 }
