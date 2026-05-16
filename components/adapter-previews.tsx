@@ -307,7 +307,7 @@ function StepperReactHookFormAdapterPreview() {
           </aside>
         </div>
 
-        <div className="flex flex-col gap-3 border-t border-white/10 pt-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-2 flex flex-col gap-3 border-t border-white/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs leading-5 text-zinc-500">
             Checkout details stay saved while the customer moves through the
             flow.
@@ -343,7 +343,7 @@ function ReceiptStatus({ submitted }: { submitted: boolean }) {
   if (!submitted) {
     return (
       <div className="border border-white/10 bg-[#050505] p-3 text-xs leading-5 text-zinc-500">
-        Review each step before placing the order.
+        Review before placing.
       </div>
     );
   }
