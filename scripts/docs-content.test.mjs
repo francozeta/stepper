@@ -72,6 +72,8 @@ describe("MDX docs content", () => {
     expect(api).toContain("Controlled fallback");
     expect(api).toContain("asChild requirements");
     expect(adapters).toContain('title="Pick your adapter"');
+    expect(reactHookFormAdapter).toContain('title="Preview"');
+    expect(reactHookFormAdapter).toContain("StepperReactHookFormAdapterPreview");
     expect(reactHookFormAdapter).toContain('title="Validation boundary"');
     expect(reactHookFormAdapter).toContain("keepMounted");
     expect(forms).toContain("Stepper represents UI state");

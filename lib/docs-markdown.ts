@@ -8,6 +8,7 @@ import {
   controlledSnippet,
   flowArchitecture,
   gettingStartedSnippet,
+  reactHookFormAdapterPreviewCode,
   registryInstallSnippet,
   stepperCompositionTree,
   stepperUsageSnippet,
@@ -253,91 +254,6 @@ function getStepperMarkdown() {
   ].join("\n");
 }
 
-const reactHookFormAdapterSnippet = `"use client";
-
-import * as React from "react";
-import { FormProvider, useForm, type FieldPath } from "react-hook-form";
-
-import {
-  Stepper,
-  StepperContent,
-  StepperItem,
-  StepperList,
-  StepperNext,
-  StepperPrevious,
-} from "@/components/ui/stepper";
-
-type StepValue = "cart" | "shipping" | "payment";
-
-type CheckoutValues = {
-  email: string;
-  address: string;
-  cardNumber: string;
-};
-
-const steps = [
-  { value: "cart" },
-  { value: "shipping" },
-  { value: "payment" },
-] as const;
-
-const fieldsByStep = {
-  cart: ["email"],
-  shipping: ["address"],
-  payment: ["cardNumber"],
-} satisfies Record<StepValue, FieldPath<CheckoutValues>[]>;
-
-export function CheckoutForm() {
-  const [step, setStep] = React.useState<StepValue>("cart");
-  const form = useForm<CheckoutValues>({
-    defaultValues: {
-      email: "",
-      address: "",
-      cardNumber: "",
-    },
-  });
-
-  async function canContinue() {
-    return form.trigger(fieldsByStep[step]);
-  }
-
-  async function submitCheckout(values: CheckoutValues) {
-    await fetch("/api/checkout", {
-      method: "POST",
-      body: JSON.stringify(values),
-    });
-  }
-
-  return (
-    <FormProvider {...form}>
-      <form onSubmit={form.handleSubmit(submitCheckout)}>
-        <Stepper value={step} onValueChange={setStep} steps={steps}>
-          <StepperList>
-            <StepperItem value="cart">Cart</StepperItem>
-            <StepperItem value="shipping">Shipping</StepperItem>
-            <StepperItem value="payment">Payment</StepperItem>
-          </StepperList>
-
-          <StepperContent value="cart" keepMounted>
-            {/* Cart fields */}
-          </StepperContent>
-          <StepperContent value="shipping" keepMounted>
-            {/* Shipping fields */}
-          </StepperContent>
-          <StepperContent value="payment" keepMounted>
-            {/* Payment fields */}
-          </StepperContent>
-
-          <div className="flex justify-end gap-2">
-            <StepperPrevious />
-            <StepperNext onBeforeNext={canContinue} />
-          </div>
-        </Stepper>
-      </form>
-    </FormProvider>
-  );
-}`;
-
 function getAdaptersMarkdown() {
   return [
     "## Pick your adapter",
@@ -372,11 +288,17 @@ function getReactHookFormAdapterMarkdown() {
     "- Stepper: reflects where the user is and moves only when the adapter allows it.",
     "- Backend: receives one validated payload instead of scattered step-local data.",
     "",
+    "## Preview",
+    "",
+    "The live docs render a persistent checkout adapter where React Hook Form owns the field payload and Stepper owns progress, navigation, and accessibility.",
+    "",
+    codeBlock("tsx", reactHookFormAdapterPreviewCode),
+    "",
     "## State model",
     "",
     "Keep Stepper controlled by local flow state, and keep the form provider above the step content so values are not lost when panels unmount.",
     "",
-    codeBlock("tsx", reactHookFormAdapterSnippet),
+    codeBlock("tsx", reactHookFormAdapterPreviewCode),
     "",
     "## Validation boundary",
     "",

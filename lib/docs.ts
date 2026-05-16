@@ -334,6 +334,118 @@ export function FormWizard() {
   );
 }`;
 
+const reactHookFormAdapterPreviewCode = `"use client";
+
+import * as React from "react";
+import { FormProvider, useForm, type FieldPath } from "react-hook-form";
+
+import {
+  Stepper,
+  StepperContent,
+  StepperItem,
+  StepperList,
+  StepperNext,
+  StepperPrevious,
+} from "@/components/ui/stepper";
+
+type StepValue = "contact" | "shipping" | "payment";
+
+type CheckoutValues = {
+  email: string;
+  shippingAddress: string;
+  city: string;
+  cardNumber: string;
+};
+
+const steps = [
+  { value: "contact" },
+  { value: "shipping" },
+  { value: "payment" },
+] as const;
+
+const fieldsByStep = {
+  contact: ["email"],
+  shipping: ["shippingAddress", "city"],
+  payment: ["cardNumber"],
+} satisfies Record<StepValue, FieldPath<CheckoutValues>[]>;
+
+export function CheckoutForm() {
+  const [step, setStep] = React.useState<StepValue>("contact");
+  const [completed, setCompleted] = React.useState<
+    Partial<Record<StepValue, boolean>>
+  >({});
+  const form = useForm<CheckoutValues>({
+    defaultValues: {
+      email: "",
+      shippingAddress: "",
+      city: "",
+      cardNumber: "",
+    },
+  });
+
+  async function canContinue() {
+    const isValid = await form.trigger(fieldsByStep[step], {
+      shouldFocus: true,
+    });
+
+    if (isValid) {
+      setCompleted((current) => ({ ...current, [step]: true }));
+    }
+
+    return isValid;
+  }
+
+  async function submitCheckout(values: CheckoutValues) {
+    await fetch("/api/checkout", {
+      method: "POST",
+      body: JSON.stringify(values),
+    });
+  }
+
+  return (
+    <FormProvider {...form}>
+      <form onSubmit={form.handleSubmit(submitCheckout)}>
+        <Stepper value={step} onValueChange={setStep} steps={steps}>
+          <StepperList>
+            <StepperItem value="contact" completed={completed.contact}>
+              Contact
+            </StepperItem>
+            <StepperItem
+              value="shipping"
+              completed={completed.shipping}
+              disabled={!completed.contact}
+            >
+              Shipping
+            </StepperItem>
+            <StepperItem value="payment" disabled={!completed.shipping}>
+              Payment
+            </StepperItem>
+          </StepperList>
+
+          <StepperContent value="contact" keepMounted>
+            {/* Email field */}
+          </StepperContent>
+          <StepperContent value="shipping" keepMounted>
+            {/* Address fields */}
+          </StepperContent>
+          <StepperContent value="payment" keepMounted>
+            {/* Payment fields */}
+          </StepperContent>
+
+          <div className="flex justify-end gap-2">
+            <StepperPrevious />
+            {step === "payment" ? (
+              <button type="submit">Submit</button>
+            ) : (
+              <StepperNext onBeforeNext={canContinue} />
+            )}
+          </div>
+        </Stepper>
+      </form>
+    </FormProvider>
+  );
+}`;
+
 const routeBasedPatternSnippet = `"use client";
 
 import Link from "next/link";
@@ -1446,6 +1558,7 @@ export {
   registryInstallSnippet,
   registryNotes,
   quickFacts,
+  reactHookFormAdapterPreviewCode,
   releaseItems,
   rootProps,
   routeBasedPatternSnippet,
