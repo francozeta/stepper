@@ -116,12 +116,13 @@ describe("Stepper", () => {
 
   it("exposes item state for custom composed indicators", async () => {
     function ItemState() {
-      const { index, isActive, stepPosition, stepState, value } =
+      const { completed, index, isActive, stepPosition, stepState, value } =
         useStepperItem();
 
       return (
         <span data-testid={`item-state-${value}`}>
-          {index}:{stepPosition}:{stepState}:{String(isActive)}
+          {index}:{stepPosition}:{stepState}:{String(isActive)}:
+          {String(completed)}
         </span>
       );
     }
@@ -132,7 +133,7 @@ describe("Stepper", () => {
           <StepperItem value="account" defaultTrigger={false}>
             <ItemState />
           </StepperItem>
-          <StepperItem value="profile" defaultTrigger={false}>
+          <StepperItem value="profile" defaultTrigger={false} completed>
             <ItemState />
           </StepperItem>
           <StepperItem value="payment" defaultTrigger={false}>
@@ -144,13 +145,13 @@ describe("Stepper", () => {
 
     await waitFor(() => {
       expect(screen.getByTestId("item-state-account")).toHaveTextContent(
-        "0:previous:inactive:false"
+        "0:previous:inactive:false:false"
       );
       expect(screen.getByTestId("item-state-profile")).toHaveTextContent(
-        "1:current:active:true"
+        "1:current:active:true:true"
       );
       expect(screen.getByTestId("item-state-payment")).toHaveTextContent(
-        "2:next:inactive:false"
+        "2:next:inactive:false:false"
       );
     });
   });
@@ -991,6 +992,27 @@ describe("Stepper", () => {
     expect(
       container.querySelectorAll('[data-slot="stepper-separator"]')
     ).toHaveLength(1);
+  });
+
+  it("keeps the separator filled when the current item is completed", () => {
+    const { container } = render(
+      <Stepper defaultValue="account">
+        <StepperList>
+          <StepperItem value="account" completed>
+            Account
+          </StepperItem>
+          <StepperItem value="profile">Profile</StepperItem>
+        </StepperList>
+      </Stepper>
+    );
+
+    const separator = container.querySelector(
+      '[data-slot="stepper-separator"]'
+    );
+
+    expect(separator).toHaveClass(
+      "group-data-[completed]/stepper-item:after:scale-x-100"
+    );
   });
 
   it("lets consumers opt out of the default separator explicitly", () => {

@@ -1,0 +1,83 @@
+---
+title: "React Hook Form"
+description: "Use React Hook Form as the state layer for persistent multi-step inputs while Stepper owns progress and navigation."
+eyebrow: "adapter"
+badge: "beta"
+navTitle: "React Hook Form"
+navIcon: "file-check"
+---
+
+import { StepperReactHookFormAdapterPreview } from "@/components/adapter-previews";
+import { CodeBlock, InfoGrid, Section } from "@/components/docs-content";
+import { DocsExample } from "@/components/docs-example";
+import { reactHookFormAdapterPreviewCode } from "@/lib/docs";
+
+<Section
+  title="Adapter role"
+  description="React Hook Form should own field values and form lifecycle. Stepper should only receive the active step and expose the next/previous controls."
+>
+  <InfoGrid
+    items={[
+      {
+        label: "Form",
+        value: "field state",
+        help: "Keeps values mounted across steps and prepares the order details.",
+      },
+      {
+        label: "Stepper",
+        value: "progress state",
+        help: "Reflects where the user is and moves only when the adapter allows it.",
+      },
+      {
+        label: "Checkout",
+        value: "final order",
+        help: "Submits one validated order instead of scattered step-local state.",
+      },
+    ]}
+  />
+</Section>
+
+<Section
+  title="Preview"
+  description="A small checkout adapter with real form state, step validation, and an order summary that survives step changes."
+>
+  <DocsExample
+    title="Persistent checkout"
+    description="Values stay in React Hook Form while each step validates before moving forward."
+    badge="adapter"
+    filename="rhf-checkout-stepper.tsx"
+    code={reactHookFormAdapterPreviewCode}
+    preview={<StepperReactHookFormAdapterPreview />}
+    previewClassName="bg-[#050505]"
+  />
+</Section>
+
+<Section
+  title="State model"
+  description="Keep Stepper controlled by local flow state, and keep the form provider above the step content so values are not lost when panels unmount."
+>
+  <CodeBlock
+    filename="checkout-form.tsx"
+    code={reactHookFormAdapterPreviewCode}
+  />
+</Section>
+
+<Section
+  title="Validation boundary"
+  description="Use onBeforeNext for step-level validation. The guard can be async, so it works with React Hook Form trigger, remote checks, and save-before-continue flows."
+>
+  <CodeBlock
+    filename="step-validation.ts"
+    code={`async function canContinue() {
+  const fields = fieldsByStep[step];
+  const isValid = await form.trigger(fields);
+
+  return isValid;
+}`}
+  />
+</Section>
+
+<Section
+  title="Production note"
+  description="Use keepMounted for fields that must preserve local state, or keep the field state in React Hook Form with stable defaultValues. Place the order from the form, not from each StepperContent panel."
+/>

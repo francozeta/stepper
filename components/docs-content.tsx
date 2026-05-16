@@ -38,7 +38,7 @@ function PageHeader({
   action,
 }: PageHeaderProps) {
   return (
-    <header className="grid max-w-4xl gap-6 border-b border-white/10 pb-7 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
+    <header className="grid w-full min-w-0 max-w-4xl gap-6 border-b border-white/10 pb-7 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
       <div className="flex min-w-0 flex-col gap-4">
         {eyebrow ? (
           <div className="flex items-center gap-2">
@@ -50,7 +50,7 @@ function PageHeader({
         ) : null}
         <div className="flex flex-col gap-3">
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="docs-page-title text-balance font-normal text-zinc-50">
+            <h1 className="docs-page-title min-w-0 max-w-full text-balance break-words font-normal text-zinc-50">
               {title}
             </h1>
             {badge ? (

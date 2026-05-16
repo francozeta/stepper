@@ -106,7 +106,7 @@ function MdxDocPage({ slug = [] }: { slug?: string[] }) {
           <div className="grid w-full min-w-0 grid-cols-1 gap-10 px-4 py-5 sm:px-6 sm:py-7 md:px-8 lg:py-7 xl:grid-cols-[minmax(0,52rem)_10rem] xl:gap-12">
             <main
               data-docs-content
-              className="flex min-w-0 max-w-3xl flex-col gap-10 text-zinc-300 xl:max-w-none"
+              className="flex w-full min-w-0 max-w-full flex-col gap-10 text-zinc-300 sm:max-w-3xl xl:max-w-none"
             >
               <PageHeader
                 eyebrow={data.eyebrow}

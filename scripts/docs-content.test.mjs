@@ -12,6 +12,8 @@ const docs = [
   "content/docs/installation.mdx",
   "content/docs/stepper.mdx",
   "content/docs/api.mdx",
+  "content/docs/adapters.mdx",
+  "content/docs/adapters/react-hook-form.mdx",
   "content/docs/examples.mdx",
   "content/docs/forms.mdx",
   "content/docs/patterns.mdx",
@@ -55,6 +57,10 @@ describe("MDX docs content", () => {
     const index = await readText("content/docs/index.mdx");
     const stepper = await readText("content/docs/stepper.mdx");
     const api = await readText("content/docs/api.mdx");
+    const adapters = await readText("content/docs/adapters.mdx");
+    const reactHookFormAdapter = await readText(
+      "content/docs/adapters/react-hook-form.mdx"
+    );
     const forms = await readText("content/docs/forms.mdx");
     const patterns = await readText("content/docs/patterns.mdx");
     const docsData = await readText("lib/docs.ts");
@@ -65,6 +71,11 @@ describe("MDX docs content", () => {
     expect(stepper).toContain('title="API Reference"');
     expect(api).toContain("Controlled fallback");
     expect(api).toContain("asChild requirements");
+    expect(adapters).toContain('title="Pick your adapter"');
+    expect(reactHookFormAdapter).toContain('title="Preview"');
+    expect(reactHookFormAdapter).toContain("StepperReactHookFormAdapterPreview");
+    expect(reactHookFormAdapter).toContain('title="Validation boundary"');
+    expect(reactHookFormAdapter).toContain("keepMounted");
     expect(forms).toContain("Stepper represents UI state");
     expect(forms).not.toContain("Owns active step");
     expect(patterns).toContain("Copy this when");

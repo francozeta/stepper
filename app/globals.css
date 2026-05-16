@@ -174,7 +174,7 @@ body {
 
 .docs-page-title {
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(2.5rem, 6vw, 4.25rem);
+  font-size: clamp(2.125rem, 9vw, 4.25rem);
   line-height: 0.92;
 }
 
