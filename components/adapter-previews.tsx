@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import * as React from "react";
 import {
   Check,
@@ -350,17 +349,16 @@ function ReceiptStatus({ submitted }: { submitted: boolean }) {
   }
 
   return (
-    <div className="border border-zinc-200 bg-zinc-50 p-2 text-zinc-950">
-      <p className="mb-2 font-mono text-[0.6rem] uppercase tracking-[0.14em]">
-        Order placed. Receipt is ready.
-      </p>
-      <Image
-        src="/receipt-barcode.png"
-        alt="Receipt barcode"
-        width={420}
-        height={96}
-        className="h-12 w-full object-cover object-[center_52%]"
-      />
+    <div className="border border-white/10 bg-white/[0.025] p-3">
+      <div className="flex items-center justify-between gap-3">
+        <p className="font-mono text-[0.6rem] uppercase tracking-[0.16em] text-zinc-600">
+          Receipt ready
+        </p>
+        <span className="grid size-5 shrink-0 place-items-center bg-zinc-100 text-zinc-950">
+          <Check className="size-3" aria-hidden="true" />
+        </span>
+      </div>
+      <p className="mt-2 text-xs leading-5 text-zinc-300">Order placed.</p>
     </div>
   );
 }
