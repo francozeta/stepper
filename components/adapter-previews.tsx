@@ -321,7 +321,7 @@ function StepperReactHookFormAdapterPreview() {
                 type="submit"
                 className="h-9 min-w-28 rounded-none bg-zinc-100 px-3 text-zinc-950 hover:bg-white hover:text-zinc-950"
               >
-                Place order
+                Confirm
                 <Check data-icon="inline-end" />
               </Button>
             ) : (
@@ -365,8 +365,10 @@ function AdapterStepTrigger({
   icon: LucideIcon;
 }) {
   const { completed, disabled, stepPosition, stepState } = useStepperItem();
+  const isCurrent = stepState === "active" || stepPosition === "current";
   const isComplete =
-    completed || stepState === "completed" || stepPosition === "previous";
+    !isCurrent &&
+    (completed || stepState === "completed" || stepPosition === "previous");
 
   return (
     <StepperTrigger className="gap-1 sm:gap-2">

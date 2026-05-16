@@ -1015,6 +1015,30 @@ describe("Stepper", () => {
     );
   });
 
+  it("staggers connector transitions when jumping across multiple steps", async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <Stepper defaultValue="account">
+        <StepperList>
+          <StepperItem value="account">Account</StepperItem>
+          <StepperItem value="profile">Profile</StepperItem>
+          <StepperItem value="shipping">Shipping</StepperItem>
+          <StepperItem value="payment">Payment</StepperItem>
+        </StepperList>
+      </Stepper>
+    );
+
+    await user.click(screen.getByRole("button", { name: /Step 4:\s*Payment/ }));
+
+    const items = container.querySelectorAll('[data-slot="stepper-item"]');
+
+    await waitFor(() => {
+      expect(items[0]).toHaveStyle("--stepper-separator-delay: 0ms");
+      expect(items[1]).toHaveStyle("--stepper-separator-delay: 80ms");
+      expect(items[2]).toHaveStyle("--stepper-separator-delay: 160ms");
+    });
+  });
+
   it("lets consumers opt out of the default separator explicitly", () => {
     const { container } = render(
       <Stepper defaultValue="account">

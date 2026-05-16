@@ -70,6 +70,8 @@ type StepperItemApi<TValue extends StepperValue = StepperValue> = {
 type StepperContextValue<TValue extends StepperValue = StepperValue> =
   StepperApi<TValue> & {
     isExplicitMode: boolean;
+    transitionFromIndex: number;
+    transitionToIndex: number;
     registerStep: (step: RegisteredStep) => void;
     unregisterStep: (id: string) => void;
     getTriggerId: (value: TValue) => string;
@@ -494,6 +496,50 @@ function useStepperNavigation({
   };
 }
 
+function useStepperTransition(currentIndex: number) {
+  const previousIndexRef = React.useRef(currentIndex);
+  const [transition, setTransition] = React.useState(() => ({
+    from: currentIndex,
+    to: currentIndex,
+  }));
+
+  React.useLayoutEffect(() => {
+    const previousIndex = previousIndexRef.current;
+
+    if (previousIndex === currentIndex) {
+      return;
+    }
+
+    setTransition({
+      from: previousIndex,
+      to: currentIndex,
+    });
+    previousIndexRef.current = currentIndex;
+  }, [currentIndex]);
+
+  return transition;
+}
+
+function getStepTransitionDelay({
+  from,
+  index,
+  to,
+}: {
+  from: number;
+  index: number;
+  to: number;
+}) {
+  if (from < 0 || to < 0 || index < 0 || from === to) {
+    return 0;
+  }
+
+  if (to > from) {
+    return index >= from && index < to ? (index - from) * 80 : 0;
+  }
+
+  return index >= to && index < from ? (from - index - 1) * 80 : 0;
+}
+
 function useDuplicateStepWarning(steps: StepperStep[]) {
   const duplicateStepValues = React.useMemo(
     () => getDuplicateStepValues(steps),
@@ -642,6 +688,8 @@ function Stepper({
       setValue: setStepperValue,
       steps,
     });
+  const { from: transitionFromIndex, to: transitionToIndex } =
+    useStepperTransition(currentIndex);
 
   useDuplicateStepWarning(steps);
 
@@ -652,6 +700,8 @@ function Stepper({
       steps,
       isExplicitMode,
       currentIndex,
+      transitionFromIndex,
+      transitionToIndex,
       totalSteps: steps.length,
       registerStep,
       unregisterStep,
@@ -670,6 +720,8 @@ function Stepper({
       canGoPrevious,
       currentValue,
       currentIndex,
+      transitionFromIndex,
+      transitionToIndex,
       goNext,
       goPrevious,
       id,
@@ -741,6 +793,7 @@ function StepperItem<TValue extends StepperValue = StepperValue>({
   error = false,
   separator = true,
   className,
+  style,
   children,
   ...props
 }: StepperItemProps<TValue>) {
@@ -749,6 +802,8 @@ function StepperItem<TValue extends StepperValue = StepperValue>({
     orientation,
     steps,
     isExplicitMode,
+    transitionFromIndex,
+    transitionToIndex,
     registerStep,
     unregisterStep,
     setValue,
@@ -785,6 +840,15 @@ function StepperItem<TValue extends StepperValue = StepperValue>({
   const isLastStep = index >= 0 && index === steps.length - 1;
   const shouldRenderSeparator =
     isInsideStepperList && separator && !isLastStep;
+  const separatorTransitionDelay = getStepTransitionDelay({
+    from: transitionFromIndex,
+    index,
+    to: transitionToIndex,
+  });
+  const itemStyle = {
+    ...style,
+    "--stepper-separator-delay": `${separatorTransitionDelay}ms`,
+  } as React.CSSProperties;
 
   React.useLayoutEffect(() => {
     if (!isInsideStepperList || isExplicitMode) {
@@ -885,6 +949,7 @@ function StepperItem<TValue extends StepperValue = StepperValue>({
         "data-[orientation=vertical]:items-start data-[orientation=vertical]:gap-3",
         className
       )}
+      style={itemStyle}
       {...props}
     >
       <StepperItemContext.Provider value={itemContext}>
@@ -1040,6 +1105,7 @@ function StepperIndicator({
           "group-data-[state=completed]:border-primary group-data-[state=completed]:bg-primary group-data-[state=completed]:text-primary-foreground",
           "group-data-[state=error]:border-destructive group-data-[state=error]:bg-destructive group-data-[state=error]:text-destructive-foreground",
           "group-data-[position=previous]:text-foreground",
+          "[transition-delay:var(--stepper-separator-delay)] motion-reduce:[transition-delay:0ms]",
           "[&>svg]:size-3.5 [&>svg]:shrink-0 sm:[&>svg]:size-4",
           className
         )}
@@ -1092,7 +1158,7 @@ function StepperSeparator({ className, ...props }: StepperSeparatorProps) {
       data-slot="stepper-separator"
       className={cn(
         "overflow-hidden bg-muted-foreground/25 after:absolute after:inset-0 after:bg-primary after:content-['']",
-        "after:transition-transform after:duration-[220ms] after:ease-out motion-reduce:after:transition-none",
+        "after:transition-transform after:duration-[220ms] after:ease-out after:[transition-delay:var(--stepper-separator-delay)] motion-reduce:after:transition-none motion-reduce:after:[transition-delay:0ms]",
         orientation === "horizontal" &&
           "absolute left-[calc(50%_+_var(--stepper-separator-offset))] right-[calc(-50%_+_var(--stepper-separator-offset))] top-(--stepper-separator-y) h-px after:origin-left after:scale-x-0 group-data-[completed]/stepper-item:after:scale-x-100 group-data-[position=previous]/stepper-item:after:scale-x-100 group-data-[state=completed]/stepper-item:after:scale-x-100",
         orientation === "vertical" &&

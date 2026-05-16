@@ -949,7 +949,7 @@ function StepperCheckoutExample({
               type="button"
               className="h-9 min-w-24 rounded-none bg-zinc-100 px-3 text-zinc-950 hover:bg-white hover:text-zinc-950"
             >
-              Place order
+              Confirm
               <Check data-icon="inline-end" />
             </Button>
           ) : (
@@ -972,7 +972,7 @@ function StepperCheckoutExample({
                 type="button"
                 className="h-9 min-w-24 rounded-none bg-zinc-100 px-3 text-zinc-950 hover:bg-white hover:text-zinc-950"
               >
-                Place order
+                Confirm
                 <Check data-icon="inline-end" />
               </Button>
             ) : undefined
