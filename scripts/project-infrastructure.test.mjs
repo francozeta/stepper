@@ -33,6 +33,9 @@ describe("project infrastructure", () => {
     expect(packageJson.devDependencies).toHaveProperty("turbo");
     expect(turbo.tasks.build.dependsOn).toContain("^build");
     expect(turbo.tasks.dev.persistent).toBe(true);
+    expect(turbo.tasks["registry:build"].outputs).toContain(
+      "registry/default/**"
+    );
     expect(turbo.tasks["registry:build"].outputs).toContain("public/*.json");
     expect(turbo.tasks).not.toHaveProperty("package:build");
   });
@@ -40,24 +43,37 @@ describe("project infrastructure", () => {
   it("builds a public shadcn registry from the root registry manifest", async () => {
     const packageJson = await readJson("package.json");
     const registry = await readJson("registry.json");
+    const defaultRegistry = await readJson("registry/default/registry.json");
+    const registryItems = defaultRegistry.items;
 
     expect(packageJson.scripts["registry:build"]).toContain("shadcn build");
+    expect(packageJson.scripts["registry:build"]).toContain(
+      "shadcn registry validate"
+    );
     expect(packageJson.scripts["registry:check"]).toContain("shadcn build");
+    expect(packageJson.scripts["registry:check"]).toContain(
+      "shadcn registry validate"
+    );
     expect(packageJson.scripts).not.toHaveProperty("package:build");
     expect(packageJson.scripts.check).not.toContain("package:build");
     expect(registry).toMatchObject({
       name: "stepper",
       homepage: "https://francozeta-stepper.vercel.app",
     });
-    expect(registry.items).toEqual(
+    expect(registry.include).toEqual(["registry/default/registry.json"]);
+    expect(registry).not.toHaveProperty("items");
+    expect(defaultRegistry).toMatchObject({
+      $schema: "https://ui.shadcn.com/schema/registry.json",
+    });
+    expect(registryItems).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           name: "stepper",
           type: "registry:ui",
           files: expect.arrayContaining([
             expect.objectContaining({
-              path: "registry/default/ui/stepper.tsx",
-              target: "components/ui/stepper.tsx",
+              path: "ui/stepper.tsx",
+              target: "@ui/stepper.tsx",
             }),
           ]),
         }),
@@ -66,8 +82,8 @@ describe("project infrastructure", () => {
           type: "registry:block",
           files: expect.arrayContaining([
             expect.objectContaining({
-              path: "registry/default/examples/stepper-demo.tsx",
-              target: "components/stepper-demo.tsx",
+              path: "examples/stepper-demo.tsx",
+              target: "@components/stepper-demo.tsx",
             }),
           ]),
         }),
@@ -84,12 +100,12 @@ describe("project infrastructure", () => {
           ]),
           files: expect.arrayContaining([
             expect.objectContaining({
-              path: "registry/default/examples/stepper-intent-onboarding.tsx",
-              target: "components/stepper-intent-onboarding.tsx",
+              path: "examples/stepper-intent-onboarding.tsx",
+              target: "@components/stepper-intent-onboarding.tsx",
             }),
             expect.objectContaining({
               path: "components/stepper-logo.tsx",
-              target: "components/stepper-logo.tsx",
+              target: "@components/stepper-logo.tsx",
             }),
           ]),
         }),
@@ -102,7 +118,7 @@ describe("project infrastructure", () => {
     const registrySource = await readText("registry/default/ui/stepper.tsx");
     const publicItem = await readJson("public/stepper.json");
     const publicSource = publicItem.files.find(
-      (file) => file.target === "components/ui/stepper.tsx"
+      (file) => file.target === "@ui/stepper.tsx"
     )?.content;
 
     expect(normalizeLineEndings(registrySource)).toBe(

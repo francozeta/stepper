@@ -9,9 +9,9 @@
   ],
   "files": [
     {
-      "path": "registry/default/ui/stepper.tsx",
+      "path": "ui/stepper.tsx",
       "type": "registry:ui",
-      "target": "components/ui/stepper.tsx"
+      "target": "@ui/stepper.tsx"
     }
   ]
 }

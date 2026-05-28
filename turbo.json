@@ -15,7 +15,7 @@
     "lint": {},
     "registry:build": {
       "outputs": [
-        "registry/default/ui/**",
+        "registry/default/**",
         "public/*.json"
       ]
     },
