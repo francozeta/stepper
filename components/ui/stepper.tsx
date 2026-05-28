@@ -1263,15 +1263,19 @@ function StepperPrevious({
       tabIndex={asChild && isDisabled ? -1 : tabIndex}
       data-slot="stepper-previous"
       data-disabled={isDisabled ? "" : undefined}
-      className={cn(
-        "inline-flex h-9 min-w-24 items-center justify-center gap-2 rounded-none border border-border bg-background px-3 text-sm font-medium text-foreground",
-        "transition-[color,background-color,border-color,box-shadow,transform] hover:border-foreground/20 hover:bg-muted hover:text-foreground active:scale-[0.97]",
-        "focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none",
-        "disabled:pointer-events-none disabled:opacity-50",
-        "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-        "[&>svg]:size-4 [&>svg]:shrink-0",
-        className
-      )}
+      className={
+        asChild
+          ? className
+          : cn(
+              "inline-flex h-9 min-w-24 items-center justify-center gap-2 rounded-none border border-border bg-background px-3 text-sm font-medium text-foreground",
+              "transition-[color,background-color,border-color,box-shadow,transform] hover:border-foreground/20 hover:bg-muted hover:text-foreground active:scale-[0.97]",
+              "focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none",
+              "disabled:pointer-events-none disabled:opacity-50",
+              "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+              "[&>svg]:size-4 [&>svg]:shrink-0",
+              className
+            )
+      }
       onClick={(event: React.MouseEvent<HTMLButtonElement>) =>
         handleClick(event, onClick)
       }
@@ -1309,15 +1313,19 @@ function StepperNext({
       tabIndex={asChild && isDisabled ? -1 : tabIndex}
       data-slot="stepper-next"
       data-disabled={isDisabled ? "" : undefined}
-      className={cn(
-        "inline-flex h-9 min-w-24 items-center justify-center gap-2 rounded-none border border-primary bg-primary px-3 text-sm font-medium text-primary-foreground",
-        "transition-[background-color,border-color,box-shadow,transform] hover:bg-primary/90 active:scale-[0.97]",
-        "focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none",
-        "disabled:pointer-events-none disabled:opacity-50",
-        "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-        "[&>svg]:size-4 [&>svg]:shrink-0",
-        className
-      )}
+      className={
+        asChild
+          ? className
+          : cn(
+              "inline-flex h-9 min-w-24 items-center justify-center gap-2 rounded-none border border-primary bg-primary px-3 text-sm font-medium text-primary-foreground",
+              "transition-[background-color,border-color,box-shadow,transform] hover:bg-primary/90 active:scale-[0.97]",
+              "focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none",
+              "disabled:pointer-events-none disabled:opacity-50",
+              "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+              "[&>svg]:size-4 [&>svg]:shrink-0",
+              className
+            )
+      }
       onClick={(event: React.MouseEvent<HTMLButtonElement>) =>
         handleClick(event, onClick)
       }

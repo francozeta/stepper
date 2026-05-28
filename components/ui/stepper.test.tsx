@@ -661,6 +661,36 @@ describe("Stepper", () => {
     expect(screen.getByText("Profile content")).toBeVisible();
   });
 
+  it("does not apply default navigation button styles to asChild controls", () => {
+    render(
+      <Stepper defaultValue="account">
+        <StepperList>
+          <StepperItem value="account">Account</StepperItem>
+          <StepperItem value="profile">Profile</StepperItem>
+        </StepperList>
+
+        <StepperPrevious asChild className="extra-previous">
+          <button type="button" className="child-previous bg-red-500">
+            Back
+          </button>
+        </StepperPrevious>
+        <StepperNext asChild className="extra-next">
+          <button type="button" className="child-next bg-blue-500">
+            Continue
+          </button>
+        </StepperNext>
+      </Stepper>
+    );
+
+    const back = screen.getByRole("button", { name: "Back" });
+    const next = screen.getByRole("button", { name: "Continue" });
+
+    expect(back).toHaveClass("child-previous", "bg-red-500", "extra-previous");
+    expect(back).not.toHaveClass("min-w-24", "bg-background");
+    expect(next).toHaveClass("child-next", "bg-blue-500", "extra-next");
+    expect(next).not.toHaveClass("min-w-24", "bg-primary");
+  });
+
   it("exposes a public useStepper hook for external controls", async () => {
     const user = userEvent.setup();
 
