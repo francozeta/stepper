@@ -20,19 +20,19 @@
   ],
   "files": [
     {
-      "path": "registry/default/ui/stepper.tsx",
+      "path": "ui/stepper.tsx",
       "type": "registry:ui",
-      "target": "components/ui/stepper.tsx"
+      "target": "@ui/stepper.tsx"
     },
     {
-      "path": "registry/default/examples/stepper-intent-onboarding.tsx",
+      "path": "examples/stepper-intent-onboarding.tsx",
       "type": "registry:component",
-      "target": "components/stepper-intent-onboarding.tsx"
+      "target": "@components/stepper-intent-onboarding.tsx"
     },
     {
       "path": "components/stepper-logo.tsx",
       "type": "registry:component",
-      "target": "components/stepper-logo.tsx"
+      "target": "@components/stepper-logo.tsx"
     }
   ]
 }

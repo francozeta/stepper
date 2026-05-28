@@ -80,7 +80,7 @@ describe("release and AI documentation surfaces", () => {
     expect(actions).toContain("prompt:");
     expect(actions).toContain("Open in v0");
     expect(actions).toContain("single installable component");
-    expect(primitive).toContain('"target": "components/ui/stepper.tsx"');
+    expect(primitive).toContain('"target": "@ui/stepper.tsx"');
     expect(primitive).toContain("StepperIndicator");
     expect(primitive).toContain("StepperDescription");
     expect(primitive).not.toContain("@francozeta/stepper");

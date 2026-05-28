@@ -435,7 +435,7 @@ export function CheckoutForm() {
           <div className="flex justify-end gap-2">
             <StepperPrevious />
             {step === "payment" ? (
-              <button type="submit">Place order</button>
+              <button type="submit">Confirm</button>
             ) : (
               <StepperNext onBeforeNext={canContinue} />
             )}
@@ -975,7 +975,7 @@ export function CheckoutFlow() {
       <div className="mt-6 flex justify-between">
         <StepperPrevious />
         {value === "payment" ? (
-          <Button type="button">Place order</Button>
+          <Button type="button">Confirm</Button>
         ) : (
           <StepperNext />
         )}

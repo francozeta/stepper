@@ -9,14 +9,14 @@
   ],
   "files": [
     {
-      "path": "registry/default/ui/stepper.tsx",
+      "path": "ui/stepper.tsx",
       "type": "registry:ui",
-      "target": "components/ui/stepper.tsx"
+      "target": "@ui/stepper.tsx"
     },
     {
-      "path": "registry/default/examples/stepper-demo.tsx",
+      "path": "examples/stepper-demo.tsx",
       "type": "registry:component",
-      "target": "components/stepper-demo.tsx"
+      "target": "@components/stepper-demo.tsx"
     }
   ]
 }

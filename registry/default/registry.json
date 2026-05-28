@@ -1,10 +1,9 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
-  "name": "stepper",
-  "homepage": "https://francozeta-stepper.vercel.app",
   "items": [
     {
       "name": "stepper",
+      "type": "registry:ui",
       "title": "Stepper",
       "description": "A lightweight, composable stepper primitive for shadcn/ui-style multi-step flows.",
       "dependencies": [
@@ -12,15 +11,15 @@
       ],
       "files": [
         {
-          "path": "registry/default/ui/stepper.tsx",
+          "path": "ui/stepper.tsx",
           "type": "registry:ui",
           "target": "@ui/stepper.tsx"
         }
-      ],
-      "type": "registry:ui"
+      ]
     },
     {
       "name": "stepper-demo",
+      "type": "registry:block",
       "title": "Stepper Demo",
       "description": "A styled Stepper demo with a default export and the Stepper source primitive.",
       "dependencies": [
@@ -28,20 +27,20 @@
       ],
       "files": [
         {
-          "path": "registry/default/ui/stepper.tsx",
+          "path": "ui/stepper.tsx",
           "type": "registry:ui",
           "target": "@ui/stepper.tsx"
         },
         {
-          "path": "registry/default/examples/stepper-demo.tsx",
+          "path": "examples/stepper-demo.tsx",
           "type": "registry:component",
           "target": "@components/stepper-demo.tsx"
         }
-      ],
-      "type": "registry:block"
+      ]
     },
     {
       "name": "stepper-intent-onboarding",
+      "type": "registry:block",
       "title": "Stepper Intent Onboarding",
       "description": "An intent-driven onboarding block with hidden Stepper state, intent routing, profile validation, interests, async setup, and a signed-in completion state.",
       "dependencies": [
@@ -60,22 +59,21 @@
       ],
       "files": [
         {
-          "path": "registry/default/ui/stepper.tsx",
+          "path": "ui/stepper.tsx",
           "type": "registry:ui",
           "target": "@ui/stepper.tsx"
         },
         {
-          "path": "registry/default/examples/stepper-intent-onboarding.tsx",
+          "path": "examples/stepper-intent-onboarding.tsx",
           "type": "registry:component",
           "target": "@components/stepper-intent-onboarding.tsx"
         },
         {
-          "path": "registry/default/components/stepper-logo.tsx",
+          "path": "components/stepper-logo.tsx",
           "type": "registry:component",
           "target": "@components/stepper-logo.tsx"
         }
-      ],
-      "type": "registry:block"
+      ]
     }
   ]
 }
