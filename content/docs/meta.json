@@ -5,7 +5,7 @@
     "installation",
     "stepper",
     "api",
-    "examples",
+    "blocks",
     "---Adapters---",
     "adapters",
     "adapters/react-hook-form",

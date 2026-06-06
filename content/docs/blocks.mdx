@@ -1,0 +1,31 @@
+---
+title: "Blocks"
+description: "Copyable Stepper surfaces built around real product workflows."
+eyebrow: "api"
+navTitle: "Blocks"
+navIcon: "boxes"
+---
+
+import { BlockPreviewCard } from "@/components/block-preview-card";
+import { Section } from "@/components/docs-content";
+
+<div className="flex flex-col gap-6">
+  <Section
+    title="Checkout block"
+    description="A full product surface that shows Stepper doing real workflow work, without embedding a large demo route in the page."
+  >
+    <BlockPreviewCard
+      imageSrc="/previews/stepper-checkout@2x.png"
+      imageAlt="Subscription checkout block preview built with Stepper"
+      demoHref="/blocks/subscription-checkout"
+      codePath="components/stepper-checkout-draft.tsx"
+      filename="stepper-checkout.tsx"
+      installCommands={{
+        pnpm: "pnpm dlx shadcn@latest add @stepper/stepper-checkout",
+        npm: "npx shadcn@latest add @stepper/stepper-checkout",
+        yarn: "yarn dlx shadcn@latest add @stepper/stepper-checkout",
+        bun: "bunx --bun shadcn@latest add @stepper/stepper-checkout",
+      }}
+    />
+  </Section>
+</div>

@@ -33,8 +33,8 @@ type NavFrontmatter = {
 const fallbackIconByUrl: Record<string, DocsNavIcon> = {
   "/docs": "book-open",
   "/docs/api": "code",
+  "/docs/blocks": "boxes",
   "/docs/changelog": "rocket",
-  "/docs/examples": "gallery",
   "/docs/forms": "file-check",
   "/docs/installation": "boxes",
   "/docs/patterns": "route",
@@ -110,11 +110,7 @@ function getNavItem(node: PageTree.Item): DocsNavItem | null {
 }
 
 function isSoonPage(href: string) {
-  return (
-    href === "/docs/examples" ||
-    href === "/docs/forms" ||
-    href === "/docs/patterns"
-  );
+  return href === "/docs/forms" || href === "/docs/patterns";
 }
 
 function pushGroup(groups: DocsNavGroup[], group: DocsNavGroup) {
