@@ -1,5 +1,40 @@
 # Changelog
 
+## [0.9.0-beta.1](https://github.com/francozeta/stepper/compare/v0.9.0-beta.0...v0.9.0-beta.1) (2026-06-06)
+
+
+### Features
+
+* add checkout block surface ([49a7986](https://github.com/francozeta/stepper/commit/49a798659052b0c03eb819d8a5acda84485ecdce))
+* add checkout draft preview ([b9f3d29](https://github.com/francozeta/stepper/commit/b9f3d29a10385888e133d2b2c804ef9d30645675))
+* add hybrid checkout stepper flow ([4d6d5b2](https://github.com/francozeta/stepper/commit/4d6d5b253c2ea61b362593f7babc84e4b30fe81e))
+* refine checkout stepper draft ([fae246e](https://github.com/francozeta/stepper/commit/fae246e4f432d21c66732b988451c5519ea16071))
+
+
+### Bug Fixes
+
+* clarify completed step states ([2b8ee06](https://github.com/francozeta/stepper/commit/2b8ee065fa80b5c2099895262c5bb453c612dc4c))
+* respect asChild styling for stepper navigation ([737675f](https://github.com/francozeta/stepper/commit/737675ffd00d320659dc182bf56769e383396ce1))
+* respect asChild styling for stepper navigation ([dc2b84f](https://github.com/francozeta/stepper/commit/dc2b84f1b675dcc90b4614eb550d0a40196b57c3))
+* stabilize stepper adapter preview ([903e21b](https://github.com/francozeta/stepper/commit/903e21b4e86659f9e0160a5cf3f460c5ce38b92b))
+
+
+### Documentation
+
+* add adapters hub ([6a154d5](https://github.com/francozeta/stepper/commit/6a154d54de46316cb249ce71805565724da719e4))
+* add checkout receipt barcode ([3b9ff33](https://github.com/francozeta/stepper/commit/3b9ff33b2faee4758c90cc2bac8c1f70657af0cb))
+* add react hook form adapter guide ([e690bda](https://github.com/francozeta/stepper/commit/e690bda40c568d6908960e813f0ee989a9905d82))
+* add react hook form adapter preview ([cbf792b](https://github.com/francozeta/stepper/commit/cbf792b13189ca114337a5e612a7f6059ff976b1))
+* polish checkout receipt state ([18ecb3a](https://github.com/francozeta/stepper/commit/18ecb3a0a41bf20276d6615161320459b07365cc))
+* simplify checkout receipt state ([4d2be2b](https://github.com/francozeta/stepper/commit/4d2be2baf5ea56712d4d9cf4fb4c1df030ee0144))
+* tighten adapter preview footer ([c54bca2](https://github.com/francozeta/stepper/commit/c54bca23ed1af88d8aadca815b3f8bdc3e15d085))
+
+
+### Refactors
+
+* simplify stepper registration ([0f83e0a](https://github.com/francozeta/stepper/commit/0f83e0a2a2f7ff4dd069f5a85ec3a0979694bd6c))
+* simplify stepper registration ([cdf3967](https://github.com/francozeta/stepper/commit/cdf3967c50aa5f31f96ffd1ce44e861f46f72412))
+
 ## [0.8.0](https://github.com/francozeta/stepper/compare/v0.7.2...v0.8.0) (2026-05-04)
 
 
