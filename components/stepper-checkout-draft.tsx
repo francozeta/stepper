@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Lock } from "lucide-react";
+import { Check, CreditCard, Lock, Mail, WalletCards } from "lucide-react";
 
 import { StepperLogo } from "@/components/stepper-logo";
 import { Button } from "@/components/ui/button";
@@ -16,24 +16,34 @@ import {
 import {
   Stepper,
   StepperContent,
+  StepperDescription,
+  StepperIndicator,
   StepperItem,
+  StepperLabel,
   StepperList,
+  StepperTrigger,
   useStepper,
 } from "@/components/ui/stepper";
 import { cn } from "@/lib/utils";
 
 const checkoutSteps = [
   {
-    value: "account",
-    label: "Account",
+    value: "email",
+    label: "Email",
+    description: "Receipt details",
+    icon: Mail,
   },
   {
-    value: "plan",
-    label: "Plan",
+    value: "method",
+    label: "Payment method",
+    description: "Choose how to pay",
+    icon: WalletCards,
   },
   {
     value: "payment",
     label: "Payment",
+    description: "Card details",
+    icon: CreditCard,
   },
 ] as const;
 
@@ -64,8 +74,8 @@ const paymentMethods = [
   },
   {
     value: "bank",
-    label: "US bank account",
-    description: "ACH debit",
+    label: "Bank account",
+    description: "Debit transfer",
     icon: BankPaymentIcon,
   },
 ] as const;
@@ -87,14 +97,23 @@ const countries = [
 ] as const;
 
 function StepperCheckoutDraft() {
-  const [step, setStep] = React.useState<CheckoutStep>("payment");
+  const [step, setStep] = React.useState<CheckoutStep>("email");
+  const [customerEmail, setCustomerEmail] = React.useState(
+    checkoutProduct.customerEmail
+  );
   const [paymentMethod, setPaymentMethod] =
     React.useState<PaymentMethod>("card");
   const [country, setCountry] = React.useState("pe");
   const [discountOpen, setDiscountOpen] = React.useState(false);
   const [businessPurchase, setBusinessPurchase] = React.useState(false);
   const discountInputRef = React.useRef<HTMLInputElement>(null);
-  const currentStepIndex = checkoutSteps.findIndex((item) => item.value === step);
+  const currentStepIndex = checkoutSteps.findIndex(
+    (item) => item.value === step
+  );
+  const selectedPaymentMethod = paymentMethods.find(
+    (method) => method.value === paymentMethod
+  );
+  const emailIsReady = customerEmail.trim().length > 0;
   const subtotal = checkoutProduct.price;
   const taxes = 0.0;
   const total = subtotal + taxes;
@@ -105,9 +124,23 @@ function StepperCheckoutDraft() {
     }
   }, [discountOpen]);
 
+  function handleStepChange(nextStep: string) {
+    const nextCheckoutStep = nextStep as CheckoutStep;
+
+    if (nextCheckoutStep !== "email" && !emailIsReady) {
+      return;
+    }
+
+    if (nextCheckoutStep === "payment" && currentStepIndex < 1) {
+      return;
+    }
+
+    setStep(nextCheckoutStep);
+  }
+
   return (
     <section className="min-h-dvh bg-[#080808] text-zinc-50">
-      <div className="mx-auto grid min-h-dvh w-full max-w-6xl lg:grid-cols-[minmax(18rem,0.9fr)_minmax(24rem,1.1fr)]">
+      <div className="grid min-h-dvh w-full lg:grid-cols-[minmax(18rem,0.9fr)_minmax(24rem,1.1fr)]">
         <aside className="relative bg-[#080808] px-2 py-6 sm:px-8 lg:px-10 lg:py-10">
           <div className="relative flex h-full flex-col justify-between gap-8">
             <div className="space-y-7">
@@ -178,72 +211,79 @@ function StepperCheckoutDraft() {
           <div className="mx-auto flex w-full max-w-md flex-col gap-5">
             <Stepper
               value={step}
-              onValueChange={(nextStep) => setStep(nextStep as CheckoutStep)}
+              onValueChange={handleStepChange}
               steps={checkoutSteps}
               className="gap-4"
             >
               <StepperList
                 aria-label="Checkout progress"
-                className="hidden"
+                className="pb-1"
               >
                 {checkoutSteps.map((item, index) => {
+                  const Icon = item.icon;
                   const completed = index < currentStepIndex;
+                  const disabled =
+                    (item.value === "method" && !emailIsReady) ||
+                    (item.value === "payment" &&
+                      (!emailIsReady || currentStepIndex < 1));
 
                   return (
                     <StepperItem
                       key={item.value}
                       value={item.value}
                       completed={completed}
-                      separator={false}
+                      defaultTrigger={false}
+                      disabled={disabled}
                     >
-                      {item.label}
+                      <StepperTrigger className="min-h-0 rounded-none text-zinc-500 data-[state=active]:text-zinc-100 data-[state=completed]:text-zinc-100">
+                        <StepperIndicator className="size-9 rounded-full border-white/10 bg-[#111111] text-zinc-500 group-data-[state=active]/stepper-item:border-white/20 group-data-[state=active]/stepper-item:bg-[#111111] group-data-[state=active]/stepper-item:text-zinc-100 group-data-[state=completed]/stepper-item:border-zinc-100 group-data-[state=completed]/stepper-item:bg-zinc-100 group-data-[state=completed]/stepper-item:text-zinc-950">
+                          {completed ? <Check /> : <Icon />}
+                        </StepperIndicator>
+                        <span className="grid gap-1">
+                          <StepperLabel className="text-sm">
+                            {item.label}
+                          </StepperLabel>
+                          <StepperDescription className="hidden text-xs text-zinc-600 sm:block">
+                            {item.description}
+                          </StepperDescription>
+                        </span>
+                      </StepperTrigger>
                     </StepperItem>
                   );
                 })}
               </StepperList>
 
               <StepperContent
-                value="account"
+                value="email"
                 className="border-0 bg-transparent p-0 shadow-none"
               >
-                <PanelHeader
-                  eyebrow="Account"
-                  title="Confirm your email"
-                  description="The checkout keeps account state separate from payment details."
-                />
-                <Field label="Email" id="draft-account-email">
+                <Field label="Email" id="draft-checkout-email">
                   <input
-                    id="draft-account-email"
+                    id="draft-checkout-email"
                     type="email"
-                    defaultValue={checkoutProduct.customerEmail}
+                    placeholder="you@example.com"
+                    value={customerEmail}
+                    onChange={(event) => setCustomerEmail(event.target.value)}
+                    autoComplete="email"
                     className={inputClassName}
                   />
                 </Field>
               </StepperContent>
 
               <StepperContent
-                value="plan"
+                value="method"
                 className="border-0 bg-transparent p-0 shadow-none"
               >
-                <PanelHeader
-                  eyebrow="Plan"
-                  title="Monthly subscription"
-                  description="The selected plan appears in the order summary."
-                />
-                <div className="border border-white/10 bg-white/[0.035] p-4">
-                  <div className="flex items-center justify-between gap-4">
-                    <div>
-                      <p className="text-sm font-medium text-zinc-100">
-                        {checkoutProduct.title}
-                      </p>
-                      <p className="mt-1 text-xs text-zinc-500">
-                        Monthly access, billed today.
-                      </p>
-                    </div>
-                    <p className="text-sm font-semibold text-zinc-50">
-                      ${checkoutProduct.price.toFixed(2)}/
-                      {checkoutProduct.interval}
-                    </p>
+                <div className="flex flex-col gap-4">
+                  <CheckoutDetail label="Email" value={customerEmail} />
+                  <PaymentMethodPicker
+                    value={paymentMethod}
+                    onValueChange={setPaymentMethod}
+                  />
+
+                  <div className="flex items-center gap-2 text-xs font-medium text-emerald-400">
+                    <Lock className="size-3.5" aria-hidden="true" />
+                    Secure, fast checkout with Link
                   </div>
                 </div>
               </StepperContent>
@@ -253,59 +293,12 @@ function StepperCheckoutDraft() {
                 className="border-0 bg-transparent p-0 shadow-none"
               >
                 <div className="flex flex-col gap-5">
-                  <Field label="Email" id="draft-checkout-email">
-                    <input
-                      id="draft-checkout-email"
-                      type="email"
-                      placeholder="you@example.com"
-                      className={inputClassName}
+                  <div className="grid gap-3 rounded-md border border-white/10 bg-white/[0.025] p-3">
+                    <CheckoutDetail label="Email" value={customerEmail} />
+                    <CheckoutDetail
+                      label="Payment method"
+                      value={selectedPaymentMethod?.label ?? "Card"}
                     />
-                  </Field>
-
-                  <div className="grid gap-2">
-                    <p className="text-xs font-medium text-zinc-200">
-                      Payment method
-                    </p>
-                    <div className="grid grid-cols-3 gap-2">
-                      {paymentMethods.map((method) => {
-                        const Icon = method.icon;
-                        const selected = paymentMethod === method.value;
-
-                        return (
-                          <button
-                            key={method.value}
-                            type="button"
-                            className={cn(
-                              "min-h-[4.125rem] rounded-md border p-2.5 text-left transition-colors",
-                              selected
-                                ? "border-blue-500 bg-blue-500 text-white"
-                                : "border-white/10 bg-white/[0.035] text-zinc-400 hover:border-white/20 hover:text-zinc-100"
-                            )}
-                            onClick={() => setPaymentMethod(method.value)}
-                          >
-                            <span className="mb-1.5 block">
-                              <Icon />
-                            </span>
-                            <span className="block text-xs font-semibold">
-                              {method.label}
-                            </span>
-                            <span
-                              className={cn(
-                                "mt-1 hidden text-[0.68rem] sm:block",
-                                selected ? "text-blue-100" : "text-zinc-600"
-                              )}
-                            >
-                              {method.description}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 text-xs font-medium text-emerald-400">
-                    <Lock className="size-3.5" aria-hidden="true" />
-                    Secure, fast checkout with Link
                   </div>
 
                   <Field label="Card number" id="draft-card-number">
@@ -314,6 +307,7 @@ function StepperCheckoutDraft() {
                         id="draft-card-number"
                         inputMode="numeric"
                         placeholder="1234 1234 1234 1234"
+                        autoComplete="cc-number"
                         className={cn(inputClassName, "pr-24")}
                       />
                       <span className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-1">
@@ -331,6 +325,7 @@ function StepperCheckoutDraft() {
                         id="draft-expiration"
                         inputMode="numeric"
                         placeholder="MM / YY"
+                        autoComplete="cc-exp"
                         className={inputClassName}
                       />
                     </Field>
@@ -340,6 +335,7 @@ function StepperCheckoutDraft() {
                           id="draft-cvc"
                           inputMode="numeric"
                           placeholder="CVC"
+                          autoComplete="cc-csc"
                           className={cn(inputClassName, "pr-12")}
                         />
                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500">
@@ -353,6 +349,7 @@ function StepperCheckoutDraft() {
                     <input
                       id="draft-cardholder"
                       placeholder="Avery Stone"
+                      autoComplete="cc-name"
                       className={inputClassName}
                     />
                   </Field>
@@ -399,17 +396,18 @@ function StepperCheckoutDraft() {
                   {businessPurchase ? (
                     <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-4">
                       <h3 className="text-sm font-semibold text-zinc-50">
-                        Business Details
+                        Business details
                       </h3>
                       <div className="mt-4 grid gap-3">
                         <input
                           aria-label="Business name"
                           placeholder="Business name"
+                          autoComplete="organization"
                           className={inputClassName}
                         />
                         <input
                           aria-label="Tax ID"
-                          placeholder="Tax ID (Optional)"
+                          placeholder="Tax ID (optional)"
                           className={inputClassName}
                         />
                       </div>
@@ -418,7 +416,7 @@ function StepperCheckoutDraft() {
                 </div>
               </StepperContent>
 
-              <CheckoutActions />
+              <CheckoutActions emailIsReady={emailIsReady} />
             </Stepper>
 
             <p className="px-2 pt-3 text-center text-[0.68rem] leading-5 text-zinc-600">
@@ -432,17 +430,80 @@ function StepperCheckoutDraft() {
   );
 }
 
-function CheckoutActions() {
+function PaymentMethodPicker({
+  value,
+  onValueChange,
+}: {
+  value: PaymentMethod;
+  onValueChange: (value: PaymentMethod) => void;
+}) {
+  return (
+    <div className="grid gap-2">
+      <p className="text-xs font-medium text-zinc-200">Payment method</p>
+      <div className="grid grid-cols-3 gap-2">
+        {paymentMethods.map((method) => {
+          const Icon = method.icon;
+          const selected = value === method.value;
+
+          return (
+            <button
+              key={method.value}
+              type="button"
+              className={cn(
+                "min-h-[4.75rem] rounded-md border p-2.5 text-left transition-colors",
+                selected
+                  ? "border-blue-500 bg-blue-500 text-white"
+                  : "border-white/10 bg-white/[0.035] text-zinc-400 hover:border-white/20 hover:text-zinc-100"
+              )}
+              onClick={() => onValueChange(method.value)}
+            >
+              <span className="mb-1.5 block">
+                <Icon />
+              </span>
+              <span className="block text-xs font-semibold">
+                {method.label}
+              </span>
+              <span
+                className={cn(
+                  "mt-1 hidden text-[0.68rem] sm:block",
+                  selected ? "text-blue-100" : "text-zinc-600"
+                )}
+              >
+                {method.description}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function CheckoutDetail({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between gap-4 text-xs">
+      <span className="text-zinc-500">{label}</span>
+      <span className="min-w-0 truncate font-medium text-zinc-100">
+        {value}
+      </span>
+    </div>
+  );
+}
+
+function CheckoutActions({ emailIsReady }: { emailIsReady: boolean }) {
   const { canGoNext, currentIndex, goNext, totalSteps, value } =
     useStepper<CheckoutStep>();
+  const isEmailStep = value === "email";
   const isPaymentStep = value === "payment";
+  const nextDisabled =
+    (!isPaymentStep && !canGoNext) || (isEmailStep && !emailIsReady);
 
   return (
     <div className="flex flex-col gap-3 pt-3">
       <Button
         type="button"
         className="h-12 w-full rounded-full bg-zinc-100 text-zinc-950 hover:bg-white"
-        disabled={!isPaymentStep && !canGoNext}
+        disabled={nextDisabled}
         onClick={() => {
           if (!isPaymentStep) {
             goNext();
@@ -676,26 +737,6 @@ function SummaryRow({
     >
       <span>{label}</span>
       <span>{value}</span>
-    </div>
-  );
-}
-
-function PanelHeader({
-  eyebrow,
-  title,
-  description,
-}: {
-  eyebrow: string;
-  title: string;
-  description: string;
-}) {
-  return (
-    <div className="mb-5">
-      <p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-zinc-600">
-        {eyebrow}
-      </p>
-      <h2 className="mt-2 text-xl font-semibold text-zinc-50">{title}</h2>
-      <p className="mt-2 text-sm leading-6 text-zinc-500">{description}</p>
     </div>
   );
 }
