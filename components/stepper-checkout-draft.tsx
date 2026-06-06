@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Check, CreditCard, Lock, Mail, WalletCards } from "lucide-react";
+import { BadgeCheck, Check, CreditCard, Lock, Mail } from "lucide-react";
 
 import { StepperLogo } from "@/components/stepper-logo";
 import { Button } from "@/components/ui/button";
@@ -26,31 +26,61 @@ import {
 } from "@/components/ui/stepper";
 import { cn } from "@/lib/utils";
 
-const checkoutSteps = [
-  {
-    value: "email",
-    label: "Email",
+const checkoutStepRegistry = {
+  account: {
+    value: "account",
+    label: "Account",
     description: "Receipt details",
     icon: Mail,
   },
-  {
-    value: "method",
-    label: "Payment method",
-    description: "Choose how to pay",
-    icon: WalletCards,
-  },
-  {
+  payment: {
     value: "payment",
     label: "Payment",
-    description: "Card details",
+    description: "Payment details",
     icon: CreditCard,
   },
+  confirmation: {
+    value: "confirmation",
+    label: "Confirmation",
+    description: "Review order",
+    icon: BadgeCheck,
+  },
+} as const;
+
+const guestCheckoutSteps = [
+  checkoutStepRegistry.account,
+  checkoutStepRegistry.payment,
+  checkoutStepRegistry.confirmation,
 ] as const;
 
-type CheckoutStep = (typeof checkoutSteps)[number]["value"];
+const authenticatedCheckoutSteps = [
+  checkoutStepRegistry.payment,
+  checkoutStepRegistry.confirmation,
+] as const;
+
+type CheckoutStep = keyof typeof checkoutStepRegistry;
+type CheckoutMode = "guest" | "authenticated";
 type PaymentMethod = "card" | "cash-app" | "bank";
 
-const checkoutProduct = {
+type CheckoutProduct = {
+  brand: string;
+  title: string;
+  price: number;
+  interval: string;
+  customerEmail: string;
+  company: string;
+};
+
+type StepperCheckoutDraftProps = {
+  mode?: CheckoutMode;
+  product?: Partial<CheckoutProduct>;
+  customer?: {
+    email?: string;
+  };
+  defaultPaymentMethod?: PaymentMethod;
+};
+
+const checkoutProduct: CheckoutProduct = {
   brand: "steppr.dev",
   title: "Stepper Pro - Monthly Subscription",
   price: 7.99,
@@ -96,25 +126,45 @@ const countries = [
   { value: "sg", label: "Singapore" },
 ] as const;
 
-function StepperCheckoutDraft() {
-  const [step, setStep] = React.useState<CheckoutStep>("email");
-  const [customerEmail, setCustomerEmail] = React.useState(
-    checkoutProduct.customerEmail
+function StepperCheckoutDraft({
+  mode = "guest",
+  product: productOverrides,
+  customer,
+  defaultPaymentMethod = "card",
+}: StepperCheckoutDraftProps = {}) {
+  const product = React.useMemo(
+    () => ({
+      ...checkoutProduct,
+      ...productOverrides,
+    }),
+    [productOverrides]
   );
+  const steps =
+    mode === "authenticated" ? authenticatedCheckoutSteps : guestCheckoutSteps;
+  const firstStep = steps[0].value;
+  const initialEmail = customer?.email ?? product.customerEmail;
+  const [step, setStep] = React.useState<CheckoutStep>(firstStep);
+  const activeStep = steps.some((item) => item.value === step)
+    ? step
+    : firstStep;
+  const [customerEmail, setCustomerEmail] = React.useState(initialEmail);
   const [paymentMethod, setPaymentMethod] =
-    React.useState<PaymentMethod>("card");
+    React.useState<PaymentMethod>(defaultPaymentMethod);
   const [country, setCountry] = React.useState("pe");
   const [discountOpen, setDiscountOpen] = React.useState(false);
   const [businessPurchase, setBusinessPurchase] = React.useState(false);
   const discountInputRef = React.useRef<HTMLInputElement>(null);
-  const currentStepIndex = checkoutSteps.findIndex(
-    (item) => item.value === step
+  const currentStepIndex = steps.findIndex(
+    (item) => item.value === activeStep
   );
+  const paymentStepIndex = steps.findIndex((item) => item.value === "payment");
   const selectedPaymentMethod = paymentMethods.find(
     (method) => method.value === paymentMethod
   );
+  const selectedCountry = countries.find((item) => item.value === country);
   const emailIsReady = customerEmail.trim().length > 0;
-  const subtotal = checkoutProduct.price;
+  const accountIsReady = mode === "authenticated" || emailIsReady;
+  const subtotal = product.price;
   const taxes = 0.0;
   const total = subtotal + taxes;
 
@@ -126,16 +176,33 @@ function StepperCheckoutDraft() {
 
   function handleStepChange(nextStep: string) {
     const nextCheckoutStep = nextStep as CheckoutStep;
+    const nextStepIndex = steps.findIndex(
+      (item) => item.value === nextCheckoutStep
+    );
 
-    if (nextCheckoutStep !== "email" && !emailIsReady) {
-      return;
-    }
-
-    if (nextCheckoutStep === "payment" && currentStepIndex < 1) {
+    if (nextStepIndex === -1 || isCheckoutStepDisabled(nextCheckoutStep)) {
       return;
     }
 
     setStep(nextCheckoutStep);
+  }
+
+  function isCheckoutStepDisabled(nextStep: CheckoutStep) {
+    const nextStepIndex = steps.findIndex((item) => item.value === nextStep);
+
+    if (nextStepIndex === -1 || nextStepIndex > currentStepIndex + 1) {
+      return true;
+    }
+
+    if (nextStep === "payment" && !accountIsReady) {
+      return true;
+    }
+
+    if (nextStep === "confirmation") {
+      return !accountIsReady || currentStepIndex < paymentStepIndex;
+    }
+
+    return false;
   }
 
   return (
@@ -149,20 +216,20 @@ function StepperCheckoutDraft() {
                   <StepperLogo className="h-4 w-auto" />
                 </span>
                 <p className="text-xs font-semibold text-zinc-50">
-                  {checkoutProduct.brand}
+                  {product.brand}
                 </p>
               </div>
 
               <div className="space-y-2">
                 <p className="text-xs font-semibold text-zinc-50 sm:text-sm">
-                  {checkoutProduct.title}
+                  {product.title}
                 </p>
                 <div className="flex items-end gap-1.5">
                   <span className="text-2xl font-semibold tracking-tight text-white sm:text-4xl">
-                    ${checkoutProduct.price.toFixed(2)}
+                    ${product.price.toFixed(2)}
                   </span>
                   <span className="pb-0.5 text-sm font-semibold text-white">
-                    / {checkoutProduct.interval}
+                    / {product.interval}
                   </span>
                 </div>
               </div>
@@ -170,12 +237,12 @@ function StepperCheckoutDraft() {
               <div className="space-y-3 py-3">
                 <SummaryRow
                   label="Subtotal"
-                  value={`$${subtotal.toFixed(2)} / ${checkoutProduct.interval}`}
+                  value={`$${subtotal.toFixed(2)} / ${product.interval}`}
                 />
                 <SummaryRow label="Taxes" value={`$${taxes.toFixed(2)}`} />
                 <SummaryRow
                   label="Monthly"
-                  value={`$${total.toFixed(2)} / ${checkoutProduct.interval}`}
+                  value={`$${total.toFixed(2)} / ${product.interval}`}
                   strong
                 />
               </div>
@@ -210,22 +277,19 @@ function StepperCheckoutDraft() {
         <div className="bg-[#080808] px-2 pb-8 pt-4 sm:px-8 lg:bg-[#0b0b0b] lg:px-12 lg:py-10">
           <div className="mx-auto flex w-full max-w-md flex-col gap-5">
             <Stepper
-              value={step}
+              value={activeStep}
               onValueChange={handleStepChange}
-              steps={checkoutSteps}
+              steps={steps}
               className="gap-4"
             >
               <StepperList
                 aria-label="Checkout progress"
                 className="pb-1"
               >
-                {checkoutSteps.map((item, index) => {
+                {steps.map((item, index) => {
                   const Icon = item.icon;
                   const completed = index < currentStepIndex;
-                  const disabled =
-                    (item.value === "method" && !emailIsReady) ||
-                    (item.value === "payment" &&
-                      (!emailIsReady || currentStepIndex < 1));
+                  const disabled = isCheckoutStepDisabled(item.value);
 
                   return (
                     <StepperItem
@@ -236,7 +300,7 @@ function StepperCheckoutDraft() {
                       disabled={disabled}
                     >
                       <StepperTrigger className="min-h-0 rounded-none text-zinc-500 data-[state=active]:text-zinc-100 data-[state=completed]:text-zinc-100">
-                        <StepperIndicator className="size-9 rounded-full border-white/10 bg-[#111111] text-zinc-500 group-data-[state=active]/stepper-item:border-white/20 group-data-[state=active]/stepper-item:bg-[#111111] group-data-[state=active]/stepper-item:text-zinc-100 group-data-[state=completed]/stepper-item:border-zinc-100 group-data-[state=completed]/stepper-item:bg-zinc-100 group-data-[state=completed]/stepper-item:text-zinc-950">
+                        <StepperIndicator className="size-9 rounded-full border-white/10 bg-[#111111] text-zinc-500 group-data-[state=active]/stepper-item:border-zinc-100 group-data-[state=active]/stepper-item:bg-zinc-100 group-data-[state=active]/stepper-item:text-zinc-950 group-data-[state=completed]/stepper-item:border-white/15 group-data-[state=completed]/stepper-item:bg-[#111111] group-data-[state=completed]/stepper-item:text-zinc-300">
                           {completed ? <Check /> : <Icon />}
                         </StepperIndicator>
                         <span className="grid gap-1">
@@ -254,7 +318,7 @@ function StepperCheckoutDraft() {
               </StepperList>
 
               <StepperContent
-                value="email"
+                value="account"
                 className="border-0 bg-transparent p-0 shadow-none"
               >
                 <Field label="Email" id="draft-checkout-email">
@@ -271,11 +335,14 @@ function StepperCheckoutDraft() {
               </StepperContent>
 
               <StepperContent
-                value="method"
+                value="payment"
                 className="border-0 bg-transparent p-0 shadow-none"
               >
-                <div className="flex flex-col gap-4">
-                  <CheckoutDetail label="Email" value={customerEmail} />
+                <div className="flex flex-col gap-5">
+                  <div className="grid gap-3 rounded-md border border-white/10 bg-white/[0.025] p-3">
+                    <CheckoutDetail label="Email" value={customerEmail} />
+                  </div>
+
                   <PaymentMethodPicker
                     value={paymentMethod}
                     onValueChange={setPaymentMethod}
@@ -284,21 +351,6 @@ function StepperCheckoutDraft() {
                   <div className="flex items-center gap-2 text-xs font-medium text-emerald-400">
                     <Lock className="size-3.5" aria-hidden="true" />
                     Secure, fast checkout with Link
-                  </div>
-                </div>
-              </StepperContent>
-
-              <StepperContent
-                value="payment"
-                className="border-0 bg-transparent p-0 shadow-none"
-              >
-                <div className="flex flex-col gap-5">
-                  <div className="grid gap-3 rounded-md border border-white/10 bg-white/[0.025] p-3">
-                    <CheckoutDetail label="Email" value={customerEmail} />
-                    <CheckoutDetail
-                      label="Payment method"
-                      value={selectedPaymentMethod?.label ?? "Card"}
-                    />
                   </div>
 
                   <Field label="Card number" id="draft-card-number">
@@ -416,11 +468,39 @@ function StepperCheckoutDraft() {
                 </div>
               </StepperContent>
 
-              <CheckoutActions emailIsReady={emailIsReady} />
+              <StepperContent
+                value="confirmation"
+                className="border-0 bg-transparent p-0 shadow-none"
+              >
+                <div className="flex flex-col gap-5">
+                  <div className="grid gap-3 rounded-md border border-white/10 bg-white/[0.025] p-3">
+                    <CheckoutDetail label="Email" value={customerEmail} />
+                    <CheckoutDetail
+                      label="Payment method"
+                      value={selectedPaymentMethod?.label ?? "Card"}
+                    />
+                    <CheckoutDetail
+                      label="Billing address"
+                      value={selectedCountry?.label ?? "Peru"}
+                    />
+                    <CheckoutDetail
+                      label="Due today"
+                      value={`$${total.toFixed(2)} / ${product.interval}`}
+                    />
+                  </div>
+
+                  <p className="text-sm leading-6 text-zinc-500">
+                    Review the subscription details before confirming. This
+                    draft keeps the payment provider disconnected.
+                  </p>
+                </div>
+              </StepperContent>
+
+              <CheckoutActions accountIsReady={accountIsReady} />
             </Stepper>
 
             <p className="px-2 pt-3 text-center text-[0.68rem] leading-5 text-zinc-600">
-              By clicking subscribe, you authorize {checkoutProduct.company} to
+              By clicking subscribe, you authorize {product.company} to
               charge your selected payment method according to the terms.
             </p>
           </div>
@@ -490,13 +570,14 @@ function CheckoutDetail({ label, value }: { label: string; value: string }) {
   );
 }
 
-function CheckoutActions({ emailIsReady }: { emailIsReady: boolean }) {
+function CheckoutActions({ accountIsReady }: { accountIsReady: boolean }) {
   const { canGoNext, currentIndex, goNext, totalSteps, value } =
     useStepper<CheckoutStep>();
-  const isEmailStep = value === "email";
-  const isPaymentStep = value === "payment";
+  const isAccountStep = value === "account";
+  const isConfirmationStep = value === "confirmation";
   const nextDisabled =
-    (!isPaymentStep && !canGoNext) || (isEmailStep && !emailIsReady);
+    (!isConfirmationStep && !canGoNext) ||
+    (isAccountStep && !accountIsReady);
 
   return (
     <div className="flex flex-col gap-3 pt-3">
@@ -505,12 +586,12 @@ function CheckoutActions({ emailIsReady }: { emailIsReady: boolean }) {
         className="h-12 w-full rounded-full bg-zinc-100 text-zinc-950 hover:bg-white"
         disabled={nextDisabled}
         onClick={() => {
-          if (!isPaymentStep) {
+          if (!isConfirmationStep) {
             goNext();
           }
         }}
       >
-        {isPaymentStep ? "Subscribe now" : "Continue"}
+        {isConfirmationStep ? "Confirm subscription" : "Continue"}
       </Button>
       <p className="sr-only">
         Step {currentIndex + 1} of {totalSteps}
