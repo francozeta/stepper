@@ -21,7 +21,12 @@ const nextConfig = {
       },
       {
         source: "/examples",
-        destination: "/docs/examples",
+        destination: "/docs/blocks",
+        permanent: true,
+      },
+      {
+        source: "/docs/examples",
+        destination: "/docs/blocks",
         permanent: true,
       },
       {

@@ -83,12 +83,12 @@ const markdownDocs: MarkdownDoc[] = [
     body: getReactHookFormAdapterMarkdown,
   },
   {
-    slug: "examples",
-    href: "/docs/examples",
-    title: "Examples",
+    slug: "blocks",
+    href: "/docs/blocks",
+    title: "Blocks",
     description:
-      "Product examples for intent onboarding, checkout, onboarding, and status flows.",
-    file: "examples.mdx",
+      "Copyable Stepper surfaces built around real product workflows.",
+    file: "blocks.mdx",
   },
   {
     slug: "forms",

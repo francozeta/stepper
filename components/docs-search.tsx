@@ -362,7 +362,6 @@ function sanitizeInlineText(value: string) {
 
 function isDisabledDocsUrl(url: string) {
   return [
-    "/docs/examples",
     "/docs/forms",
     "/docs/patterns",
   ].some((pathname) => url === pathname || url.startsWith(`${pathname}#`));
