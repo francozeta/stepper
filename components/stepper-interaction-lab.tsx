@@ -146,7 +146,10 @@ export function StepperInteractionLab() {
   return (
     <main className="mx-auto grid min-h-dvh max-w-xl content-start gap-8 px-5 py-8 sm:py-14">
       <header className="grid gap-3">
-        <Link href="/docs" className="w-fit text-xs text-muted-foreground hover:text-foreground">Stepper / Research</Link>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <Link href="/docs" className="w-fit text-xs text-muted-foreground hover:text-foreground">Stepper / Research</Link>
+          <Link href="/drafts/handoff" className="text-xs text-muted-foreground hover:text-foreground">Next experiment: Handoff →</Link>
+        </div>
         <h1 className="text-2xl font-medium tracking-tight">Make progress feel natural.</h1>
         <p className="text-sm text-muted-foreground">Same primitive. Same workflow. Four ways to explore layout and continuity.</p>
       </header>
