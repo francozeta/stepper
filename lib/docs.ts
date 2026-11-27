@@ -1499,7 +1499,7 @@ const apiComponents = [
   {
     name: "StepperSeparator",
     element: "span",
-    description: "Connector line between steps. Hidden automatically when rendered in the final item.",
+    description: "Connector (Track + Fill) between steps. Hidden automatically when rendered in the final item.",
   },
   {
     name: "StepperContent",

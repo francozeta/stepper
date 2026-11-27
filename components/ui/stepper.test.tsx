@@ -1139,12 +1139,10 @@ describe("Stepper", () => {
       '[data-slot="stepper-separator"]'
     );
 
-    expect(separator).toHaveClass(
-      "group-data-[completed]/stepper-item:after:scale-x-100"
-    );
+    expect(separator?.closest('[data-slot="stepper-item"]')).toHaveStyle("--stepper-connector-fill: 1");
   });
 
-  it("staggers connector transitions when jumping across multiple steps", async () => {
+  it("uses one shared progress cursor for forward and reverse jumps", async () => {
     const user = userEvent.setup();
     const { container } = render(
       <Stepper defaultValue="account">
@@ -1156,16 +1154,30 @@ describe("Stepper", () => {
         </StepperList>
       </Stepper>
     );
-
-    await user.click(screen.getByRole("button", { name: /Step 4:\s*Payment/ }));
-
+    const root = container.querySelector('[data-slot="stepper"]') as HTMLElement;
     const items = container.querySelectorAll('[data-slot="stepper-item"]');
+    expect(root.style.getPropertyValue("--stepper-progress")).toBe("0");
+    await user.click(screen.getByRole("button", { name: /Step 4:\s*Payment/ }));
+    expect(root.style.getPropertyValue("--stepper-progress")).toBe("3");
+    expect(root.style.transitionDuration).toBe("660ms");
+    expect(items[1]).toHaveStyle("--stepper-connector-index: 1");
+    expect(items[2]).toHaveStyle("--stepper-connector-index: 2");
+    await user.click(screen.getByRole("button", { name: /Step 1:\s*Account/ }));
+    expect(root.style.getPropertyValue("--stepper-progress")).toBe("0");
+    expect(root.style.transitionDuration).toBe("660ms");
+    expect(root).toHaveClass("motion-reduce:transition-none");
+  });
 
-    await waitFor(() => {
-      expect(items[0]).toHaveStyle("--stepper-separator-delay: 0ms");
-      expect(items[1]).toHaveStyle("--stepper-separator-delay: 80ms");
-      expect(items[2]).toHaveStyle("--stepper-separator-delay: 160ms");
-    });
+  it("uses an inset visible outline for keyboard focus without changing selection", async () => {
+    const user = userEvent.setup();
+    render(<BasicStepper />);
+    const account = screen.getByRole("button", { name: /Account/ });
+    const profile = screen.getByRole("button", { name: /Profile/ });
+    account.focus();
+    await user.keyboard("{ArrowRight}");
+    expect(profile).toHaveFocus();
+    expect(profile).toHaveClass("focus-visible:outline-offset-[-2px]", "focus-visible:outline-ring");
+    expect(account).toHaveAttribute("aria-current", "step");
   });
 
   it("lets consumers opt out of the default separator explicitly", () => {

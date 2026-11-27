@@ -70,8 +70,6 @@ type StepperItemApi<TValue extends StepperValue = StepperValue> = {
 type StepperContextValue<TValue extends StepperValue = StepperValue> =
   StepperApi<TValue> & {
     isExplicitMode: boolean;
-    transitionFromIndex: number;
-    transitionToIndex: number;
     registerStep: (step: RegisteredStep) => void;
     unregisterStep: (id: string) => void;
     getTriggerId: (value: TValue) => string;
@@ -504,48 +502,32 @@ function useStepperNavigation({
   };
 }
 
-function useStepperTransition(currentIndex: number) {
-  const previousIndexRef = React.useRef(currentIndex);
-  const [transition, setTransition] = React.useState(() => ({
-    from: currentIndex,
-    to: currentIndex,
-  }));
+// A single inherited numeric cursor drives every connector. CSS retargets
+// from the in-flight value on reversal instead of restarting a stagger.
+// Browsers without typed custom properties fall back to an instant update.
+const progressProperty = "--stepper-progress";
+let progressPropertyRegistered = false;
+
+function useConnectorProgress(currentIndex: number) {
+  const previousIndex = React.useRef(currentIndex);
+  const [duration, setDuration] = React.useState(0);
 
   React.useLayoutEffect(() => {
-    const previousIndex = previousIndexRef.current;
-
-    if (previousIndex === currentIndex) {
-      return;
+    if (!progressPropertyRegistered && typeof CSS !== "undefined" && typeof CSS.registerProperty === "function") {
+      try {
+        CSS.registerProperty({ name: progressProperty, syntax: "<number>", inherits: true, initialValue: "0" });
+      } catch {
+        // Multiple installed copies may already have registered the property.
+      }
+      progressPropertyRegistered = true;
     }
-
-    setTransition({
-      from: previousIndex,
-      to: currentIndex,
-    });
-    previousIndexRef.current = currentIndex;
+    const previous = previousIndex.current;
+    if (previous === currentIndex) return;
+    previousIndex.current = currentIndex;
+    setDuration(previous < 0 || currentIndex < 0 ? 0 : Math.min(1200, Math.abs(currentIndex - previous) * 220));
   }, [currentIndex]);
 
-  return transition;
-}
-
-function getStepTransitionDelay({
-  from,
-  index,
-  to,
-}: {
-  from: number;
-  index: number;
-  to: number;
-}) {
-  if (from < 0 || to < 0 || index < 0 || from === to) {
-    return 0;
-  }
-
-  if (to > from) {
-    return index >= from && index < to ? (index - from) * 80 : 0;
-  }
-
-  return index >= to && index < from ? (from - index - 1) * 80 : 0;
+  return { progress: Math.max(0, currentIndex), duration };
 }
 
 function useDuplicateStepWarning(steps: StepperStep[]) {
@@ -683,6 +665,7 @@ function Stepper({
   orientation = "horizontal",
   steps: stepsProp,
   className,
+  style,
   children,
   ...props
 }: StepperProps) {
@@ -709,8 +692,7 @@ function Stepper({
       setValue: setStepperValue,
       steps,
     });
-  const { from: transitionFromIndex, to: transitionToIndex } =
-    useStepperTransition(currentIndex);
+  const { progress, duration } = useConnectorProgress(currentIndex);
 
   useDuplicateStepWarning(steps);
 
@@ -721,8 +703,6 @@ function Stepper({
       steps,
       isExplicitMode,
       currentIndex,
-      transitionFromIndex,
-      transitionToIndex,
       totalSteps: steps.length,
       registerStep,
       unregisterStep,
@@ -741,8 +721,6 @@ function Stepper({
       canGoPrevious,
       currentValue,
       currentIndex,
-      transitionFromIndex,
-      transitionToIndex,
       goNext,
       goPrevious,
       id,
@@ -760,7 +738,8 @@ function Stepper({
       <div
         data-slot="stepper"
         data-orientation={orientation}
-        className={cn("flex flex-col gap-6", className)}
+        className={cn("flex flex-col gap-6 transition-[--stepper-progress] ease-linear motion-reduce:transition-none", className)}
+        style={{ ...style, "--stepper-progress": progress, transitionDuration: duration + "ms" } as React.CSSProperties}
         {...props}
       >
         {children}
@@ -823,8 +802,6 @@ function StepperItem<TValue extends StepperValue = StepperValue>({
     orientation,
     steps,
     isExplicitMode,
-    transitionFromIndex,
-    transitionToIndex,
     registerStep,
     unregisterStep,
     setValue,
@@ -861,14 +838,10 @@ function StepperItem<TValue extends StepperValue = StepperValue>({
   const isLastStep = index >= 0 && index === steps.length - 1;
   const shouldRenderSeparator =
     isInsideStepperList && separator && !isLastStep;
-  const separatorTransitionDelay = getStepTransitionDelay({
-    from: transitionFromIndex,
-    index,
-    to: transitionToIndex,
-  });
   const itemStyle = {
     ...style,
-    "--stepper-separator-delay": `${separatorTransitionDelay}ms`,
+    "--stepper-connector-index": Math.max(0, index),
+    "--stepper-connector-fill": completed ? 1 : index < 0 ? 0 : "clamp(0, calc(var(--stepper-progress, 0) - var(--stepper-connector-index)), 1)",
   } as React.CSSProperties;
 
   React.useLayoutEffect(() => {
@@ -1067,7 +1040,7 @@ function StepperTrigger({
       className={cn(
         "group inline-flex min-h-10 min-w-0 items-center gap-2 rounded-lg text-left text-sm font-medium outline-none",
         "text-muted-foreground transition-[color,background-color,border-color,box-shadow,transform] hover:text-foreground active:scale-[0.96]",
-        "focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none",
+        "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ring",
         "disabled:pointer-events-none disabled:opacity-50",
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         "data-[state=active]:text-foreground",
@@ -1157,7 +1130,6 @@ function StepperIndicator({
           "group-data-[state=completed]:border-primary group-data-[state=completed]:bg-primary group-data-[state=completed]:text-primary-foreground",
           "group-data-[state=error]:border-destructive group-data-[state=error]:bg-destructive group-data-[state=error]:text-destructive-foreground",
           "group-data-[position=previous]:text-foreground",
-          "[transition-delay:var(--stepper-separator-delay)] motion-reduce:[transition-delay:0ms]",
           "[&>svg]:size-3.5 [&>svg]:shrink-0 sm:[&>svg]:size-4",
           className
         )}
@@ -1210,11 +1182,10 @@ function StepperSeparator({ className, ...props }: StepperSeparatorProps) {
       data-slot="stepper-separator"
       className={cn(
         "overflow-hidden bg-muted-foreground/25 after:absolute after:inset-0 after:bg-primary after:content-['']",
-        "after:transition-transform after:duration-[220ms] after:ease-out after:[transition-delay:var(--stepper-separator-delay)] motion-reduce:after:transition-none motion-reduce:after:[transition-delay:0ms]",
         orientation === "horizontal" &&
-          "absolute left-[calc(50%_+_var(--stepper-separator-offset))] right-[calc(-50%_+_var(--stepper-separator-offset))] top-(--stepper-separator-y) h-px after:origin-left after:scale-x-0 group-data-[completed]/stepper-item:after:scale-x-100 group-data-[position=previous]/stepper-item:after:scale-x-100 group-data-[state=completed]/stepper-item:after:scale-x-100",
+          "absolute start-[calc(50%_+_var(--stepper-separator-offset))] end-[calc(-50%_+_var(--stepper-separator-offset))] top-(--stepper-separator-y) h-px after:origin-left rtl:after:origin-right after:[transform:scaleX(var(--stepper-connector-fill,0))]",
         orientation === "vertical" &&
-          "absolute left-[calc(var(--stepper-indicator-size)_/_2)] top-[calc(var(--stepper-indicator-size)_+_0.5rem)] h-[calc(100%_-_var(--stepper-indicator-size)_+_0.75rem)] w-px after:origin-top after:scale-y-0 group-data-[completed]/stepper-item:after:scale-y-100 group-data-[position=previous]/stepper-item:after:scale-y-100 group-data-[state=completed]/stepper-item:after:scale-y-100",
+          "absolute left-[calc(var(--stepper-indicator-size)_/_2)] top-[calc(var(--stepper-indicator-size)_+_0.5rem)] h-[calc(100%_-_var(--stepper-indicator-size)_+_0.75rem)] w-px after:origin-top after:[transform:scaleY(var(--stepper-connector-fill,0))]",
         className
       )}
       {...props}

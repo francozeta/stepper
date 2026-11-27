@@ -46,6 +46,17 @@ import {
   <InfoGrid items={asChildRequirements} />
 </Section>
 
+<Section title="Anatomy" description="Use these names when discussing visuals or behavior. Connector refers to StepperSeparator: the Track is the unfilled line and the Fill is the progress overlay. The Trigger is the interactive hit area; the Focus outline marks keyboard focus, not the active step.">
+  <InfoGrid items={[
+    { label: "Indicator", value: "StepperIndicator", help: "Number or status symbol." },
+    { label: "Connector", value: "StepperSeparator", help: "Track and Fill between adjacent steps." },
+    { label: "Trigger", value: "StepperTrigger", help: "Interactive target, distinct from its focus outline." },
+    { label: "Label / Description", value: "StepperLabel / StepperDescription", help: "Visible step name and supporting text." },
+    { label: "Panel", value: "StepperContent", help: "Content associated with the active step." },
+    { label: "Navigation", value: "StepperPrevious / StepperNext", help: "Persistent previous and next controls." },
+  ]} />
+</Section>
+
 <Section title="List props">
   <PropsTable rows={listProps} />
 </Section>
