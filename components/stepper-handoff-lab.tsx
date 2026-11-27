@@ -27,7 +27,10 @@ export function StepperHandoffLab() {
   return (
     <main className="mx-auto grid min-h-dvh max-w-xl content-start gap-7 px-5 py-8 sm:py-14">
       <header className="grid gap-3">
-        <Link href="/drafts/interactions" className="w-fit text-xs text-muted-foreground hover:text-foreground">Stepper / Research / 005</Link>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <Link href="/drafts/interactions" className="w-fit text-xs text-muted-foreground hover:text-foreground">Stepper / Research / 005</Link>
+          <Link href="/drafts/onboarding" className="text-xs text-muted-foreground hover:text-foreground">Next: Agent-ready →</Link>
+        </div>
         <h1 className="text-2xl font-medium tracking-tight">One interface. Shared intent.</h1>
         <p className="text-sm text-muted-foreground">A human and a simulated agent can request navigation. Neither owns the workflow.</p>
       </header>
