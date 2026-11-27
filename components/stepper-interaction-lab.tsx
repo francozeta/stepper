@@ -9,10 +9,11 @@ import {
 
 const steps = [{ value: "account" }, { value: "preferences" }, { value: "review" }] as const;
 type Stage = (typeof steps)[number]["value"];
+type LayoutMode = "instant" | "adaptive" | "spatial";
 
 // Lab only. Retarget from the in-flight visual height rather than replaying
 // from the last committed height. Keep the actual content in normal flow.
-function AdaptiveHeight({ enabled, children }: { enabled: boolean; children: React.ReactNode }) {
+function AdaptiveHeight({ enabled, spatial, children }: { enabled: boolean; spatial: boolean; children: React.ReactNode }) {
   const outer = React.useRef<HTMLDivElement>(null);
   const inner = React.useRef<HTMLDivElement>(null);
   React.useLayoutEffect(() => {
@@ -56,9 +57,23 @@ function AdaptiveHeight({ enabled, children }: { enabled: boolean; children: Rea
   }, [enabled]);
   return (
     <div ref={outer} className={enabled ? "overflow-clip" : undefined}>
-      <div ref={inner} className="flow-root">{children}</div>
+      <div ref={inner} className={spatial ? "grid min-w-0 grid-cols-1 items-start" : "flow-root"}>{children}</div>
     </div>
   );
+}
+
+// The largest real panel determines the shared grid track. Inactive panels
+// stay in layout for intrinsic sizing, but cannot be read or interacted with.
+function spatialPanel(mode: LayoutMode, stage: Stage, value: Stage): React.ComponentProps<typeof StepperContent> {
+  if (mode !== "spatial") return { value };
+  const inactive = stage !== value;
+  return {
+    value,
+    hidden: false,
+    inert: inactive,
+    "aria-hidden": inactive ? true : undefined,
+    style: { gridArea: "1 / 1", visibility: inactive ? "hidden" : "visible" },
+  };
 }
 
 function Field({ label, ...props }: React.ComponentProps<"input"> & { label: string }) {
@@ -71,7 +86,7 @@ function Field({ label, ...props }: React.ComponentProps<"input"> & { label: str
 }
 
 export function StepperInteractionLab() {
-  const [mode, setMode] = React.useState<"instant" | "adaptive">("adaptive");
+  const [mode, setMode] = React.useState<LayoutMode>("spatial");
   const [stage, setStage] = React.useState<Stage>("account");
   const [name, setName] = React.useState("");
   const [expanded, setExpanded] = React.useState(false);
@@ -88,17 +103,18 @@ export function StepperInteractionLab() {
       <header className="grid gap-3">
         <Link href="/docs" className="w-fit text-xs text-muted-foreground hover:text-foreground">Stepper / Research</Link>
         <h1 className="text-2xl font-medium tracking-tight">Make progress feel natural.</h1>
-        <p className="text-sm text-muted-foreground">Same primitive. Same workflow. Two ways to handle a change in height.</p>
+        <p className="text-sm text-muted-foreground">Same primitive. Same workflow. Three ways to handle a change in height.</p>
       </header>
       <fieldset className="flex flex-wrap gap-2">
         <legend className="mb-2 text-xs text-muted-foreground">Layout behavior</legend>
-        {(["instant", "adaptive"] as const).map((value) => (
+        {(["instant", "adaptive", "spatial"] as const).map((value) => (
           <label key={value} className="flex cursor-pointer items-center gap-2 rounded-full border px-3 py-2 text-sm">
             <input type="radio" name="layout" checked={mode === value} onChange={() => setMode(value)} />
-            {value === "instant" ? "Instant / baseline" : "Adaptive / experiment"}
+            {value === "instant" ? "Instant" : value === "adaptive" ? "Adaptive" : "Spatial"}
           </label>
         ))}
       </fieldset>
+      <p className="-mt-5 text-xs text-muted-foreground" aria-live="polite">{mode === "instant" ? "The panel and controls follow content immediately." : mode === "adaptive" ? "The panel and controls move together with an animated height." : "A shared intrinsic height keeps navigation in place when switching steps."}</p>
       <section className="rounded-2xl border border-border p-4 sm:p-6">
         <Stepper steps={steps} value={stage} onValueChange={navigate}>
           <StepperList>
@@ -106,12 +122,12 @@ export function StepperInteractionLab() {
             <StepperItem value="preferences">Preferences</StepperItem>
             <StepperItem value="review">Review</StepperItem>
           </StepperList>
-          <AdaptiveHeight enabled={mode === "adaptive"}>
-            <StepperContent value="account" keepMounted className="space-y-4 border-0 bg-transparent p-1 shadow-none">
+          <AdaptiveHeight enabled={mode === "adaptive"} spatial={mode === "spatial"}>
+            <StepperContent {...spatialPanel(mode, stage, "account")} keepMounted className="space-y-4 border-0 bg-transparent p-1 shadow-none">
               <h2 className="text-lg font-medium">Start with the essentials.</h2>
               <Field label="Workspace name" value={name} onChange={(event) => setName(event.target.value)} placeholder="Studio" />
             </StepperContent>
-            <StepperContent value="preferences" keepMounted className="space-y-4 border-0 bg-transparent p-1 shadow-none">
+            <StepperContent {...spatialPanel(mode, stage, "preferences")} keepMounted className="space-y-4 border-0 bg-transparent p-1 shadow-none">
               <h2 className="text-lg font-medium">Make it yours.</h2>
               <p className="text-sm text-muted-foreground">Change the content height, then move quickly between stages.</p>
               <Field label="Timezone" placeholder="America/Lima" />
@@ -122,12 +138,12 @@ export function StepperInteractionLab() {
                 <Field label="Default view" />
               </div>
             </StepperContent>
-            <StepperContent value="review" keepMounted className="space-y-4 border-0 bg-transparent p-1 shadow-none">
+            <StepperContent {...spatialPanel(mode, stage, "review")} keepMounted className="space-y-4 border-0 bg-transparent p-1 shadow-none">
               <h2 className="text-lg font-medium">Everything in place.</h2>
               <p className="text-sm text-muted-foreground">Workspace: {name || "Untitled"}</p>
             </StepperContent>
           </AdaptiveHeight>
-          <div className="flex justify-between gap-3 border-t pt-4">
+          <div data-lab-controls className="flex justify-between gap-3 border-t pt-4">
             <StepperPrevious className="rounded-full">Back</StepperPrevious>
             <StepperNext className="rounded-full">Continue</StepperNext>
           </div>
@@ -136,8 +152,8 @@ export function StepperInteractionLab() {
       <section className="grid gap-3 text-sm">
         <h2 className="font-medium">Navigation trace</h2>
         <p className="break-words font-mono text-xs text-muted-foreground">{history.join(" → ")}</p>
-        <p className="text-muted-foreground">Try jumping across stages while the layout is moving, expanding preferences mid-transition, returning to Account, and enabling reduced motion in your OS.</p>
-        <p className="text-xs text-muted-foreground">Experimental native animation, not a benchmark or a registry component.</p>
+        <p className="text-muted-foreground">Try rapid Continue / Back, compare the position of the controls in all three modes, expand preferences, and return to Account. Spatial reserves the tallest current panel, so expanding content or resizing the viewport can still move the controls.</p>
+        <p className="text-xs text-muted-foreground">Experimental native layout and animation, not a benchmark or a registry component. Spatial trades extra whitespace for more predictable control placement.</p>
       </section>
     </main>
   );
