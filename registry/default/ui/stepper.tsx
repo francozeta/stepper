@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useRender } from "@base-ui/react/use-render";
 
-import { cn } from "@/lib/utils";
+import { cn } from "cn";
 
 // ----------------------------------------------------------------------------
 // Types

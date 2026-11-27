@@ -20,7 +20,7 @@ const stepperItem = {
   title: "Stepper",
   description:
     "A lightweight, composable stepper primitive for shadcn/ui-style multi-step flows.",
-  dependencies: ["@base-ui/react@^1.4.1"],
+  dependencies: ["@base-ui/react@^1.4.1", "cn@^0.5.2"],
   files: [
     {
       path: "ui/stepper.tsx",
@@ -42,7 +42,7 @@ const stepperDemoItem = {
   title: "Stepper Demo",
   description:
     "A styled Stepper demo with a default export and the Stepper source primitive.",
-  dependencies: ["@base-ui/react@^1.4.1"],
+  dependencies: ["@base-ui/react@^1.4.1", "cn@^0.5.2"],
   files: [
     stepperDependencyFile,
     {
@@ -61,6 +61,7 @@ const stepperIntentOnboardingItem = {
     "An intent-driven onboarding block with hidden Stepper state, intent routing, profile validation, interests, async setup, and a signed-in completion state.",
   dependencies: [
     "@base-ui/react@^1.4.1",
+    "cn@^0.5.2",
     "lucide-react",
     "react-icons",
     "react-hook-form",

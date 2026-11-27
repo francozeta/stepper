@@ -127,6 +127,9 @@ describe("project infrastructure", () => {
     expect(normalizeLineEndings(publicSource)).toBe(
       normalizeLineEndings(source)
     );
+    expect(registrySource).toContain('import { cn } from "cn"');
+    expect(publicItem.dependencies).toContain("cn@^0.5.2");
+    expect(publicItem.dependencies).not.toContain("@ui-sdk/react");
     expect(registrySource).toContain("function Stepper(");
     expect(registrySource).toContain("function StepperItem<");
     expect(registrySource).toContain("export type {");
