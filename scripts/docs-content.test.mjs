@@ -14,7 +14,7 @@ const docs = [
   "content/docs/api.mdx",
   "content/docs/adapters.mdx",
   "content/docs/adapters/react-hook-form.mdx",
-  "content/docs/examples.mdx",
+  "content/docs/blocks.mdx",
   "content/docs/forms.mdx",
   "content/docs/patterns.mdx",
   "content/docs/styling.mdx",

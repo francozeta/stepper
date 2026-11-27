@@ -570,17 +570,29 @@ function useDuplicateStepWarning(steps: StepperStep[]) {
 
 function useNavigationButton({
   canNavigate,
+  sourceValue,
+  targetValue,
   disabled,
   navigate,
   onBeforeNavigate,
 }: {
   canNavigate: boolean;
+  sourceValue: StepperValue | undefined;
+  targetValue: StepperValue | undefined;
   disabled: boolean | undefined;
   navigate: () => void;
   onBeforeNavigate: StepperNavigationGuard | undefined;
 }) {
   const [isPending, setIsPending] = React.useState(false);
   const pendingRef = React.useRef(false);
+  const navigationEpoch = React.useRef(0);
+
+  // Invalidate a pending guard when its source or destination changes, or
+  // when the navigation control unmounts. A stale result cannot move the UI.
+  React.useLayoutEffect(() => {
+    return () => { navigationEpoch.current += 1; };
+  }, [sourceValue, targetValue]);
+
   const isDisabled = disabled || !canNavigate || isPending;
 
   const handleClick = React.useCallback(
@@ -599,6 +611,7 @@ function useNavigationButton({
         return;
       }
 
+      const epoch = navigationEpoch.current;
       pendingRef.current = true;
       setIsPending(true);
 
@@ -606,7 +619,7 @@ function useNavigationButton({
         const canCompleteNavigation =
           await resolveNavigationGuard(onBeforeNavigate);
 
-        if (canCompleteNavigation) {
+        if (canCompleteNavigation && epoch === navigationEpoch.current) {
           navigate();
         }
       } finally {
@@ -1289,9 +1302,11 @@ function StepperPrevious({
   tabIndex,
   ...props
 }: StepperPreviousProps) {
-  const { canGoPrevious, goPrevious } = useStepperContext("StepperPrevious");
+  const { canGoPrevious, goPrevious, value, steps } = useStepperContext("StepperPrevious");
   const { handleClick, isDisabled } = useNavigationButton({
     canNavigate: canGoPrevious,
+    sourceValue: value,
+    targetValue: getPreviousEnabledStep(steps, value)?.value,
     disabled,
     navigate: goPrevious,
     onBeforeNavigate: onBeforePrevious,
@@ -1344,9 +1359,11 @@ function StepperNext({
   tabIndex,
   ...props
 }: StepperNextProps) {
-  const { canGoNext, goNext } = useStepperContext("StepperNext");
+  const { canGoNext, goNext, value, steps } = useStepperContext("StepperNext");
   const { handleClick, isDisabled } = useNavigationButton({
     canNavigate: canGoNext,
+    sourceValue: value,
+    targetValue: getNextEnabledStep(steps, value)?.value,
     disabled,
     navigate: goNext,
     onBeforeNavigate: onBeforeNext,

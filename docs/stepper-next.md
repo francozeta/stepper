@@ -8,7 +8,9 @@ and shadcn registry namespace. The documentation site's existing Radix-based
 components are not migrated in this phase. Keep legacy asChild temporarily;
 new code should prefer render, with nativeButton=false for links.
 
-## Validation gates (not yet executed)
+## Validation gates
+
+Initial CI: registry, lint, typecheck, 37/37 primitive tests and Vercel deployment passed; 73/74 total tests passed. The only failing test referenced removed examples.mdx (replaced with blocks.mdx in the follow-up). New commits require a fresh run.
 
 - pnpm registry:build, inspect generated artifacts, then pnpm check.
 - Verify existing asChild behavior, render element/callback, refs and events,
@@ -34,3 +36,9 @@ Do not add Beetle, a new workflow engine, persistence or form ownership.
 Review the compatibility bridge and composition behavior, regenerate registry
 artifacts, run the checks, fix regressions, and produce a Vercel preview.
 Keep the PR in draft until verified. Do not merge or publish a release.
+
+## Interaction research — baseline
+
+- A stale async navigation guard must not move the user after the source or destination changes. Added regression cases for a direct jump and a replaced destination.
+- /drafts/interactions is a noindex lab, not a registry item. Compare instant height changes with a native WAAPI/ResizeObserver prototype using the same Stepper and flow. No new runtime dependency. Check rapid reversal, reduced motion, preserved input and focus, narrow viewports, and dynamic content. The animation is experimental and not part of the installed core.
+- Next compare the same fixture with UI SDK. Measure the rendered result rather than infer performance from library size. Keep cn migration separate until package/version and lockfile can be verified.

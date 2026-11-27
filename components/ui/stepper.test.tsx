@@ -1017,6 +1017,54 @@ describe("Stepper", () => {
     });
   });
 
+  it("ignores a guard that resolves after the user changes steps", async () => {
+    let resolveGuard: ((allowed: boolean) => void) | undefined;
+    const guard = () => new Promise<boolean>((resolve) => { resolveGuard = resolve; });
+    const user = userEvent.setup();
+    render(
+      <Stepper defaultValue="account">
+        <StepperList>
+          <StepperItem value="account">Account</StepperItem>
+          <StepperItem value="profile">Profile</StepperItem>
+          <StepperItem value="review">Review</StepperItem>
+        </StepperList>
+        <StepperContent value="account">Account content</StepperContent>
+        <StepperContent value="profile">Profile content</StepperContent>
+        <StepperContent value="review">Review content</StepperContent>
+        <StepperNext onBeforeNext={guard}>Continue</StepperNext>
+      </Stepper>
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+    await user.click(screen.getByRole("button", { name: /Review/ }));
+    resolveGuard?.(true);
+    await waitForSettledEffects();
+    expect(screen.getByText("Review content")).toBeVisible();
+    expect(screen.queryByText("Profile content")).not.toBeInTheDocument();
+  });
+
+  it("ignores a guard when its destination is replaced", async () => {
+    let resolveGuard: ((allowed: boolean) => void) | undefined;
+    const guard = () => new Promise<boolean>((resolve) => { resolveGuard = resolve; });
+    const onValueChange = vi.fn();
+    const fixture = (middle: string) => (
+      <Stepper value="account" onValueChange={onValueChange}
+        steps={[{ value: "account" }, { value: middle }, { value: "review" }]}>
+        <StepperList>
+          <StepperItem value="account">Account</StepperItem>
+          <StepperItem value={middle}>{middle}</StepperItem>
+          <StepperItem value="review">Review</StepperItem>
+        </StepperList>
+        <StepperNext onBeforeNext={guard}>Continue</StepperNext>
+      </Stepper>
+    );
+    const { rerender } = render(fixture("profile"));
+    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+    rerender(fixture("shipping"));
+    resolveGuard?.(true);
+    await waitFor(() => expect(screen.getByRole("button", { name: "Continue" })).toBeEnabled());
+    expect(onValueChange).not.toHaveBeenCalled();
+  });
+
   it("moves focus between triggers with keyboard navigation without changing the current step", async () => {
     const user = userEvent.setup();
 
