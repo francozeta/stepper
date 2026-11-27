@@ -8,6 +8,8 @@ describe("cn migration: Stepper class contracts", () => {
     expect(cn("border border-border/70 p-4 shadow-sm", "border-0 p-1 shadow-none")).toBe("border-border/70 border-0 p-1 shadow-none");
   });
   it("keeps modifier boundaries, logical geometry and connector transforms", () => {
+    expect(cn("start-1 end-2", "inset-x-4")).toBe("inset-x-4");
+
     const value = cn(
       "focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ring",
       "sm:focus-visible:outline-offset-2",

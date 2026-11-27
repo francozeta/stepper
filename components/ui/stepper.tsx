@@ -255,11 +255,13 @@ function getPreviousEnabledStep<TValue extends StepperValue>(
 function getKeyboardNavigationStepValue<TValue extends StepperValue>({
   key,
   orientation,
+  rtl,
   steps,
   value,
 }: {
   key: string;
   orientation: StepperOrientation;
+  rtl: boolean;
   steps: readonly StepperStep<TValue>[];
   value: TValue;
 }) {
@@ -279,7 +281,7 @@ function getKeyboardNavigationStepValue<TValue extends StepperValue>({
   }
 
   if (
-    (orientation === "horizontal" && key === "ArrowRight") ||
+    (orientation === "horizontal" && key === (rtl ? "ArrowLeft" : "ArrowRight")) ||
     (orientation === "vertical" && key === "ArrowDown")
   ) {
     return enabledSteps[Math.min(currentIndex + 1, enabledSteps.length - 1)]
@@ -287,23 +289,13 @@ function getKeyboardNavigationStepValue<TValue extends StepperValue>({
   }
 
   if (
-    (orientation === "horizontal" && key === "ArrowLeft") ||
+    (orientation === "horizontal" && key === (rtl ? "ArrowRight" : "ArrowLeft")) ||
     (orientation === "vertical" && key === "ArrowUp")
   ) {
     return enabledSteps[Math.max(currentIndex - 1, 0)]?.value;
   }
 
   return undefined;
-}
-
-async function resolveNavigationGuard(
-  guard: StepperNavigationGuard | undefined
-) {
-  if (!guard) {
-    return true;
-  }
-
-  return (await guard()) !== false;
 }
 
 function setDisplayName(component: object, displayName: string) {
@@ -509,8 +501,15 @@ const progressProperty = "--stepper-progress";
 let progressPropertyRegistered = false;
 
 function useConnectorProgress(currentIndex: number) {
-  const previousIndex = React.useRef(currentIndex);
-  const [duration, setDuration] = React.useState(0);
+  const [cursor, setCursor] = React.useState({ index: currentIndex, duration: 0 });
+
+  if (currentIndex !== cursor.index) {
+    // Commit the duration and target together so layout reads see both.
+    const duration = cursor.index < 0 || currentIndex < 0
+      ? 0
+      : Math.min(330, Math.abs(currentIndex - cursor.index) * 110);
+    setCursor({ index: currentIndex, duration });
+  }
 
   React.useLayoutEffect(() => {
     if (!progressPropertyRegistered && typeof CSS !== "undefined" && typeof CSS.registerProperty === "function") {
@@ -521,13 +520,9 @@ function useConnectorProgress(currentIndex: number) {
       }
       progressPropertyRegistered = true;
     }
-    const previous = previousIndex.current;
-    if (previous === currentIndex) return;
-    previousIndex.current = currentIndex;
-    setDuration(previous < 0 || currentIndex < 0 ? 0 : Math.min(330, Math.abs(currentIndex - previous) * 110));
-  }, [currentIndex]);
+  }, []);
 
-  return { progress: Math.max(0, currentIndex), duration };
+  return { progress: Math.max(0, cursor.index), duration: cursor.duration };
 }
 
 function useDuplicateStepWarning(steps: StepperStep[]) {
@@ -593,15 +588,17 @@ function useNavigationButton({
         return;
       }
 
+      if (!onBeforeNavigate) {
+        navigate();
+        return;
+      }
+
       const epoch = navigationEpoch.current;
       pendingRef.current = true;
       setIsPending(true);
 
       try {
-        const canCompleteNavigation =
-          await resolveNavigationGuard(onBeforeNavigate);
-
-        if (canCompleteNavigation && epoch === navigationEpoch.current) {
+        if ((await onBeforeNavigate()) !== false && epoch === navigationEpoch.current) {
           navigate();
         }
       } finally {
@@ -1039,7 +1036,7 @@ function StepperTrigger({
       data-disabled={isDisabled ? "" : undefined}
       className={cn(
         "group inline-flex min-h-10 min-w-0 items-center gap-2 rounded-lg text-left text-sm font-medium outline-none",
-        "text-muted-foreground transition-[color,background-color,border-color,box-shadow,transform] hover:text-foreground active:scale-[0.96]",
+        "text-muted-foreground transition-[color,background-color,border-color,box-shadow,transform] hover:text-foreground active:scale-[0.96] motion-reduce:transition-none motion-reduce:active:scale-100",
         "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ring",
         "disabled:pointer-events-none disabled:opacity-50",
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
@@ -1069,9 +1066,14 @@ function StepperTrigger({
           return;
         }
 
+        const { key } = event;
+        const rtl = orientation === "horizontal" &&
+          (key === "ArrowLeft" || key === "ArrowRight") &&
+          getComputedStyle(event.currentTarget).direction === "rtl";
         const targetStepValue = getKeyboardNavigationStepValue({
-          key: event.key,
+          key,
           orientation,
+          rtl,
           steps,
           value,
         });
@@ -1124,7 +1126,7 @@ function StepperIndicator({
         data-slot="stepper-indicator"
         className={cn(
           "flex size-(--stepper-indicator-size) shrink-0 items-center justify-center rounded-full border border-border bg-background text-xs font-semibold text-muted-foreground shadow-sm",
-          "transition-[color,background-color,border-color,box-shadow,transform]",
+          "transition-[color,background-color,border-color,box-shadow,transform] motion-reduce:transition-none",
           "group-hover:border-foreground/30",
           "group-data-[state=active]:border-primary group-data-[state=active]:bg-primary group-data-[state=active]:text-primary-foreground group-data-[state=active]:shadow-md",
           "group-data-[state=completed]:border-primary group-data-[state=completed]:bg-primary group-data-[state=completed]:text-primary-foreground",
@@ -1300,7 +1302,7 @@ function StepperPrevious({
           ? className
           : cn(
               "inline-flex h-9 min-w-24 items-center justify-center gap-2 rounded-none border border-border bg-background px-3 text-sm font-medium text-foreground",
-              "transition-[color,background-color,border-color,box-shadow,transform] hover:border-foreground/20 hover:bg-muted hover:text-foreground active:scale-[0.97]",
+              "transition-[color,background-color,border-color,box-shadow,transform] hover:border-foreground/20 hover:bg-muted hover:text-foreground active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100",
               "focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none",
               "disabled:pointer-events-none disabled:opacity-50",
               "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
@@ -1357,7 +1359,7 @@ function StepperNext({
           ? className
           : cn(
               "inline-flex h-9 min-w-24 items-center justify-center gap-2 rounded-none border border-primary bg-primary px-3 text-sm font-medium text-primary-foreground",
-              "transition-[background-color,border-color,box-shadow,transform] hover:bg-primary/90 active:scale-[0.97]",
+              "transition-[background-color,border-color,box-shadow,transform] hover:bg-primary/90 active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100",
               "focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none",
               "disabled:pointer-events-none disabled:opacity-50",
               "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",

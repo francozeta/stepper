@@ -80,13 +80,13 @@ export function StepperAgentOnboarding() {
     const controller = new AbortController();
     running.current = controller;
     setBusy(true);
-    setMessage("Preparing your example…");
+    setMessage("");
     try {
       const agent = getBridge();
       const result = await agent.act({ steps: exampleSteps(stage, name, currency, qrTouched) }, { signal: controller.signal });
       if (controller.signal.aborted) setMessage("Paused. Continue by hand or resume.");
       else if (result.ok) setMessage("Draft prepared. Review before confirming.");
-      else setMessage("A change was blocked. Check the fields or open the action details.");
+      else setMessage((message) => message || "A change was blocked. Check the fields or open the action details.");
       setInspect(JSON.stringify(result, null, 2));
     } catch {
       setMessage(controller.signal.aborted ? "Paused." : "The bridge could not finish. You can continue manually.");
@@ -163,12 +163,16 @@ export function StepperAgentOnboarding() {
           {busy && <button type="button" onClick={stop} className="rounded-full border px-3 py-2 text-sm">Stop</button>}
         </div>
         <p className="text-xs text-muted-foreground">Café Studio · PEN · QR enabled. Existing choices are preserved.</p>
-        <p role="status" className="min-h-5 text-xs text-muted-foreground">{message}</p>
+        <p role="status" className="min-h-5 text-xs text-muted-foreground">{message || (busy ? "Preparing your example…" : "")}</p>
       </div>
       <details className="border-t pt-4 text-sm text-muted-foreground">
         <summary className="cursor-pointer">Developer details</summary>
         <button type="button" onClick={() => setInspect(JSON.stringify(getBridge().snapshot(), null, 2))} className="mt-3 rounded-full border px-3 py-2 text-xs">Inspect SDK snapshot</button>
-        {inspect && <pre className="mt-3 max-h-64 overflow-auto whitespace-pre-wrap break-all text-[11px]">{inspect}</pre>}
+        {inspect && (
+          <pre role="region" aria-label="SDK output" tabIndex={0} className="mt-3 max-h-64 overflow-auto whitespace-pre-wrap break-all text-[11px] focus-visible:outline-2 focus-visible:outline-ring">
+            {inspect}
+          </pre>
+        )}
         <p className="mt-3 text-xs">Actual UI SDK actions; a deterministic local example, not an LLM. No external submissions.</p>
       </details>
     </main>

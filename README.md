@@ -7,6 +7,8 @@ source into your app, so you own the code and can customize it directly.
 
 ## Install
 
+Use Node.js 22 or newer for the `cn` dependency.
+
 ```bash
 pnpm dlx shadcn@latest add @stepper/stepper
 ```

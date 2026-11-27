@@ -1065,7 +1065,10 @@ describe("Stepper", () => {
     expect(onValueChange).not.toHaveBeenCalled();
   });
 
-  it("moves focus between triggers with keyboard navigation without changing the current step", async () => {
+  it.each([
+    ["ltr", "ArrowRight"],
+    ["rtl", "ArrowLeft"],
+  ])("moves focus in %s without changing the current step", async (direction, forwardKey) => {
     const user = userEvent.setup();
 
     render(
@@ -1087,8 +1090,9 @@ describe("Stepper", () => {
     const account = screen.getByRole("button", { name: /Account/ });
     const profile = screen.getByRole("button", { name: /Profile/ });
 
+    account.style.direction = direction;
     account.focus();
-    await user.keyboard("{ArrowRight}");
+    await user.keyboard(`{${forwardKey}}`);
 
     expect(profile).toHaveFocus();
     expect(screen.getByText("Account content")).toBeVisible();
@@ -1144,8 +1148,21 @@ describe("Stepper", () => {
 
   it("uses one shared progress cursor for forward and reverse jumps", async () => {
     const user = userEvent.setup();
+    const layoutReads = new Map<number, string>();
+
+    function ReadConnectorTiming() {
+      const { currentIndex } = useStepper();
+      const marker = React.useRef<HTMLSpanElement>(null);
+      React.useLayoutEffect(() => {
+        const root = marker.current?.closest<HTMLElement>('[data-slot="stepper"]');
+        if (root) layoutReads.set(currentIndex, root.style.transitionDuration);
+      }, [currentIndex]);
+      return <span ref={marker} />;
+    }
+
     const { container } = render(
       <Stepper defaultValue="account">
+        <ReadConnectorTiming />
         <StepperList>
           <StepperItem value="account">Account</StepperItem>
           <StepperItem value="profile">Profile</StepperItem>
@@ -1160,6 +1177,7 @@ describe("Stepper", () => {
     await user.click(screen.getByRole("button", { name: /Step 4:\s*Payment/ }));
     expect(root.style.getPropertyValue("--stepper-progress")).toBe("3");
     expect(root.style.transitionDuration).toBe("330ms");
+    expect(layoutReads.get(3)).toBe("330ms");
     expect(items[1]).toHaveStyle("--stepper-connector-index: 1");
     expect(items[2]).toHaveStyle("--stepper-connector-index: 2");
     await user.click(screen.getByRole("button", { name: /Step 1:\s*Account/ }));
