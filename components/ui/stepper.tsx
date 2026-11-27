@@ -524,7 +524,7 @@ function useConnectorProgress(currentIndex: number) {
     const previous = previousIndex.current;
     if (previous === currentIndex) return;
     previousIndex.current = currentIndex;
-    setDuration(previous < 0 || currentIndex < 0 ? 0 : Math.min(1200, Math.abs(currentIndex - previous) * 220));
+    setDuration(previous < 0 || currentIndex < 0 ? 0 : Math.min(330, Math.abs(currentIndex - previous) * 110));
   }, [currentIndex]);
 
   return { progress: Math.max(0, currentIndex), duration };

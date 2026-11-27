@@ -28,4 +28,21 @@ describe("Stepper spatial interaction lab", () => {
     expect(panels()[1]).toHaveAttribute("hidden");
     expect(panels()[1]).not.toHaveAttribute("inert");
   });
+  it("recovers keyboard focus at the last stage without losing input", async () => {
+    const user = userEvent.setup();
+    const { container } = render(<StepperInteractionLab />);
+    await user.click(screen.getByRole("radio", { name: "Continuity" }));
+    await user.type(screen.getByLabelText("Workspace name"), "Studio");
+    const controls = container.querySelector("[data-lab-controls]") as HTMLElement;
+    const next = within(controls).getByRole("button", { name: "Continue" });
+    await user.click(next);
+    next.focus();
+    await user.keyboard("{Enter}");
+    expect(screen.getByRole("heading", { name: "Everything in place." })).toHaveFocus();
+    expect(screen.getByText("Workspace: Studio")).toBeVisible();
+    expect(container.querySelector("[data-lab-controls]")).toBe(controls);
+    await user.click(within(controls).getByRole("button", { name: "Back" }));
+    await user.click(within(controls).getByRole("button", { name: "Back" }));
+    expect(screen.getByLabelText("Workspace name")).toHaveValue("Studio");
+  });
 });

@@ -1159,13 +1159,15 @@ describe("Stepper", () => {
     expect(root.style.getPropertyValue("--stepper-progress")).toBe("0");
     await user.click(screen.getByRole("button", { name: /Step 4:\s*Payment/ }));
     expect(root.style.getPropertyValue("--stepper-progress")).toBe("3");
-    expect(root.style.transitionDuration).toBe("660ms");
+    expect(root.style.transitionDuration).toBe("330ms");
     expect(items[1]).toHaveStyle("--stepper-connector-index: 1");
     expect(items[2]).toHaveStyle("--stepper-connector-index: 2");
     await user.click(screen.getByRole("button", { name: /Step 1:\s*Account/ }));
     expect(root.style.getPropertyValue("--stepper-progress")).toBe("0");
-    expect(root.style.transitionDuration).toBe("660ms");
+    expect(root.style.transitionDuration).toBe("330ms");
     expect(root).toHaveClass("motion-reduce:transition-none");
+    await user.click(screen.getByRole("button", { name: /Step 2:\s*Profile/ }));
+    expect(root.style.transitionDuration).toBe("110ms");
   });
 
   it("uses an inset visible outline for keyboard focus without changing selection", async () => {
