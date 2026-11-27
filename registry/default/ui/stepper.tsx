@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Slot } from "@radix-ui/react-slot";
+import { useRender } from "@base-ui/react/use-render";
 
 import { cn } from "@/lib/utils";
 
@@ -116,9 +116,17 @@ type StepperItemProps<TValue extends StepperValue = StepperValue> = Omit<
   separator?: boolean;
 };
 
-type StepperTriggerProps = React.ComponentPropsWithoutRef<"button"> & {
+type StepperCompositionProps = {
+  render?: useRender.RenderProp;
+  /** @deprecated Prefer the Base UI render prop. */
   asChild?: boolean;
 };
+
+type StepperTriggerProps = React.ComponentPropsWithoutRef<"button"> &
+  StepperCompositionProps & {
+    /** Set false when rendering a link or another non-button element. */
+    nativeButton?: boolean;
+  };
 
 type StepperIndicatorProps = React.ComponentPropsWithoutRef<"span">;
 
@@ -133,12 +141,12 @@ type StepperContentProps<TValue extends StepperValue = StepperValue> =
     value: TValue;
     forceMount?: boolean;
     keepMounted?: boolean;
-    asChild?: boolean;
-  };
+  } & StepperCompositionProps;
 
-type StepperButtonProps = React.ComponentPropsWithoutRef<"button"> & {
-  asChild?: boolean;
-};
+type StepperButtonProps = React.ComponentPropsWithoutRef<"button"> &
+  StepperCompositionProps & {
+    nativeButton?: boolean;
+  };
 
 type StepperPreviousProps = StepperButtonProps & {
   onBeforePrevious?: StepperNavigationGuard;
@@ -976,8 +984,37 @@ function StepperItem<TValue extends StepperValue = StepperValue>({
 // Trigger
 // ----------------------------------------------------------------------------
 
+// Keep the legacy composition shape working while using Base UI for prop
+// and event merging. All new consumers should use the render prop.
+function StepperElement({
+  defaultTagName,
+  render,
+  asChild,
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLElement> & StepperCompositionProps & {
+  defaultTagName: "button" | "div";
+  type?: React.ComponentPropsWithoutRef<"button">["type"];
+  disabled?: boolean;
+}) {
+  const legacyRender = asChild
+    ? React.Children.only(children) as React.ReactElement
+    : undefined;
+
+  return useRender({
+    defaultTagName,
+    render: render ?? legacyRender,
+    props: {
+      ...props,
+      ...(!asChild && children !== undefined ? { children } : {}),
+    },
+  });
+}
+
 function StepperTrigger({
   asChild = false,
+  render,
+  nativeButton = !asChild,
   className,
   children,
   disabled,
@@ -998,17 +1035,19 @@ function StepperTrigger({
   } = useStepperItemContext("StepperTrigger");
   const { steps, getTriggerId } = useStepperContext("StepperTrigger");
   const isDisabled = itemDisabled || disabled;
-  const Comp = asChild ? Slot : "button";
 
   return (
-    <Comp
+    <StepperElement
+      defaultTagName="button"
+      render={render}
+      asChild={asChild}
       id={triggerId}
-      type={asChild ? undefined : "button"}
+      type={nativeButton ? "button" : undefined}
       aria-current={isActive ? "step" : undefined}
       aria-controls={isActive ? contentId : undefined}
       aria-disabled={isDisabled ? true : undefined}
-      disabled={asChild ? undefined : isDisabled}
-      tabIndex={asChild && isDisabled ? -1 : tabIndex}
+      disabled={nativeButton ? isDisabled : undefined}
+      tabIndex={!nativeButton && isDisabled ? -1 : tabIndex}
       data-slot="stepper-trigger"
       data-state={stepState}
       data-disabled={isDisabled ? "" : undefined}
@@ -1067,7 +1106,7 @@ function StepperTrigger({
       {...props}
     >
       {children}
-    </Comp>
+    </StepperElement>
   );
 }
 
@@ -1179,6 +1218,7 @@ function StepperContent<TValue extends StepperValue = StepperValue>({
   forceMount = false,
   keepMounted = false,
   asChild = false,
+  render,
   className,
   children,
   ...props
@@ -1211,10 +1251,11 @@ function StepperContent<TValue extends StepperValue = StepperValue>({
     return null;
   }
 
-  const Comp = asChild ? Slot : "div";
-
   return (
-    <Comp
+    <StepperElement
+      defaultTagName="div"
+      render={render}
+      asChild={asChild}
       id={getContentId(value)}
       role="region"
       aria-labelledby={getTriggerId(value)}
@@ -1228,7 +1269,7 @@ function StepperContent<TValue extends StepperValue = StepperValue>({
       {...props}
     >
       {children}
-    </Comp>
+    </StepperElement>
   );
 }
 
@@ -1238,8 +1279,10 @@ function StepperContent<TValue extends StepperValue = StepperValue>({
 
 function StepperPrevious({
   asChild = false,
+  render,
+  nativeButton = !asChild,
   className,
-  children = "Previous",
+  children,
   disabled,
   onBeforePrevious,
   onClick,
@@ -1253,18 +1296,21 @@ function StepperPrevious({
     navigate: goPrevious,
     onBeforeNavigate: onBeforePrevious,
   });
-  const Comp = asChild ? Slot : "button";
+  const isComposed = asChild || render !== undefined;
 
   return (
-    <Comp
-      type={asChild ? undefined : "button"}
-      disabled={asChild ? undefined : isDisabled}
+    <StepperElement
+      defaultTagName="button"
+      render={render}
+      asChild={asChild}
+      type={nativeButton ? "button" : undefined}
+      disabled={nativeButton ? isDisabled : undefined}
       aria-disabled={isDisabled ? true : undefined}
-      tabIndex={asChild && isDisabled ? -1 : tabIndex}
+      tabIndex={!nativeButton && isDisabled ? -1 : tabIndex}
       data-slot="stepper-previous"
       data-disabled={isDisabled ? "" : undefined}
       className={
-        asChild
+        isComposed
           ? className
           : cn(
               "inline-flex h-9 min-w-24 items-center justify-center gap-2 rounded-none border border-border bg-background px-3 text-sm font-medium text-foreground",
@@ -1281,15 +1327,17 @@ function StepperPrevious({
       }
       {...props}
     >
-      {children}
-    </Comp>
+      {children ?? (!isComposed ? "Previous" : undefined)}
+    </StepperElement>
   );
 }
 
 function StepperNext({
   asChild = false,
+  render,
+  nativeButton = !asChild,
   className,
-  children = "Next",
+  children,
   disabled,
   onBeforeNext,
   onClick,
@@ -1303,18 +1351,21 @@ function StepperNext({
     navigate: goNext,
     onBeforeNavigate: onBeforeNext,
   });
-  const Comp = asChild ? Slot : "button";
+  const isComposed = asChild || render !== undefined;
 
   return (
-    <Comp
-      type={asChild ? undefined : "button"}
-      disabled={asChild ? undefined : isDisabled}
+    <StepperElement
+      defaultTagName="button"
+      render={render}
+      asChild={asChild}
+      type={nativeButton ? "button" : undefined}
+      disabled={nativeButton ? isDisabled : undefined}
       aria-disabled={isDisabled ? true : undefined}
-      tabIndex={asChild && isDisabled ? -1 : tabIndex}
+      tabIndex={!nativeButton && isDisabled ? -1 : tabIndex}
       data-slot="stepper-next"
       data-disabled={isDisabled ? "" : undefined}
       className={
-        asChild
+        isComposed
           ? className
           : cn(
               "inline-flex h-9 min-w-24 items-center justify-center gap-2 rounded-none border border-primary bg-primary px-3 text-sm font-medium text-primary-foreground",
@@ -1331,8 +1382,8 @@ function StepperNext({
       }
       {...props}
     >
-      {children}
-    </Comp>
+      {children ?? (!isComposed ? "Next" : undefined)}
+    </StepperElement>
   );
 }
 

@@ -6,7 +6,7 @@ const quickFacts = [
   "Controlled and uncontrolled",
   "Horizontal and vertical",
   "Composed primitives",
-  "Radix Slot for asChild",
+  "Base UI render (legacy asChild supported)",
   "Public useStepper hook",
   "No Motion in core",
   "shadcn/ui tokens",
@@ -185,7 +185,7 @@ const worksWith = [
   {
     label: "Next.js",
     value: "Routes",
-    help: "Use StepperTrigger asChild with Link for route-based flows.",
+    help: "Use StepperTrigger render with Link and nativeButton={false} for route-based flows.",
   },
   {
     label: "shadcn/ui Form",
@@ -198,9 +198,9 @@ const worksWith = [
     help: "Keep persistence outside the Stepper while the UI reflects progress.",
   },
   {
-    label: "Radix Slot",
-    value: "asChild",
-    help: "Used only for custom trigger/content composition.",
+    label: "Base UI",
+    value: "render",
+    help: "Used for custom trigger/content composition; asChild remains a compatibility alias.",
   },
 ];
 
@@ -1337,7 +1337,7 @@ const contentProps = [
     name: "asChild",
     type: "boolean",
     defaultValue: "false",
-    description: "Render the content props onto a child element with Radix Slot.",
+    description: "Render the content props onto a child element with Base UI composition (legacy API).",
   },
 ];
 
@@ -1346,7 +1346,7 @@ const triggerProps = [
     name: "asChild",
     type: "boolean",
     defaultValue: "false",
-    description: "Render the trigger props onto a custom button or link with Radix Slot.",
+    description: "Render the trigger props onto a custom button or link with Base UI composition (legacy API).",
   },
   {
     name: "disabled",
@@ -1361,7 +1361,7 @@ const navigationProps = [
     name: "asChild",
     type: "boolean",
     defaultValue: "false",
-    description: "Render StepperPrevious or StepperNext onto a custom button primitive with Radix Slot.",
+    description: "Render StepperPrevious or StepperNext onto a custom button primitive with Base UI composition (legacy API).",
   },
   {
     name: "disabled",
@@ -1478,7 +1478,7 @@ const apiComponents = [
   },
   {
     name: "StepperTrigger",
-    element: "button / Slot",
+    element: "button / render",
     description: "Real button by default. Can use asChild for custom triggers while keeping step selection logic.",
   },
   {
@@ -1503,12 +1503,12 @@ const apiComponents = [
   },
   {
     name: "StepperContent",
-    element: "div / Slot",
+    element: "div / render",
     description: "Associated panel for a step value. Can stay mounted with forceMount or render asChild.",
   },
   {
     name: "StepperPrevious / StepperNext",
-    element: "button / Slot",
+    element: "button / render",
     description: "Navigation helpers that skip disabled steps, support asChild, and can run async guards.",
   },
   {

@@ -5,7 +5,7 @@
   "title": "Stepper Demo",
   "description": "A styled Stepper demo with a default export and the Stepper source primitive.",
   "dependencies": [
-    "@radix-ui/react-slot"
+    "@base-ui/react@^1.4.1"
   ],
   "files": [
     {

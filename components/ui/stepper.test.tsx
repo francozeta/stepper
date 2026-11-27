@@ -528,6 +528,57 @@ describe("Stepper", () => {
     expect(screen.getAllByRole("button", { name: /Account/ })).toHaveLength(1);
   });
 
+  it("composes Base UI render buttons and preserves native semantics", async () => {
+    const user = userEvent.setup();
+    render(
+      <Stepper defaultValue="account">
+        <StepperList>
+          <StepperItem value="account">Account</StepperItem>
+          <StepperItem value="payment" defaultTrigger={false}>
+            <StepperTrigger render={<button className="custom-trigger" />}>
+              Payment
+            </StepperTrigger>
+          </StepperItem>
+        </StepperList>
+        <StepperContent value="account">Account content</StepperContent>
+        <StepperContent value="payment" render={<section />}>Payment content</StepperContent>
+        <StepperNext render={<button>Continue</button>} />
+      </Stepper>
+    );
+    const next = screen.getByRole("button", { name: "Continue" });
+    expect(next).toHaveAttribute("type", "button");
+    await user.click(next);
+    const trigger = screen.getByRole("button", { name: "Payment" });
+    expect(trigger).toHaveClass("custom-trigger");
+    expect(trigger).toHaveAttribute("aria-current", "step");
+    expect(screen.getByText("Payment content").tagName).toBe("SECTION");
+    expect(next).toBeDisabled();
+  });
+
+  it("keeps disabled render links from navigating", async () => {
+    const user = userEvent.setup();
+    render(
+      <Stepper defaultValue="account">
+        <StepperList>
+          <StepperItem value="account">Account</StepperItem>
+          <StepperItem value="payment" defaultTrigger={false} disabled>
+            <StepperTrigger nativeButton={false} render={<a href="/payment" />}>
+              Payment
+            </StepperTrigger>
+          </StepperItem>
+        </StepperList>
+        <StepperContent value="account">Account content</StepperContent>
+        <StepperContent value="payment">Payment content</StepperContent>
+      </Stepper>
+    );
+    const link = screen.getByRole("link", { name: "Payment" });
+    expect(link).toHaveAttribute("aria-disabled", "true");
+    expect(link).toHaveAttribute("tabindex", "-1");
+    expect(link).not.toHaveAttribute("type");
+    await user.click(link);
+    expect(screen.getByText("Account content")).toBeVisible();
+  });
+
   it("keeps disabled asChild triggers unfocusable and prevents navigation", async () => {
     const user = userEvent.setup();
 

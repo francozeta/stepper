@@ -7,7 +7,7 @@
       "title": "Stepper",
       "description": "A lightweight, composable stepper primitive for shadcn/ui-style multi-step flows.",
       "dependencies": [
-        "@radix-ui/react-slot"
+        "@base-ui/react@^1.4.1"
       ],
       "files": [
         {
@@ -23,7 +23,7 @@
       "title": "Stepper Demo",
       "description": "A styled Stepper demo with a default export and the Stepper source primitive.",
       "dependencies": [
-        "@radix-ui/react-slot"
+        "@base-ui/react@^1.4.1"
       ],
       "files": [
         {
@@ -44,7 +44,7 @@
       "title": "Stepper Intent Onboarding",
       "description": "An intent-driven onboarding block with hidden Stepper state, intent routing, profile validation, interests, async setup, and a signed-in completion state.",
       "dependencies": [
-        "@radix-ui/react-slot",
+        "@base-ui/react@^1.4.1",
         "lucide-react",
         "react-icons",
         "react-hook-form",

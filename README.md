@@ -45,6 +45,9 @@ server actions.
 
 Your app owns the workflow. Stepper reflects that workflow in the UI.
 
+Stepper uses Base UI `useRender` for composition. Existing `asChild` usage is
+supported for compatibility; prefer `render` for new code.
+
 ## Development
 
 The registry item is generated from `components/ui/stepper.tsx`.

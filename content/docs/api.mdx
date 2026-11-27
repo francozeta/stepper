@@ -42,6 +42,10 @@ import {
   <InfoGrid items={controlledBehaviorNotes} />
 </Section>
 
+<Section title="Base UI composition" description="Prefer render={<CustomButton />} over asChild for new code. Set nativeButton={false} when rendering a link. The render prop also accepts a Base UI render callback.">
+  <InfoGrid items={asChildRequirements} />
+</Section>
+
 <Section title="List props">
   <PropsTable rows={listProps} />
 </Section>
@@ -56,7 +60,7 @@ import {
 
 <Section
   title="asChild requirements"
-  description="StepperTrigger and navigation helpers use Radix Slot composition. The child owns the final element, so it must accept the props Stepper passes."
+  description="Stepper uses Base UI render composition. Existing asChild usage is supported as a compatibility alias. Custom elements must forward props and refs."
 >
   <InfoGrid items={asChildRequirements} />
 </Section>
