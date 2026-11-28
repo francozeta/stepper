@@ -591,14 +591,22 @@ function StepperElement({
     ? React.Children.only(children) as React.ReactElement
     : undefined;
 
-  return useRender({
+  const customRender = render ?? legacyRender;
+  const element = useRender({
     defaultTagName,
-    render: render ?? legacyRender,
+    enabled: customRender !== undefined,
+    render: customRender,
     props: {
       ...props,
       ...(!asChild && children !== undefined ? { children } : {}),
     },
   });
+
+  // Keep the hook order and host element identity when composition changes.
+  // Base UI only needs to merge props/events/refs for custom composition.
+  return customRender !== undefined
+    ? element
+    : React.createElement(defaultTagName, props, children);
 }
 
 function StepperTrigger({

@@ -12,10 +12,12 @@ Run in a disposable directory (the runner writes generated files):
 ```sh
 repo="$PWD"
 tmp="$(mktemp -d)"
-cp benchmarks/browser/* "$tmp/"
+cp -R benchmarks/browser/. "$tmp/"
 (cd "$tmp" && npm install --ignore-scripts --no-audit --no-fund && npx --no-install playwright install chromium && STEPPER_REPO="$repo" node run.mjs)
 ```
 
 Next comparators: Dice UI Base at pinned commit 391f1ef1a015e34666b25aa00c07de4a80feeea1; its registry requires direction and icon generation dependencies, so include the real installed source in a separate fixture rather than stubbing its behavior. Also test installed consumer code in a real product, current Stepperize release, actual WebKit and physical mobile, async network abort, and independent developers. No comparative results until the workflow has run. References: https://ark-ui.com/docs/components/steps, https://www.stepperize.com/docs/v8/api/react/primitives, https://www.stepperize.com/docs/v8/guides/navigation.
 
 First successful exploratory browser run: [captured Vercel Sandbox measurements](results/2026-11-27-vercel.json). Direct dependency versions are recorded; the disposable VM's full lock was not retained. This run used Playwright 1.65.1 rather than the CI pin, and is separate from the failed GitHub Actions run.
+
+Second-pass harness: pin Playwright 1.65.1 (verified in the prior sandbox), use the actual first-run core revision via git show, and build it beside the candidate with identical dependencies. Requires that revision in the Git checkout. Record esbuild minified byte attribution by package and raw metafiles; these attributions are not additive gzip costs. Build all variants first; run desktop in forward order and mobile in reverse order. This is still not randomized repeated whole-suite testing. Retain the complete resolved dependency lock on CI. The source registry and public API remain unchanged except for the candidate native rendering fast path.

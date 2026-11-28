@@ -2,7 +2,7 @@
 
 ## Reduction and comparison — draft PR #48
 
-CI run 100 passed the full check and reproducible baseline benchmark; documented results and a noindex /drafts/benchmark study distinguish internal measurements from competitive documentation. Browser comparison run 1 failed at Playwright installation on Ubuntu 26.04, before any measurements. The opt-in browser workflow now targets Ubuntu 24.04 with seven-day artifact retention; the fix has not been rerun. A separate Vercel Sandbox run at 5cd44a9 completed all 40 checks; see benchmarks/browser/results/2026-11-27-vercel.json. Stepper has the largest bundle and trails Stepperize on the throttled profile; investigate bundle and runtime cost before release. CI browser rerun, real-agent, visual and physical-device validation remain pending. No merge or release.
+CI run 100 passed the full check and reproducible baseline benchmark; documented results and a noindex /drafts/benchmark study distinguish internal measurements from competitive documentation. Browser comparison run 1 failed at Playwright installation on Ubuntu 26.04, before any measurements. The opt-in browser workflow now targets Ubuntu 24.04 with seven-day artifact retention; the fix has not been rerun. A separate Vercel Sandbox run at 5cd44a9 completed all 40 checks; see benchmarks/browser/results/2026-11-27-vercel.json. Stepper has the largest bundle and trails Stepperize on the throttled profile; a native rendering fast-path candidate and same-run baseline / package attribution harness are in review; no measured improvement yet. CI browser rerun, real-agent, visual and physical-device validation remain pending. No merge or release.
 
 ## Stepper modernization — review branch
 

@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, mkdirSync, copyFileSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { gzipSync } from "node:zlib";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -10,14 +10,17 @@ const here = dirname(fileURLToPath(import.meta.url));
 const root = process.env.STEPPER_REPO ?? join(here, "../..");
 const out = join(here, "results");
 mkdirSync(out, { recursive: true });
-copyFileSync(join(root, "components/ui/stepper.tsx"), join(here, "core.tsx"));
+const corePath = "components/ui/stepper.tsx";
+const baselineRevision = "5cd44a9512fa92c979dddaa30beefdd74fcd218c";
+const baselineSource = execFileSync("git", ["show", baselineRevision + ":" + corePath], { cwd: root, encoding: "utf8" });
+const candidateSource = readFileSync(join(root, corePath), "utf8");
 const html = name => '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Stepper comparison</title><style>*{box-sizing:border-box}body{font:16px system-ui;margin:16px}main{max-width:540px;margin:auto}button,input{font:inherit}button{padding:8px 12px}label{display:block;margin:16px 0}input:not([type=checkbox]){display:block;width:100%;padding:8px}ol,[data-part=list],[data-component=stepper-list]{display:flex;gap:6px;flex-wrap:wrap;padding:0;list-style:none}footer,[data-component=stepper-actions]{display:flex;gap:8px;margin-top:16px}button:focus-visible{outline:2px solid #555} [hidden]{display:none!important}</style><div id="root"></div><script src="./'+name+'.js"></script></html>';
-const libraries = ["native", "stepper", "ark", "stepperize"];
+const libraries = ["native", "stepper-before", "stepper", "ark", "stepperize"];
 const results = [];
 const median = xs => xs.toSorted((a,b)=>a-b)[Math.floor(xs.length/2)];
 const browser = await chromium.launch({headless:true});
 const versions = Object.fromEntries(Object.entries(JSON.parse(readFileSync(join(here,"package-lock.json"),"utf8")).packages).filter(([p])=>["node_modules/@ark-ui/react","node_modules/@stepperize/react","node_modules/@base-ui/react","node_modules/react","node_modules/react-dom","node_modules/cn","node_modules/esbuild","node_modules/playwright"].includes(p)).map(([p,v])=>[p,v.version]));
-const report = { revision:execFileSync("git",["rev-parse","HEAD"],{cwd:root,encoding:"utf8"}).trim(),node:process.version,browser:browser.version(),versions,results };
+const report = { revision:execFileSync("git",["rev-parse","HEAD"],{cwd:root,encoding:"utf8"}).trim(),node:process.version,browser:browser.version(),baselineRevision,versions,results };
 async function test(name, mobile) {
   const context=await browser.newContext({viewport:mobile?{width:390,height:844}:{width:1280,height:900},isMobile:mobile,hasTouch:mobile,reducedMotion:"reduce"});
   const page=await context.newPage();
@@ -76,18 +79,36 @@ try {
   for(const name of libraries){
     const record={name};results.push(record);
     try{
-      const adapter=readFileSync(join(here,name+".tsx.txt"),"utf8");
+      const adapter=readFileSync(join(here,(name==="stepper-before"?"stepper":name)+".tsx.txt"),"utf8");
+      writeFileSync(join(here,"core.tsx"),name==="stepper-before"?baselineSource:candidateSource);
       writeFileSync(join(here,"adapter.tsx"),adapter);
       writeFileSync(join(here,"fixture.tsx"),readFileSync(join(here,"fixture.tsx.txt"),"utf8"));
       const started=performance.now();
-      await build({entryPoints:[join(here,"fixture.tsx")],outfile:join(out,name+".js"),bundle:true,minify:true,jsx:"automatic",platform:"browser",target:"es2022",define:{"process.env.NODE_ENV":'"production"'},logLevel:"silent"});
+      const built=await build({entryPoints:[join(here,"fixture.tsx")],outfile:join(out,name+".js"),bundle:true,minify:true,jsx:"automatic",platform:"browser",target:"es2022",define:{"process.env.NODE_ENV":'"production"'},metafile:true,logLevel:"silent"});
+      const contributions={};
+      for(const output of Object.values(built.metafile.outputs)){
+        for(const [input,meta] of Object.entries(output.inputs)){
+          const pkg=input.match(/node_modules\/((?:@[^/]+\/)?[^/]+)/)?.[1] ?? "app/adapter";
+          contributions[pkg]=(contributions[pkg]??0)+meta.bytesInOutput;
+        }
+      }
+      record.bytesByPackage=contributions;
+      writeFileSync(join(out,name+".metafile.json"),JSON.stringify(built.metafile,null,2)+"\n");
       const bytes=readFileSync(join(out,name+".js"));
       record.bundle={minifiedBytes:bytes.length,gzipBytes:gzipSync(bytes,{level:9}).length,adapterLines:adapter.trimEnd().split("\n").length,buildMs:performance.now()-started};
       writeFileSync(join(out,name+".html"),html(name));
-      record.profiles=[await test(name,false),await test(name,true)];
+      record.profiles=[];
     }catch(e){record.error=String(e).slice(0,1000);}
-    console.log("BROWSER_COMPARISON",JSON.stringify(record));
   }
+  // Opposite library order on the second profile reduces systematic order bias.
+  for(const mobile of [false,true]){
+    for(const record of (mobile?[...results].reverse():results)){
+      if(record.error)continue;
+      try{record.profiles.push(await test(record.name,mobile));}
+      catch(e){record.error=String(e).slice(0,1000);}
+    }
+  }
+  for(const record of results)console.log("BROWSER_COMPARISON",JSON.stringify(record));
 }finally{
   await browser.close();
   writeFileSync(join(out,"report.json"),JSON.stringify(report,null,2)+"\n");

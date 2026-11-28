@@ -14,13 +14,14 @@ jobs:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
+          fetch-depth: 0
       - uses: actions/setup-node@v6
         with:
           node-version: 24.15.0
       - name: Isolate benchmark dependencies
         run: |
           mkdir -p "$RUNNER_TEMP/stepper-comparison"
-          cp benchmarks/browser/* "$RUNNER_TEMP/stepper-comparison/"
+          cp -R benchmarks/browser/. "$RUNNER_TEMP/stepper-comparison/"
           cd "$RUNNER_TEMP/stepper-comparison"
           npm install --ignore-scripts --no-audit --no-fund
           npx --no-install playwright install --with-deps chromium
@@ -36,4 +37,5 @@ jobs:
           retention-days: 7
           path: |
             ${{ runner.temp }}/stepper-comparison/results/report.json
+            ${{ runner.temp }}/stepper-comparison/results/*.metafile.json
             ${{ runner.temp }}/stepper-comparison/package-lock.json

@@ -665,6 +665,33 @@ describe("Stepper", () => {
     expect(screen.getAllByRole("button", { name: /Account/ })).toHaveLength(1);
   });
 
+  it("keeps the native trigger and focus when switching to equivalent composition", () => {
+    const steps = [{ value: "account" }, { value: "profile" }];
+    const view = (composed: boolean) => (
+      <Stepper steps={steps} value="account">
+        <StepperList>
+          <StepperItem value="account" defaultTrigger={false}>
+            <StepperTrigger render={composed ? <button /> : undefined}>
+              <StepperLabel>Account</StepperLabel>
+            </StepperTrigger>
+          </StepperItem>
+          <StepperItem value="profile">Profile</StepperItem>
+        </StepperList>
+        <StepperContent value="account">Account content</StepperContent>
+      </Stepper>
+    );
+    const { rerender } = render(view(false));
+    const trigger = screen.getByRole("button", { name: "Account" });
+    trigger.focus();
+    expect(trigger).toHaveAttribute("type", "button");
+    rerender(view(true));
+    expect(screen.getByRole("button", { name: "Account" })).toBe(trigger);
+    expect(trigger).toHaveFocus();
+    rerender(view(false));
+    expect(screen.getByRole("button", { name: "Account" })).toBe(trigger);
+    expect(trigger).toHaveFocus();
+  });
+
   it("composes Base UI render buttons and preserves native semantics", async () => {
     const user = userEvent.setup();
     render(
