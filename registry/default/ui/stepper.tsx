@@ -74,6 +74,7 @@ type StepperContextValue = {
   collection: StepperCollection;
   previousValue: StepperValue | undefined;
   nextValue: StepperValue | undefined;
+  navigationEpoch: React.RefObject<number>;
 };
 
 type StepperProps<TValue extends StepperValue = StepperValue> =
@@ -359,8 +360,13 @@ function Stepper({
   const previousValue = currentIndex < 0 ? undefined : steps[findEnabledIndex(steps, currentIndex, -1)]?.value;
   const nextValue = currentIndex < 0 ? undefined : steps[findEnabledIndex(steps, currentIndex, 1)]?.value;
 
+  // One root-scoped intent clock covers direct requests and both guarded directions.
+  const navigationEpoch = React.useRef(0);
+  React.useLayoutEffect(() => () => { navigationEpoch.current += 1; }, [currentValue]);
+
   const setValue = React.useCallback((nextValue: StepperValue) => {
     if (steps[getStepIndex(nextValue)]?.disabled !== false) return;
+    navigationEpoch.current += 1;
     if (!controlled) setUncontrolledValue(nextValue);
     onValueChange?.(nextValue);
   }, [controlled, getStepIndex, onValueChange, steps]);
@@ -390,6 +396,7 @@ function Stepper({
     collection,
     previousValue,
     nextValue,
+    navigationEpoch,
   }), [collection, currentIndex, currentValue, getStepIndex, goNext, goPrevious, nextValue, orientation, previousValue, setValue, steps]);
 
   return (
@@ -873,7 +880,7 @@ function StepperNavigationButton({
   onBeforeNavigate?: StepperNavigationGuard;
 }) {
   const previous = direction === "previous";
-  const { api: { value, goPrevious, goNext }, previousValue, nextValue } =
+  const { api: { value, goPrevious, goNext }, previousValue, nextValue, navigationEpoch } =
     useStepperContext(previous ? "StepperPrevious" : "StepperNext");
   const target = previous ? previousValue : nextValue;
   const navigate = previous ? goPrevious : goNext;
@@ -889,8 +896,9 @@ function StepperNavigationButton({
 
   async function handleClick(event: React.MouseEvent<HTMLButtonElement>) {
     const request = epoch.current;
+    const beforeClick = navigationEpoch.current;
     onClick?.(event);
-    if (isDisabled || pendingRef.current || request !== epoch.current) {
+    if (isDisabled || pendingRef.current || request !== epoch.current || beforeClick !== navigationEpoch.current) {
       event.preventDefault();
       return;
     }
@@ -900,10 +908,11 @@ function StepperNavigationButton({
       return;
     }
 
+    const intent = ++navigationEpoch.current;
     pendingRef.current = true;
     setPending(true);
     try {
-      if ((await onBeforeNavigate()) !== false && request === epoch.current) {
+      if ((await onBeforeNavigate()) !== false && request === epoch.current && intent === navigationEpoch.current) {
         navigate();
       }
     } finally {
@@ -921,7 +930,9 @@ function StepperNavigationButton({
       disabled={nativeButton ? isDisabled : undefined}
       aria-disabled={isDisabled ? true : undefined}
       tabIndex={!nativeButton && isDisabled ? -1 : tabIndex}
+      aria-busy={pending || undefined}
       data-slot={previous ? "stepper-previous" : "stepper-next"}
+      data-pending={pending ? "" : undefined}
       data-disabled={isDisabled ? "" : undefined}
       className={isComposed ? className : cn(
         "inline-flex h-9 min-w-24 items-center justify-center gap-2 rounded-none border px-3 text-sm font-medium",

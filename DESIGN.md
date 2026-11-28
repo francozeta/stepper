@@ -17,6 +17,7 @@
 - Panel motion is deliberately subtle and directional (8 px, 160 ms in the lab). Cancel obsolete motion, preserve inputs and keep inactive content inert/hidden from assistive technology. Full visual reversal and mobile/AT behavior are still to be validated.
 - Keep typography, spacing, existing monochrome treatment and compact controls. Do not add decorative containers, accordions or extra copy unless they solve a concrete problem. The labs are research surfaces, not new product navigation or a style template for every consumer.
 - Use at least 16 CSS px for form fields on touch devices to prevent Safari's focus zoom. Allow manual browser zoom. Use the [Vercel Web Interface Guidelines](https://vercel.com/design/guidelines) as a review reference for touch, focus and forms.
+- A newer valid navigation request supersedes older pending guarded requests across controls. Pending validation exposes semantic busy state, but the application owns cancellation of external side effects and authorization. Do not revive stale navigation after a denied request.
 - Agent-ready means semantic actions with a human interface, not a technical simulator as the product. Keep validation app-owned; no silent overwriting, final confirmation remains human. UI SDK is an opt-in experiment in /drafts/onboarding, not a mandatory dependency of the registry primitive.
 
 ## Review protocol

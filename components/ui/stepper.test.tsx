@@ -1179,6 +1179,55 @@ describe("Stepper", () => {
     expect(screen.queryByText("Profile content")).not.toBeInTheDocument();
   });
 
+  it("keeps the latest guarded navigation intent across different controls", async () => {
+    let resolveNext: ((allowed: boolean) => void) | undefined;
+    let resolvePrevious: ((allowed: boolean) => void) | undefined;
+    const onValueChange = vi.fn();
+
+    render(
+      <Stepper value="profile" steps={[{ value: "account" }, { value: "profile" }, { value: "review" }]} onValueChange={onValueChange}>
+        <StepperPrevious onBeforePrevious={() => new Promise<boolean>((resolve) => { resolvePrevious = resolve; })}>Back</StepperPrevious>
+        <StepperNext onBeforeNext={() => new Promise<boolean>((resolve) => { resolveNext = resolve; })}>Continue</StepperNext>
+      </Stepper>
+    );
+
+    const next = screen.getByRole("button", { name: "Continue" });
+    const back = screen.getByRole("button", { name: "Back" });
+    fireEvent.click(next);
+    expect(next).toHaveAttribute("aria-busy", "true");
+    expect(next).toHaveAttribute("data-pending");
+    fireEvent.click(back);
+    resolveNext?.(true);
+    await waitFor(() => expect(next).toBeEnabled());
+    expect(next).not.toHaveAttribute("aria-busy");
+    expect(onValueChange).not.toHaveBeenCalled();
+    resolvePrevious?.(true);
+    await waitFor(() => expect(back).toBeEnabled());
+    expect(onValueChange.mock.calls).toEqual([["account"]]);
+  });
+
+  it("invalidates a pending guard on a newer direct request even before a controlled commit", async () => {
+    let resolveGuard: ((allowed: boolean) => void) | undefined;
+    const onValueChange = vi.fn();
+    function DirectRequest() {
+      const { setValue } = useStepper();
+      return <button type="button" onClick={() => setValue("review")}>Review directly</button>;
+    }
+
+    render(
+      <Stepper value="account" steps={[{ value: "account" }, { value: "profile" }, { value: "review" }]} onValueChange={onValueChange}>
+        <StepperNext onBeforeNext={() => new Promise<boolean>((resolve) => { resolveGuard = resolve; })}>Continue</StepperNext>
+        <DirectRequest />
+      </Stepper>
+    );
+    const next = screen.getByRole("button", { name: "Continue" });
+    fireEvent.click(next);
+    fireEvent.click(screen.getByRole("button", { name: "Review directly" }));
+    resolveGuard?.(true);
+    await waitFor(() => expect(next).toBeEnabled());
+    expect(onValueChange.mock.calls).toEqual([["review"]]);
+  });
+
   it("ignores a guard when its destination is replaced", async () => {
     let resolveGuard: ((allowed: boolean) => void) | undefined;
     const guard = () => new Promise<boolean>((resolve) => { resolveGuard = resolve; });
