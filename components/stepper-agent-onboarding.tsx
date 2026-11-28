@@ -44,6 +44,7 @@ function getBridge() {
 }
 
 const fieldClass = "h-11 w-full rounded-lg border border-border bg-background px-3 text-sm outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
+const steps = stages.map((value) => ({ value }));
 
 export function StepperAgentOnboarding() {
   const [stage, setStage] = React.useState<Stage>("business");
@@ -73,6 +74,17 @@ export function StepperAgentOnboarding() {
 
   function stop() {
     running.current?.abort();
+  }
+
+  function acceptChange(details: Pick<ChangeDetails<string>, "source" | "cancel">) {
+    if (details.source !== "agent") {
+      stop();
+      return true;
+    }
+    // An action can already be in flight when the person interrupts a run.
+    if (running.current?.signal.aborted === false) return true;
+    details.cancel();
+    return false;
   }
 
   async function prepare() {
@@ -115,8 +127,13 @@ export function StepperAgentOnboarding() {
         <p className="text-sm text-muted-foreground">Do it yourself, or let the assistant prepare a sample. You stay in control.</p>
       </header>
       <section onPointerDownCapture={(event) => { if (event.nativeEvent.isTrusted) stop(); }} onKeyDownCapture={(event) => { if (event.nativeEvent.isTrusted) stop(); }} className="rounded-2xl border border-border p-4 sm:p-6">
-        <AgentProgress aria-label="Onboarding progress" value={stage} onValueChange={(value, details) => { if (!requestStage(value)) details.cancel(); }}>
-          <Stepper steps={stages.map((value) => ({ value }))} value={stage} onValueChange={requestStage}>
+        <AgentProgress aria-label="Onboarding progress" value={stage} onValueChange={(value, details) => {
+          if (acceptChange(details) && !requestStage(value)) details.cancel();
+        }}>
+          <Stepper steps={steps} value={stage} onValueChange={(value) => {
+            stop();
+            requestStage(value);
+          }}>
             <StepperList>
               {stages.map((value) => <StepperItem key={value} value={value}>{labels[value]}</StepperItem>)}
             </StepperList>
@@ -124,18 +141,26 @@ export function StepperAgentOnboarding() {
               <StepperContent {...panel("business")}>
                 <h2 className="text-lg font-medium">Make it yours.</h2>
                 <label className="grid gap-2 text-sm">Business name
-                  <Input aria-label="Business name" name="business" value={name} onValueChange={setName} placeholder="Your café" className={fieldClass} />
+                  <Input aria-label="Business name" name="business" value={name} onValueChange={(value, details) => {
+                    if (acceptChange(details)) setName(value);
+                  }} placeholder="Your café" className={fieldClass} />
                 </label>
                 <p className="text-xs text-muted-foreground">The name your customers will see.</p>
               </StepperContent>
               <StepperContent {...panel("preferences")}>
                 <h2 className="text-lg font-medium">Set your preferences.</h2>
                 <label className="grid gap-2 text-sm">Currency
-                  <Input aria-label="Currency" name="currency" value={currency} onValueChange={setCurrency} placeholder="PEN or USD" className={fieldClass} />
+                  <Input aria-label="Currency" name="currency" value={currency} onValueChange={(value, details) => {
+                    if (acceptChange(details)) setCurrency(value);
+                  }} placeholder="PEN or USD" className={fieldClass} />
                 </label>
                 <label className="flex items-center justify-between gap-3 text-sm">
                   <span>QR payments</span>
-                  <Switch aria-label="QR payments" checked={qr} onCheckedChange={(value) => { setQr(value); setQrTouched(true); }} className="group relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border bg-muted p-0.5 data-checked:bg-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
+                  <Switch aria-label="QR payments" checked={qr} onCheckedChange={(value, details) => {
+                    if (!acceptChange(details)) return;
+                    setQr(value);
+                    setQrTouched(true);
+                  }} className="group relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border bg-muted p-0.5 data-checked:bg-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
                     <SwitchThumb className="size-4 rounded-full bg-background shadow-sm transition-transform group-data-checked:translate-x-5 motion-reduce:transition-none" />
                   </Switch>
                 </label>

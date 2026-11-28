@@ -173,11 +173,6 @@ describe("project infrastructure", () => {
     ].forEach((section) => {
       expect(stepperSource).toContain(section);
     });
-
-    expect(stepperSource).toContain("function useRegisteredSteps");
-    expect(stepperSource).toContain("function useStepperSteps");
-    expect(stepperSource).toContain("function useStepperValue");
-    expect(stepperSource).toContain("function useNavigationButton");
   });
 
   it("automates registry version releases without npm publishing", async () => {

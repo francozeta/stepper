@@ -82,3 +82,36 @@ Follow the official shadcn migration (https://ui.shadcn.com/docs/changelog/2026-
 - Installed all three items through the localhost namespace in initialized Base UI and Radix shadcn consumers on Node 22. Both passed TypeScript. A browser fixture using the installed file verified Base UI composition and that a stale async guard cannot move the user after a direct jump. Node 20 rejected `cn@0.5.2` with strict engine checking.
 - Production builds referenced about 2.3–2.5 KiB more gzip-compressed initial JavaScript per tested route than `d9f6b22`. The route sample covered home, interactions, onboarding and checkout. `pnpm check` passed on Node 22 with 88 tests.
 - The lightweight MDS dry run and local adoption check passed. The generated local bridge files are excluded from the public checkout. Physical mobile keyboards, screen readers and full panel reversal remain open. The draft is ready for the owner's visual review.
+
+## V2 final refinement
+
+The owner approved `b77468d` as the comparison baseline. The Stepper still owns ordered progress, selection and panel relationships. The app owns validation and workflow decisions. [shadcn Tabs](https://github.com/shadcn-ui/ui/blob/main/apps/v4/registry/bases/base/ui/tabs.tsx) demonstrates thin styling wrappers around a matching primitive. Base UI Tabs adds tab roles and roving tab stops. Stepper uses ordered-list semantics and arrow focus without selection. [Base UI useRender](https://base-ui.com/react/utils/use-render) continues to compose elements, props, events and refs.
+
+- A single step index serves item and panel lookups. The root computes neighboring enabled steps once for both navigation controls. Stable collection context keeps Triggers and the List out of active-step updates that do not affect them. The public hooks retain their existing API.
+- Automatic registration pairs each layout effect with removal of its own entry. It retains mount order and resolves after the initial commit, including through wrappers. Use explicit `steps` for data-driven reordering and complete server-rendered progress. Legacy `asChild` remains a deprecated compatibility path. Prefer `render` for new code. A removal would require a separately announced migration.
+- Back and Continue share guard and button behavior. A pending result is ignored once its source, destination or external `disabled` prop changes. Pass workflow disablement to the Stepper control when using a custom `render` element. The button stays pending until validation settles.
+- In the UI SDK lab, a replacement input event with no pointer or key event could arrive after preparation started and then be overwritten. The app now aborts on a person’s edit or navigation, and checks the active run again in controlled change callbacks. The reproduced edit remained in place, the run paused, and a new run resumed from the edited value. UI SDK remains an optional experiment outside the registry.
+
+| Measure | Approved | Candidate |
+| --- | ---: | ---: |
+| Core source lines including blanks | 1,435 | 992 |
+| Core source bytes | 40,764 | 32,703 |
+| Minified core bundle | 47,543 B | 44,877 B |
+| Gzipped core bundle | 17,859 B | 17,441 B |
+| Trigger render callbacks across 80 explicit-step updates | 1,920 | 160 |
+| Median time for 80 explicit-step updates | 43.9 ms | 22.9 ms |
+| Label renders across 80 automatic-step updates | 1,920 | 160 |
+| Median time for 80 automatic-step updates | 53.0 ms | 20.9 ms |
+
+The isolated esbuild 0.28 bundle includes Base UI composition and `cn`, with React external. The production React 19 fixture ran on the same Chromium runner with 24 steps, stable children and alternating adjacent selections. Timings are medians of seven samples per case after warm-up. Explicit mount rendered 24 controls in both builds. Automatic mount rendered 48 because registration completes after the initial commit. These timings cover synchronous updates in the fixture. Browser paint, dynamic step-array recreation and wider jumps have different costs.
+
+| Initial route JavaScript, gzip per referenced chunk | Approved | Candidate |
+| --- | ---: | ---: |
+| Home | 281,567 B | 281,567 B |
+| Interactions lab | 229,955 B | 229,557 B |
+| SDK onboarding lab | 259,246 B | 258,899 B |
+| Subscription checkout | 253,659 B | 253,261 B |
+
+`pnpm check` passed on Node 22 with 90 tests. The guard regression covers both directions and verifies that disabling then re-enabling a control still discards the older result. The infrastructure suite checks the single-file layout and registry output. It leaves the choice of private helper names to the implementation.
+
+The paired production builds matched in 12 settled Chromium captures at 1440 × 960 and 390 × 844 with identical inputs. The homepage was compared after its gradient initialized. Chromium exercised rapid forward and back, retained input, inset focus, RTL and connector reversal from the in-flight fill. Reduced motion completed immediately. WebKit passed a narrow touch smoke test. The regenerated primitive installed and typechecked in Base UI and Radix shadcn consumers on Node 22. The installed fixture verified custom rendering, disabled links and discarded validation after a direct jump. Physical iOS keyboards and screen reader announcements remain open.

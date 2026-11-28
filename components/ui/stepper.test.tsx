@@ -1065,6 +1065,38 @@ describe("Stepper", () => {
     expect(onValueChange).not.toHaveBeenCalled();
   });
 
+  it.each(["next", "previous"] as const)("ignores %s validation after the control is disabled", async (direction) => {
+    let resolveGuard: ((allowed: boolean) => void) | undefined;
+    const guard = () => new Promise<boolean>((resolve) => { resolveGuard = resolve; });
+    const onValueChange = vi.fn();
+    const steps = [{ value: "account" }, { value: "profile" }];
+    const value = direction === "next" ? "account" : "profile";
+    const fixture = (disabled: boolean) => (
+      <Stepper value={value} steps={steps} onValueChange={onValueChange}>
+        {direction === "next" ? (
+          <StepperNext disabled={disabled} onBeforeNext={guard}>Go</StepperNext>
+        ) : (
+          <StepperPrevious disabled={disabled} onBeforePrevious={guard}>Go</StepperPrevious>
+        )}
+      </Stepper>
+    );
+
+    const { rerender } = render(fixture(false));
+    const button = screen.getByRole("button", { name: "Go" });
+    fireEvent.click(button);
+    rerender(fixture(true));
+    rerender(fixture(false));
+    resolveGuard?.(true);
+
+    await waitFor(() => expect(button).toBeEnabled());
+    expect(onValueChange).not.toHaveBeenCalled();
+    fireEvent.click(button);
+    resolveGuard?.(true);
+    await waitFor(() => expect(onValueChange).toHaveBeenCalledWith(
+      direction === "next" ? "profile" : "account"
+    ));
+  });
+
   it.each([
     ["ltr", "ArrowRight"],
     ["rtl", "ArrowLeft"],
