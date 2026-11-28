@@ -518,6 +518,34 @@ describe("Stepper", () => {
     warn.mockRestore();
   });
 
+  it("indexes the first occurrence and warns once per duplicate explicit value", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    function IndexProbe() {
+      const { getStepIndex, steps } = useStepper();
+      return <output data-testid="step-indices">{getStepIndex("a")},{getStepIndex("b")},{getStepIndex("missing")},{steps.length}</output>;
+    }
+
+    try {
+      render(
+        <Stepper steps={[{ value: "a" }, { value: "b" }, { value: "a" }, { value: "a" }, { value: "b" }]}>
+          <IndexProbe />
+        </Stepper>
+      );
+
+      expect(screen.getByTestId("step-indices")).toHaveTextContent("0,1,-1,5");
+      const duplicateWarnings = warn.mock.calls
+        .map(([message]) => String(message))
+        .filter((message) => message.includes("is duplicated"));
+      expect(duplicateWarnings).toEqual([
+        expect.stringContaining('StepperItem value "a" is duplicated'),
+        expect.stringContaining('StepperItem value "b" is duplicated'),
+      ]);
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
   it("warns in development when content references a missing step value", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
 

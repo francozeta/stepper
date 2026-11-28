@@ -274,22 +274,6 @@ function useConnectorProgress(currentIndex: number) {
   return { progress: Math.max(0, cursor.index), duration: cursor.duration };
 }
 
-function useDuplicateStepWarning(steps: StepperStep[]) {
-  React.useEffect(() => {
-    if (!isDevelopment) return;
-
-    const seen = new Set<StepperValue>();
-    const duplicates = new Set<StepperValue>();
-    for (const { value } of steps) {
-      if (seen.has(value)) duplicates.add(value);
-      seen.add(value);
-    }
-    for (const value of duplicates) {
-      warnDev(`StepperItem value "${value}" is duplicated. Step values must be unique within a Stepper.`);
-    }
-  }, [steps]);
-}
-
 function useStepper<
   TValue extends StepperValue = StepperValue,
 >(): StepperApi<TValue> {
@@ -339,14 +323,26 @@ function Stepper({
   }, []);
   const registration = stepsProp === undefined ? register : undefined;
 
-  const { steps, getStepIndex } = React.useMemo(() => {
-    const steps = (stepsProp ?? [...registrations.values()]).map(({ value, disabled }) => ({ value, disabled: !!disabled }));
+  const { steps, getStepIndex, duplicates } = React.useMemo(() => {
     const indices = new Map<StepperValue, number>();
-    steps.forEach(({ value }, index) => {
-      if (!indices.has(value)) indices.set(value, index);
-    });
-    return { steps, getStepIndex: (value: StepperValue) => indices.get(value) ?? -1 };
+    const duplicates = isDevelopment ? new Set<StepperValue>() : undefined;
+    const steps = Array.from<StepperStepInput, StepperStep>(
+      stepsProp ?? registrations.values(),
+      ({ value, disabled }, index) => {
+        if (indices.has(value)) duplicates?.add(value);
+        else indices.set(value, index);
+        return { value, disabled: !!disabled };
+      }
+    );
+    return { steps, getStepIndex: (value: StepperValue) => indices.get(value) ?? -1, duplicates };
   }, [registrations, stepsProp]);
+
+  React.useEffect(() => {
+    if (!duplicates) return;
+    for (const value of duplicates) {
+      warnDev(`StepperItem value "${value}" is duplicated. Step values must be unique within a Stepper.`);
+    }
+  }, [duplicates]);
   const collection = React.useMemo<StepperCollection>(
     () => ({ id, orientation, steps, register: registration }),
     [id, orientation, registration, steps]
@@ -376,7 +372,6 @@ function Stepper({
   }, [nextValue, setValue]);
 
   const { progress, duration } = useConnectorProgress(currentIndex);
-  useDuplicateStepWarning(steps);
 
   const context = React.useMemo<StepperContextValue>(() => ({
     api: {
