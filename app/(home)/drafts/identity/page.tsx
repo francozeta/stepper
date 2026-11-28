@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/stepper";
 
 export const metadata: Metadata = {
-  title: "Identity study 006",
+  title: "Identity study 007",
   description: "A composable React stepper for onboarding, checkout and multi-step forms.",
   robots: { index: false, follow: false },
 };
@@ -281,6 +281,118 @@ function Anatomy() {
   </div>;
 }
 
+const stateSteps = [
+  {value:"account"},
+  {value:"details"},
+  {value:"review"},
+  {value:"payment"},
+  {value:"finish", disabled:true},
+] as const;
+
+const stateNames = ["completed","active","inactive","error","disabled"] as const;
+
+const variationStyles = `
+  .identity-states [data-state-label] { display: none; }
+  ${stateNames.map(state=>`.identity-states [data-slot="stepper-item"][data-state="${state}"] [data-state-label="${state}"] { display: inline; }`).join("\n")}
+  .identity-variants:has(#identity-style-outline:checked) [data-slot="stepper-indicator"] {
+    background: var(--background);
+    box-shadow: none;
+  }
+  .identity-variants:has(#identity-style-outline:checked) [data-slot="stepper-item"]:is([data-state="active"],[data-state="completed"]) [data-slot="stepper-indicator"] {
+    color: var(--primary);
+    border-color: var(--primary);
+    border-width: 2px;
+  }
+  .identity-variants:has(#identity-style-outline:checked) [data-slot="stepper-item"][data-state="active"] [data-slot="stepper-indicator"] {
+    box-shadow: 0 0 0 3px #27272718;
+  }
+  .identity-variants:has(#identity-style-editorial:checked) [data-variant-flow] {
+    --primary: #bd171c;
+    --primary-foreground: #fff;
+    --ring: #bd171c;
+  }
+  .identity-variants:has(#identity-style-editorial:checked) [data-slot="stepper-indicator"] {
+    border-radius: 2px;
+    box-shadow: none;
+    font-family: var(--font-geist-mono), monospace;
+  }
+  .identity-variants:has(#identity-style-editorial:checked) [data-slot="stepper-label"] {
+    font-family: var(--font-geist-mono), monospace;
+  }
+  .identity-variants:has(#identity-style-editorial:checked) [data-slot="stepper-item"]:is([data-state="active"],[data-state="completed"]) [data-slot="stepper-trigger"] {
+    color: var(--primary);
+  }
+  .identity-variants:has(#identity-style-editorial:checked) [data-slot="stepper-next"],
+  .identity-variants:has(#identity-style-editorial:checked) [data-slot="stepper-previous"] {
+    border-radius: 2px;
+  }
+`;
+
+function StateStudy() {
+  return (
+    <div className="identity-states min-w-0">
+      <h3 className="text-xl font-medium tracking-tight">State</h3>
+      <p className="mt-2 max-w-[44ch] text-sm leading-relaxed text-[#555]">Select a step. Its state updates with the flow; errors and disabled steps are set by your application.</p>
+      <div style={neutral} className="mt-5 flex min-h-[220px] items-center rounded-xl border border-border bg-background px-2 py-6 text-foreground sm:px-5">
+        <Stepper steps={stateSteps} defaultValue="details" className="w-full min-w-0 gap-5">
+          <StepperList aria-label="Explore step states" className="min-w-0 [&>li]:min-w-0">
+            {stateSteps.map(({value},index)=>(
+              <StepperItem key={value} value={value} completed={value==="account"} error={value==="payment"} defaultTrigger={false} className="min-w-0">
+                <StepperTrigger className="min-w-0 gap-2.5">
+                  <StepperIndicator/>
+                  <StepperLabel className="text-[11px] sm:text-xs">
+                    {stateNames.map(state=><span key={state} data-state-label={state} className="capitalize">{state}</span>)}
+                  </StepperLabel>
+                  <span className="sr-only">, {["Account","Details","Review","Payment","Finish"][index]}</span>
+                </StepperTrigger>
+              </StepperItem>
+            ))}
+          </StepperList>
+          <div className="min-h-[48px] border-t border-border pt-3 text-center text-sm">
+            <StepperContent value="account" className="border-0 bg-transparent p-0 shadow-none">Account already completed.</StepperContent>
+            <StepperContent value="details" className="border-0 bg-transparent p-0 shadow-none">Details is the current step.</StepperContent>
+            <StepperContent value="review" className="border-0 bg-transparent p-0 shadow-none">Review is now the current step.</StepperContent>
+            <StepperContent value="payment" className="border-0 bg-transparent p-0 shadow-none">Payment has an error set by the app.</StepperContent>
+          </div>
+        </Stepper>
+      </div>
+    </div>
+  );
+}
+
+function VariationStudy() {
+  return (
+    <div className="identity-variants min-w-0">
+      <h3 className="text-xl font-medium tracking-tight">Appearance</h3>
+      <p className="mt-2 max-w-[44ch] text-sm leading-relaxed text-[#555]">Change the style, not the behavior. Your current step stays the same when you switch appearances.</p>
+      <div style={neutral} className="mt-5 rounded-xl border border-border bg-background px-3 py-4 text-foreground sm:px-5">
+        <fieldset className="mx-auto flex w-fit max-w-full items-center gap-0.5 rounded-full border border-border bg-muted/50 p-1">
+          <legend className="sr-only">Stepper appearance</legend>
+          {([{id:"minimal",label:"Minimal"},{id:"outline",label:"Outline"},{id:"editorial",label:"Editorial"}] as const).map(({id,label})=>(
+            <label key={id} className="relative cursor-pointer">
+              <input type="radio" name="identity-style" id={"identity-style-"+id} defaultChecked={id==="minimal"} className="peer sr-only"/>
+              <span className="flex h-9 items-center justify-center rounded-full px-3 text-xs font-medium text-muted-foreground peer-checked:bg-background peer-checked:text-foreground peer-checked:shadow-sm peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-ring sm:text-sm">{label}</span>
+            </label>
+          ))}
+        </fieldset>
+        <div data-variant-flow="" className="mt-5">
+          <Stepper steps={stages} defaultValue="details" className="gap-4">
+            <StepperList aria-label="Style example" className="min-w-0 [&>li]:min-w-0">
+              <StepperItem value="account" completed>Account</StepperItem>
+              <StepperItem value="details">Details</StepperItem>
+              <StepperItem value="confirm">Confirm</StepperItem>
+            </StepperList>
+            <div className="flex justify-between gap-2 border-t border-border pt-3">
+              <StepperPrevious className="rounded-full">Back</StepperPrevious>
+              <StepperNext className="rounded-full">Continue</StepperNext>
+            </div>
+          </Stepper>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function IdentityStudy() {
   return <main className="min-h-dvh bg-[#f2efeb] text-[#242424] selection:bg-[#bd171c] selection:text-white" style={{colorScheme:"light"}}>
     <div className="mx-auto max-w-[1440px] px-5 sm:px-10 lg:px-14">
@@ -323,6 +435,14 @@ export default function IdentityStudy() {
           <Link href="/docs/api" className="inline-flex items-center gap-2 text-sm font-medium hover:text-[#bd171c]">API reference <ArrowUpRight aria-hidden="true" className="size-4"/></Link>
         </div>
         <Anatomy/>
+      </section>
+      <section id="composition" className={`border-b py-10 lg:py-14 ${rule}`}>
+        <style>{variationStyles}</style>
+        <h2 className={`${serif} text-5xl text-[#bd171c] sm:text-6xl`}>Same behavior. Your design.</h2>
+        <div className="mt-8 grid min-w-0 gap-8 lg:grid-cols-2 lg:gap-10">
+          <StateStudy/>
+          <VariationStudy/>
+        </div>
       </section>
       <section className={`border-b py-10 lg:py-14 ${rule}`}>
         <h2 className={`${serif} text-5xl text-[#bd171c] sm:text-6xl`}>Your flow. Your rules.</h2>
