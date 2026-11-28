@@ -37,6 +37,9 @@ jobs:
       - name: Check benchmark protocol
         run: |
           node --check benchmarks/browser/run.mjs
+          node --check benchmarks/browser/competitive.mjs
+          node --check benchmarks/browser/competitive-browser.mjs
+          node --check benchmarks/browser/competitive-adapters.mjs
           node --test benchmarks/browser/interaction-study.test.mjs
 
       - name: Install dependencies

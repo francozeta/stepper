@@ -43,3 +43,29 @@ Third run: [reactive isolation results](results/2026-11-27-vercel-v3.json). Cand
 Run `node --test interaction-study.test.mjs` for the aggregation/order unit checks. Run `node run.mjs --interactions` with the same browser dependencies installed, or opt into interactions in the manual browser workflow. An existing local Chromium can be selected with `STEPPER_CHROMIUM_EXECUTABLE`; record the actual browser version alongside the Playwright version. Each of five rounds per profile rotates all five implementations through each order position once. Every round collects three forward/reverse cycles after a warmup. Simulated server wait is excluded. The observer checks actual input visibility and retained draft. Each round records a two-animation-frame proxy and Chrome DevTools totals for script, layout, style and task time. These measures include observation and automation overhead.
 
 The [local Windows run](results/2026-11-27-local-interactions.json) recorded all 50 rounds at `1e31336` on Chromium 156 and Node 22. Each implementation has 15 samples per direction and profile. The [V2 review notes](../../docs/stepper-next.md#v2-release-review) give median/p90 results, profiling attribution and experimental limits. Keep these results separate from the earlier stress measurements and retain the rejected V3 result.
+
+### Final competitive protocol
+
+Use the committed dependency lock in a disposable copy. The default run builds plain and shared-`cn` variants, then measures the shared-`cn` ones. Set `STEPPER_CHROMIUM_EXECUTABLE` to reuse an existing Chromium. Otherwise install the pinned Playwright Chromium shell in the disposable directory.
+
+```sh
+repo="$PWD"
+tmp="$(mktemp -d)"
+cp benchmarks/browser/*.mjs benchmarks/browser/*.txt benchmarks/browser/package*.json "$tmp/"
+cd "$tmp"
+npm ci --ignore-scripts --no-audit --no-fund
+# Run if a local Chromium path is unavailable.
+npx --no-install playwright install --only-shell chromium
+export STEPPER_REPO="$repo"
+node competitive.mjs --smoke
+node competitive.mjs
+node competitive.mjs --cpu
+node competitive.mjs --react
+node competitive.mjs --guard
+```
+
+The measurement commands write `timing.json`, `cpu.json`, `react.json` and `guard.json` under `results/competitive/`. The CPU and guard probes save local Chrome profiles and map their samples to the bundled sources in the aggregate report. The guard probe focuses on the built-in Back and guarded Continue path used in the original mobile finding. The React pass uses the production profiling renderer. Interpret profiled durations separately from the production timing pass. Run the modes sequentially to keep browser contention comparable.
+
+The fixtures hold React, React DOM, shared app code, fixtures, CSS and workflow rules constant. The source copy for Dice UI is pinned to `391f1ef1`. Its local import paths and Lucide icon use match the registry transform. All third-party sources are obtained through official packages or the pinned public source. The isolated dependencies and fixture are excluded from the production app and registry.
+
+See [the final comparative report](competitive-validation.md) for the captured measurements and integration findings.

@@ -4,7 +4,7 @@
 
 The active branch is `refactor/reduction-pass`. The [consumer installation verifier](./docs/consumer-install.md) passed the three advertised items in Base Nova and Radix Nova with distinct component aliases. A separate Next.js production build using the installed primitive exercised keyboard, focus, async interruption and responsive behavior in Chromium and WebKit. The optional SDK lab exercised real local semantic actions and human interruption.
 
-The [local interaction benchmark](./benchmarks/browser/results/2026-11-27-local-interactions.json) completed all 50 rounds. At 4× CPU slowdown, the candidate took 26.8 ms median from guard release to visible panel versus 21.6 ms for the historical Stepper. Profile attribution and the rejected V3 experiment remain documented. [V2 review notes](./docs/stepper-next.md#v2-release-review) cover the measurements, migration and open checks. Physical devices, assistive technology and a live product backend remain open before broader adoption claims.
+The [final competitive study](./benchmarks/browser/competitive-validation.md) completed 144 production rounds comparing Stepper V2, the historical core, Stepperize, Ark UI, Dice UI Base and native React. At 4× CPU slowdown, V2's warm release measured 14.3 ms median versus 14.2 ms for the historical Stepper with a shared app gate. Stepperize had the smallest incremental bundle among the libraries. Cold-start variation and the [earlier reasoning and rejected V3 experiment](./docs/stepper-next.md#v2-release-review) remain part of the review record. Physical devices, assistive technology and a live product backend remain open before broader adoption claims.
 
 ## Previous modernization review
 
