@@ -20,7 +20,8 @@ const libraries = ["native", "stepper-before", "stepper", "ark", "stepperize"];
 const interactionMode = process.argv.includes("--interactions");
 const results = [];
 const median = xs => xs.toSorted((a,b)=>a-b)[Math.floor(xs.length/2)];
-const browser = await chromium.launch({headless:true});
+const executablePath = process.env.STEPPER_CHROMIUM_EXECUTABLE;
+const browser = await chromium.launch({ headless: true, executablePath });
 const versions = Object.fromEntries(Object.entries(JSON.parse(readFileSync(join(here,"package-lock.json"),"utf8")).packages).filter(([p])=>["node_modules/@ark-ui/react","node_modules/@stepperize/react","node_modules/@base-ui/react","node_modules/react","node_modules/react-dom","node_modules/cn","node_modules/esbuild","node_modules/playwright"].includes(p)).map(([p,v])=>[p,v.version]));
 const report = { revision:execFileSync("git",["rev-parse","HEAD"],{cwd:root,encoding:"utf8"}).trim(),node:process.version,browser:browser.version(),baselineRevision,versions,mode:interactionMode?"interactions":"stress",results };
 async function test(name, mobile) {

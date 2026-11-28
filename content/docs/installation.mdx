@@ -16,6 +16,7 @@ import {
   controlledSnippet,
   gettingStartedSnippet,
   registryInstallCommands,
+  registryNamespaceConfig,
 } from "@/lib/docs";
 
 <Section
@@ -27,8 +28,10 @@ import {
     Keep your existing shadcn preset. Stepper uses Base UI internally for composition, but Base Nova is not required. The installed source uses your theme tokens and UI alias. Base Nova and Radix Nova have passed local registry install, TypeScript and markup checks; other presets have not yet been verified.
   </p>
   <p className="text-sm text-muted-foreground">
-    If the namespace cannot be resolved, use the direct registry URL:
+    If the namespace cannot be resolved, merge this entry into the registries object in your components.json.
   </p>
+  <CodeBlock code={registryNamespaceConfig} filename="components.json" lang="json" />
+  <p className="text-sm text-muted-foreground">You can also install from the direct registry URL.</p>
   <CodeBlock code="npx shadcn@latest add https://francozeta-stepper.vercel.app/r/stepper.json" filename="terminal" lang="bash" showLineNumbers={false} compact />
 </Section>
 

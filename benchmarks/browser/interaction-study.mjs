@@ -74,7 +74,7 @@ async function arm(page, kind, target) {
 }
 
 async function readSample(page) {
-  await page.waitForFunction(() => window.__interaction.result || window.__interaction.error, { timeout: 5000 });
+  await page.waitForFunction(() => window.__interaction.result || window.__interaction.error, undefined, { timeout: 5000 });
   return page.evaluate(() => {
     if (window.__interaction.error) throw new Error(window.__interaction.error);
     return window.__interaction.result;

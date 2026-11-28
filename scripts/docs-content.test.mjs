@@ -69,7 +69,7 @@ describe("MDX docs content", () => {
     const blocks = await readText("content/docs/blocks.mdx");
     const markdown = await readText("lib/docs-markdown.ts");
     const registry = JSON.parse(await readText("public/registry.json"));
-    for (const source of [blocks, markdown]) {
+    for (const source of [blocks, markdown, await readText("README.md"), await readText("lib/docs.ts")]) {
       for (const [, name] of source.matchAll(/add @stepper\/([a-z-]+)/g)) {
         expect(registry.items.some((item) => item.name === name)).toBe(true);
       }

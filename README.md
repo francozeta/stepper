@@ -73,10 +73,8 @@ one Stepper file and installs or reuses Base UI and `cn`.
 
 ## Philosophy
 
-Stepper does not own your form state, routing, validation, persistence, or
-server actions.
-
-Your app owns the workflow. Stepper reflects that workflow in the UI.
+Stepper adapts to your project. Keep your app's form state, routing, validation,
+persistence and server actions. Stepper reflects that workflow in the UI.
 
 Stepper uses Base UI `useRender` for composition. Existing `asChild` usage is
 supported for compatibility; prefer `render` for new code.

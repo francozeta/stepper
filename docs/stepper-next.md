@@ -256,3 +256,21 @@ An opt-in interaction protocol adds round rotation (each variant occupies each p
 ## Developer experience — real registry consumer
 
 [Consumer install evidence](./consumer-install.md): shadcn CLI 4.8.2 installed the actual local public registry payload from 50871b2 in a disposable configured React/TypeScript consumer. Base Nova and Radix Nova (custom UI alias) both passed strict TypeScript and esbuild. Base-style transformation removed three internal asChild JSX attributes, silently breaking compatibility. Rename only the internal transport to legacyAsChild; public asChild and render remain unchanged. Reinstalled the patched payload with both styles; three internal attributes preserved, strict TypeScript and server static markup checks for custom trigger/content/next hosts passed. Source and all public mirrors updated. The full shadcn init/template, live namespace, demo/onboarding block, hydration, actual CSS and visual/physical device checks were not exercised. No browser downloaded. Also correct false API fallback callback documentation, unreachable quickstart final step, install prerequisites, alias and direct URL instructions. Fix Node test runner/Vitest collision: protocol unit tests passed in CI #112 but Vitest incorrectly discovered the Node suite. Exclude only that file from Vitest while keeping its explicit Node check. No merge or release. Final CI pending.
+## V2 release review
+
+Stepper adapts to the consumer's preset, theme, aliases and workflow. The [installed consumer checks](./consumer-install.md#pr-48-verification) cover the full advertised registry inventory. The API and Markdown guides show the same anatomy, custom-host migration and guard contract. Existing copied source can retain `asChild`. For new composition, use `render` and set `nativeButton={false}` for links. Review local source customizations before updating the installed file.
+
+The [counterbalanced local run](../benchmarks/browser/results/2026-11-27-local-interactions.json) collected 15 samples per direction and profile for each implementation. Times below measure guard release or Back click to an observable visible panel. Each cell gives median / p90 in milliseconds.
+
+| Case | Historical Stepper `5cd44a9` | Candidate `1e31336` |
+| --- | ---: | ---: |
+| Desktop, guard release | 3.7 / 4.8 | 4.4 / 5.4 |
+| Desktop, Back | 3.2 / 5.2 | 3.3 / 4.4 |
+| 390 px and CPU 4×, guard release | 21.6 / 34.5 | 26.8 / 35.5 |
+| 390 px and CPU 4×, Back | 16.9 / 25.8 | 20.8 / 34.3 |
+
+The complete Stepper fixture bundle measured 78,575 gzip bytes versus 78,540 for the historical fixture. At CPU 4×, Chrome DevTools averaged 200.5 ms of script, 14.8 ms of layout and 26.4 ms of style recalculation per candidate round of three cycles, including automation. A separate source-mapped CPU profile sampled 18 cycles per Stepper revision. In the candidate, React DOM accounted for about 608 ms of sampled leaf time and the primitive for about 99 ms, alongside substantial Playwright accessibility and geometry work. This exposed where the observed workload spent time and left the latency gap without a single established cause. The protocol uses emulated CPU, simulated validation and a DOM visibility observer on one host. Retain the [rejected V3 evidence](../benchmarks/browser/results/2026-11-27-vercel-v3.json) and the current accessible composition while the slowdown is monitored.
+
+A production-shaped consumer installed Stepper in a separate Next.js 16/Tailwind v4 app. Its workspace form owns draft state, validation, a simulated asynchronous preferences check, and final confirmation. Chromium desktop and touch-emulated WebKit exercised initial server markup and hydration, keyboard focus, rapid navigation, stale validation after Back, form retention, a custom content host and reduced motion. The optional SDK lab executed its real local bridge for sample preparation, invalid currency, user-edited values and interruption/resume in both engines.
+
+The independent workspace flow is a candidate shape for a Soma onboarding pilot. Establish the actual product stages and validation boundary before proposing an integration. The study used simulated decisions and synthetic data. Physical devices, manual assistive-technology checks, a live backend, and external-model agent access remain unverified.

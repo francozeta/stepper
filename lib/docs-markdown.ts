@@ -3,15 +3,27 @@ import path from "node:path";
 
 import {
   accessibilityNotes,
+  anatomyParts,
   apiComponents,
   checkoutExampleCode,
+  compositionMigrationCode,
+  compositionMigrationNotes,
+  contentProps,
   controlledSnippet,
   flowArchitecture,
   gettingStartedSnippet,
+  itemHookNotes,
+  itemProps,
+  listProps,
+  navigationGuardNotes,
+  navigationProps,
   reactHookFormAdapterPreviewCode,
   registryInstallSnippet,
+  registryNamespaceConfig,
+  rootProps,
   stepperCompositionTree,
   stepperUsageSnippet,
+  triggerProps,
   useStepperRows,
   worksWith,
 } from "@/lib/docs";
@@ -328,7 +340,11 @@ function getGettingStartedMarkdown() {
     "",
     codeBlock("bash", registryInstallSnippet),
     "",
-    "If the namespace cannot be resolved, install from the direct registry URL:",
+    "If the namespace cannot be resolved, merge this entry into the registries object in components.json.",
+    "",
+    codeBlock("json", registryNamespaceConfig),
+    "",
+    "You can also install from the direct registry URL.",
     "",
     codeBlock("bash", "npx shadcn@latest add " + absoluteUrl("/r/stepper.json")),
     "",
@@ -358,11 +374,11 @@ function getBlocksMarkdown() {
     "",
     codeBlock("bash", "npx shadcn@latest add @stepper/stepper-demo"),
     "",
-    "A styled checkout demo; no payment integration. Render its default export. Separate installed-block smoke testing remains pending.",
+    "Render the default export from stepper-demo.tsx in your components alias. The styled checkout demo uses local state. Base Nova and Radix Nova passed installation and a server markup smoke test.",
     "",
     codeBlock("bash", "npx shadcn@latest add @stepper/stepper-intent-onboarding"),
     "",
-    "An example with local form state and simulated setup; no real account creation or verification. Form and icon dependencies belong to the block, not the core. Separate installed-block smoke testing remains pending.",
+    "Render the named export StepperIntentOnboardingExample from stepper-intent-onboarding.tsx in your components alias. The example uses local form state and simulated setup, and installs its form and icon dependencies with the block. Base Nova and Radix Nova passed installation and a server markup smoke test.",
     "",
     "## Research preview",
     "",
@@ -371,6 +387,15 @@ function getBlocksMarkdown() {
 }
 
 function getApiMarkdown() {
+  const propTables = [
+    ["Root props", rootProps],
+    ["List props", listProps],
+    ["Item props", itemProps],
+    ["Trigger props", triggerProps],
+    ["Content props", contentProps],
+    ["Navigation props", navigationProps],
+  ] as const;
+
   return [
     "## Components",
     "",
@@ -379,15 +404,40 @@ function getApiMarkdown() {
         `- \`${component.name}\` (${component.element}): ${component.description}`
     ),
     "",
+    "## Anatomy",
+    "",
+    ...anatomyParts.map((part) => `- **${part.label}** (${part.value}). ${part.help}`),
+    "",
+    "## Updating existing copies",
+    "",
+    compositionMigrationNotes,
+    "",
+    codeBlock("tsx", compositionMigrationCode),
+    "",
     "## Controlled fallback",
     "",
     "A missing or disabled controlled value displays the first enabled step without emitting onValueChange. A guard attached to Continue does not validate direct requests or every other navigation control. The app owns validation and final submission.",
     "",
+    navigationGuardNotes,
+    "",
+    ...propTables.flatMap(([title, rows]) => [
+      "## " + title,
+      "",
+      ...rows.map((row) => {
+        const defaultValue = "defaultValue" in row ? ` (default \`${row.defaultValue}\`)` : "";
+        return `- \`${row.name}\` (${row.type})${defaultValue}. ${row.description}`;
+      }),
+      "",
+    ]),
     "## useStepper",
     "",
     ...useStepperRows.map(
       (row) => `- \`${row.name}\` - ${row.type}: ${row.description}`
     ),
+    "",
+    "## useStepperItem",
+    "",
+    itemHookNotes,
     "",
     "## Accessibility model",
     "",

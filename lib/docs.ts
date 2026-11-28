@@ -1,4 +1,5 @@
 import packageJson from "@/package.json";
+import { absoluteUrl } from "@/lib/site";
 
 const registryVersion = packageJson.version;
 
@@ -99,6 +100,9 @@ const usageSnippet = `import {
 } from "@/components/ui/stepper";`;
 
 const registryInstallSnippet = `pnpm dlx shadcn@latest add @stepper/stepper`;
+const registryNamespaceConfig = JSON.stringify({
+  registries: { "@stepper": absoluteUrl("/r/{name}.json") },
+}, null, 2);
 
 const registryInstallCommands = {
   pnpm: registryInstallSnippet,
@@ -243,7 +247,7 @@ const asChildRequirements = [
   {
     label: "Focusable child",
     value: "button or link",
-    help: "StepperTrigger asChild should render a focusable element that can receive keyboard focus.",
+    help: "Use a focusable host for custom triggers and controls. Set nativeButton={false} for a link.",
   },
   {
     label: "Prop forwarding",
@@ -252,10 +256,30 @@ const asChildRequirements = [
   },
   {
     label: "Refs and events",
-    value: "forwardRef",
-    help: "Forward refs for custom components and avoid preventDefault unless you intentionally block navigation.",
+    value: "props and ref to the host",
+    help: "Forward the ref to the DOM element. An event handler can call preventDefault to block Stepper navigation.",
   },
 ];
+
+const anatomyParts = [
+  { label: "Indicator", value: "StepperIndicator", help: "Number or status symbol." },
+  { label: "Connector", value: "StepperSeparator", help: "Track and Fill between adjacent steps." },
+  { label: "Trigger", value: "StepperTrigger", help: "Interactive target. Its focus outline identifies keyboard focus." },
+  { label: "Label / Description", value: "StepperLabel / StepperDescription", help: "Visible step name and supporting text." },
+  { label: "Panel", value: "StepperContent", help: "Content associated with the active step." },
+  { label: "Navigation", value: "StepperPrevious / StepperNext", help: "Persistent previous and next controls." },
+];
+
+const compositionMigrationCode = `<StepperTrigger
+  nativeButton={false}
+  render={<a href="/setup/preferences" />}
+>
+  Preferences
+</StepperTrigger>`;
+
+const compositionMigrationNotes = "When updating an existing copy, review the installed source diff before replacing local customizations. Existing asChild composition is supported. Prefer render for new composition. Custom hosts receive the supplied props, handlers, and ref.";
+const navigationGuardNotes = "Guards run only on their own navigation controls. A pending guard sets aria-busy and data-pending on that control. A newer eligible request supersedes pending navigation even if its guard later returns false. The app owns shared workflow validation, external cancellation, and submission.";
+const itemHookNotes = "Call useStepperItem inside a StepperItem to read its value, index, orientation, state, position and trigger/panel IDs. Use setValue for enabled-step requests.";
 
 const themeTokensSnippet = `:root {
   --background: oklch(1 0 0);
@@ -1356,7 +1380,25 @@ const contentProps = [
     defaultValue: "false",
     description: "Render the content props onto a child element with Base UI composition (legacy API).",
   },
+  {
+    name: "render",
+    type: "ReactElement or Base UI render callback",
+    description: "Renders a custom content host with the panel's attributes.",
+  },
 ];
+
+const renderButtonProp = {
+  name: "render",
+  type: "ReactElement or Base UI render callback",
+  description: "Renders a custom interactive host with Stepper's props and handlers.",
+};
+
+const nativeButtonProp = {
+  name: "nativeButton",
+  type: "boolean",
+  defaultValue: "!asChild",
+  description: "Set false for a link or other non-button host. Disabled non-button hosts use aria-disabled and leave the tab order.",
+};
 
 const triggerProps = [
   {
@@ -1369,8 +1411,10 @@ const triggerProps = [
     name: "disabled",
     type: "boolean",
     defaultValue: "false",
-    description: "Disables the trigger in addition to the parent StepperItem disabled state. With asChild, aria-disabled and tabIndex are applied instead of a native disabled attribute.",
+    description: "Disables the trigger in addition to the parent StepperItem disabled state.",
   },
+  renderButtonProp,
+  nativeButtonProp,
 ];
 
 const navigationProps = [
@@ -1396,6 +1440,8 @@ const navigationProps = [
     type: "() => boolean | Promise<boolean>",
     description: "Runs before StepperNext changes the value. Return false to cancel navigation.",
   },
+  renderButtonProp,
+  nativeButtonProp,
 ];
 
 const useStepperRows = [
@@ -1408,6 +1454,11 @@ const useStepperRows = [
     name: "steps",
     type: "{ value: string; disabled: boolean }[]",
     description: "Registered step order used by navigation helpers.",
+  },
+  {
+    name: "orientation",
+    type: '"horizontal" | "vertical"',
+    description: "The configured direction of the list and connectors.",
   },
   {
     name: "currentIndex",
@@ -1423,6 +1474,11 @@ const useStepperRows = [
     name: "setValue",
     type: "(value: string) => void",
     description: "Selects an enabled step by value.",
+  },
+  {
+    name: "getStepIndex",
+    type: "(value: string) => number",
+    description: "Looks up a step's zero-based index. Returns -1 for unknown values.",
   },
   {
     name: "canGoPrevious / canGoNext",
@@ -1552,11 +1608,14 @@ const v2Roadmap = [
 
 export {
   accessibilityNotes,
+  anatomyParts,
   apiComponents,
   asChildRequirements,
   checkoutExampleCode,
   circleProgressRecipeSnippet,
   compositionCode,
+  compositionMigrationCode,
+  compositionMigrationNotes,
   contentProps,
   controlledBehaviorNotes,
   controlledExampleCode,
@@ -1567,12 +1626,15 @@ export {
   gettingStartedSnippet,
   indicatorCode,
   itemProps,
+  itemHookNotes,
   listProps,
   mobileDrawerPatternSnippet,
   navigationProps,
+  navigationGuardNotes,
   registryVersion,
   registryInstallCommands,
   registryInstallSnippet,
+  registryNamespaceConfig,
   registryNotes,
   quickFacts,
   reactHookFormAdapterPreviewCode,

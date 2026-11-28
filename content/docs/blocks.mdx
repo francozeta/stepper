@@ -16,7 +16,7 @@ import { Section } from "@/components/docs-content";
     description="A self-contained styled checkout example. Installs the Stepper source and a demo component into your project. No payment integration."
   >
     <CodeBlockCommand pnpm="pnpm dlx shadcn@latest add @stepper/stepper-demo" npm="npx shadcn@latest add @stepper/stepper-demo" yarn="yarn dlx shadcn@latest add @stepper/stepper-demo" bun="bunx shadcn@latest add @stepper/stepper-demo" />
-    <p className="text-sm text-muted-foreground">Render the default export from stepper-demo.tsx in your components alias. The registry item exists; this block has not yet passed the separate consumer installation smoke test.</p>
+    <p className="text-sm text-muted-foreground">Render the default export from stepper-demo.tsx in your components alias. The block was installed and its server markup was checked in Base Nova and Radix Nova.</p>
   </Section>
   <Section
     title="Checkout preview"
@@ -32,6 +32,6 @@ import { Section } from "@/components/docs-content";
   </Section>
   <Section title="Intent onboarding" description="An installable example with local form state and simulated setup. It does not create accounts or perform real verification.">
     <CodeBlockCommand pnpm="pnpm dlx shadcn@latest add @stepper/stepper-intent-onboarding" npm="npx shadcn@latest add @stepper/stepper-intent-onboarding" yarn="yarn dlx shadcn@latest add @stepper/stepper-intent-onboarding" bun="bunx shadcn@latest add @stepper/stepper-intent-onboarding" />
-    <p className="text-sm text-muted-foreground">This block includes form and icon dependencies; it is not required by the core. Separate consumer install validation remains pending.</p>
+    <p className="text-sm text-muted-foreground">Render the named export StepperIntentOnboardingExample from stepper-intent-onboarding.tsx in your components alias. Its form and icon dependencies are installed with the block. The block was installed and its server markup was checked in Base Nova and Radix Nova.</p>
   </Section>
 </div>

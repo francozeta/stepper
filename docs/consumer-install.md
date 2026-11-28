@@ -1,6 +1,19 @@
 # Consumer installation evidence
 
-## Environment and scope
+## PR #48 verification
+
+The consolidated verifier ran on Windows with Node 22.23.5, npm and shadcn 4.8.2. It installed `stepper`, `stepper-demo` and `stepper-intent-onboarding` from the review branch’s HTTP registry namespace. Both Base Nova and Radix Nova passed strict typechecking, bundled the documented first flow, and rendered the installed blocks and legacy host composition on the server.
+
+| Preset | UI alias | Component alias |
+| --- | --- | --- |
+| Base Nova | `@/components/ui` | `@/components` |
+| Radix Nova | `@/ui` | `@/widgets` |
+
+Windows required invoking the installed JavaScript CLIs through Node. In the clean Base Nova fixture, generated Button and Field modules imported `class-variance-authority` without a matching dependency in their registry manifests. The onboarding block now declares it. The Radix fixture uses its preset's `radix-ui` dependency. Both configurations retain their own aliases and UI components.
+
+Run `node scripts/verify-consumer-install.mjs` against the generated local JSON. For the HTTP namespace path, start the review site and set `STEPPER_REGISTRY_URL=http://localhost:3000/` before the same command. The verifier creates a disposable configured project. The separate production consumer used a Base Nova Next.js app with Tailwind v4 to test styled hydration and navigation. These checks cover two presets and simulated validation.
+
+## Historical environment and scope
 
 - Revision tested: `50871b2d77fa16b141099f235ca3d52d78a8bbf1`.
 - One disposable Vercel Sandbox, 1 vCPU / 2 GB, Node 24.22.3 (universal image), no persistence.
@@ -27,7 +40,7 @@ Use base-nova first, then radix-nova with a different UI alias in a disposable c
 
 ## Resources
 
-Sandbox stopped after 116.524 seconds; 60.599 seconds active CPU, 58.24 MB ingress. No Chromium download or second session. An opt-in consolidated reproduction script is available: `node scripts/verify-consumer-install.mjs` (Node 22+, npm, Linux/macOS, network access). It installs into a temporary directory, uses the actual quickstart from lib/docs.ts, checks both installed styles and removes the directory. Its constituent commands were tested in the VM; the consolidated script itself has not been run. It resolves transitive versions at execution time. Follow-up: preserve a full lock and validate actual browser CSS/hydration. Do not describe this as a visual or full template test.
+The original sandbox stopped after 116.524 seconds, with 60.599 seconds of active CPU and 58.24 MB of ingress. It ran the constituent installation commands. The consolidated verifier and separate browser checks are recorded above. The verifier resolves transitive versions at execution time.
 
 ## Preset independence
 
