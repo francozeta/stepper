@@ -187,3 +187,19 @@ Stepper is larger than both libraries; desktop medians are similar to Stepperize
 ## Performance candidate — native render path and attribution
 
 The production browser result suggests inspecting composition overhead and bundle composition rather than deleting public features. Base UI useRender 1.4.1 documents enabled=false as skipping most internal work. The default host path now uses React.createElement and passes enabled=false; explicit render and legacy asChild still use the same Base UI hook. No hook order changes or separate wrapper component; a regression covers DOM identity and focus across equivalent render composition. Existing class merging, ARIA, pending guards, connector timing and registry contract stay intact. The Base UI dependency remains, so no bundle reduction is promised. Benchmark now builds the actual 5cd44a9 source and current source side by side, outputs esbuild metafiles and package-attributed minified bytes, and reverses execution order for the mobile profile. Pin Playwright 1.65.1 and correct recursive fixture copy now that results exist. Full Git history required. CI, visual and production browser comparison pending; do not infer speedup. No new sandbox in this pass.
+
+## Second competitive Chromium run — native fast path
+
+[Captured measurements](../benchmarks/browser/results/2026-11-27-vercel-v2.json) compare revision `4cc8f9e` against `5cd44a9` in the same disposable Vercel VM (1 vCPU, 2 GB, Node 24.22.3, Chromium 159.0.8154.6, Playwright 1.65.1). CI [run 105](https://github.com/francozeta/stepper/actions/runs/46101913695) passed 99 tests and the separate internal benchmark. All five production integrations passed five checks per profile (50/50), with no page errors.
+
+| Integration | Full gzip bytes | Desktop median ms / 80 updates | Mobile 4x median ms / 80 updates |
+| --- | ---: | ---: | ---: |
+| Native | 61,325 | 4.8 | 23.1 |
+| Stepper before | 78,528 | 21.7 | 89.6 |
+| Stepper candidate | 78,554 | 19.0 | 81.9 |
+| Ark UI | 69,311 | 32.1 | 104.7 |
+| Stepperize | 66,695 | 18.0 | 61.2 |
+
+Observed same-run medians are 12.4% lower on desktop and 8.6% lower on the throttled profile for the candidate. Samples overlap; this is directional evidence, not a statistically established gain. The candidate remains slower than Stepperize on the mobile profile and adds 26 gzip bytes. Do not compare across VM runs as if the hardware were identical. Both Stepper adapters moved focus without selecting the next step; the other tested defaults left focus on Business. All passed the shared onboarding and owner-change checks.
+
+Minified byte attribution for the candidate: cn 26,840; Base UI React and utilities combined 4,142; application/adapter including Stepper source 16,742. cn is the largest identified non-React dependency, so investigate a supported lean class-merging strategy or consumer-provided class helper without breaking Tailwind overrides. These are esbuild output attributions, not independent gzip savings. Keep composition, motion and existing public API. No dependency replacement was attempted in this pass. Lock checksum and direct versions captured; complete transitive lock and raw metafiles were not retained before the disposable VM stopped. VM stopped after 90.347 seconds, 49.230 CPU-active seconds; 306.6 MB ingress. No further sandbox or core changes.
