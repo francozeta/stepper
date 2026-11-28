@@ -1,0 +1,105 @@
+{
+  "revision": "829c87ea9a3fa86b7d1f8ac1f4f0649018e7d4c4",
+  "date": "2026-11-27 (Lima)",
+  "environment": {
+    "provider": "Vercel Sandbox",
+    "vcpus": 1,
+    "memoryMb": 2048,
+    "node": "24.22.3",
+    "react": "19.2.5",
+    "baseUi": "1.9.0",
+    "cn": "0.5.2",
+    "esbuild": "0.28.1",
+    "clsx": "2.1.1",
+    "tailwindMerge": "3.5.0",
+    "browserInstalled": false,
+    "durationMs": 51398,
+    "activeCpuMs": 13104,
+    "ingressBytes": 56904519
+  },
+  "method": "Synthetic consumer with actual Stepper source and shared heading class helper. Fitted native and Stepper bundles use identical scan corpus, including both variants. Legacy experiment ran in the same VM with optional exact dependencies installed no-save. Full lock not preserved; direct dependencies and base lock checksum captured. No runtime/CSS/visual or full shadcn application tests.",
+  "baseLockSha256": "7f59b95b9e4cc9d5576a0540e386e17c847b20de4c61378d6e375fc55e2bdf27",
+  "compiled": {
+    "usedGroups": 50,
+    "totalGroups": 384,
+    "warnings": [],
+    "scannedOverridePairsMatching": 10,
+    "scannedOverridePairsTotal": 10
+  },
+  "legacy": {
+    "matchingPairs": 9,
+    "totalPairs": 10,
+    "differences": [
+      {
+        "args": [
+          "start-1 end-2",
+          "inset-x-4"
+        ],
+        "full": "inset-x-4",
+        "legacy": "start-1 end-2 inset-x-4"
+      }
+    ]
+  },
+  "results": [
+    {
+      "mode": "plain",
+      "native": {
+        "minifiedBytes": 196643,
+        "gzipBytes": 61325
+      },
+      "stepper": {
+        "minifiedBytes": 242015,
+        "gzipBytes": 78554
+      },
+      "incrementalGzipBytes": 17229
+    },
+    {
+      "mode": "shared-full",
+      "native": {
+        "minifiedBytes": 223874,
+        "gzipBytes": 72549
+      },
+      "stepper": {
+        "minifiedBytes": 242082,
+        "gzipBytes": 78605
+      },
+      "incrementalGzipBytes": 6056
+    },
+    {
+      "mode": "shared-fitted",
+      "native": {
+        "minifiedBytes": 215354,
+        "gzipBytes": 69470
+      },
+      "stepper": {
+        "minifiedBytes": 233562,
+        "gzipBytes": 75472
+      },
+      "incrementalGzipBytes": 6002
+    },
+    {
+      "mode": "legacy-duplicate",
+      "native": {
+        "minifiedBytes": 223519,
+        "gzipBytes": 69616
+      },
+      "stepper": {
+        "minifiedBytes": 268892,
+        "gzipBytes": 86430
+      },
+      "incrementalGzipBytes": 16814
+    },
+    {
+      "mode": "legacy-shared",
+      "native": {
+        "minifiedBytes": 223519,
+        "gzipBytes": 69616
+      },
+      "stepper": {
+        "minifiedBytes": 241724,
+        "gzipBytes": 75706
+      },
+      "incrementalGzipBytes": 6090
+    }
+  ]
+}

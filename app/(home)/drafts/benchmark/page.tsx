@@ -32,7 +32,7 @@ export default function BenchmarkPage() {
       </header>
       <section aria-labelledby="measured" className="grid gap-5 border-t pt-5">
         <div className="grid gap-1">
-          <h2 id="measured" className="text-lg font-medium">Measured against our own baseline</h2>
+          <h2 id="measured" className="text-lg font-medium">Historical internal baseline · CI #100</h2>
           <p className="text-xs text-muted-foreground">24 steps · 80 updates · seven samples · same installed dependencies</p>
         </div>
         {measures.map((measure) => (
@@ -51,6 +51,37 @@ export default function BenchmarkPage() {
           </div>
         ))}
         <p className="text-xs leading-relaxed text-muted-foreground">Development React and jsdom, Node 24.15.0. Not production browser paint, bundle size, or a comparison with another library. Source size is raw UTF-8. <a href={run} className="underline underline-offset-2">CI #100 and raw measurements</a>.</p>
+      </section>
+      <section aria-labelledby="browser" className="grid gap-4 border-t pt-5">
+        <h2 id="browser" className="text-lg font-medium">Production browser comparison</h2>
+        <p className="text-xs leading-relaxed text-muted-foreground">Five integrations, 50/50 checks, same VM. Median of seven samples of 80 controlled updates; 4× CPU slowdown on the mobile profile.</p>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[24rem] text-left text-xs tabular-nums">
+            <thead><tr className="border-b text-muted-foreground"><th scope="col" className="py-2 font-medium">Integration</th><th scope="col" className="py-2 text-right font-medium">Desktop</th><th scope="col" className="py-2 text-right font-medium">Mobile</th><th scope="col" className="py-2 text-right font-medium">Gzip</th></tr></thead>
+            <tbody>{[
+              ["Native", "4.8 ms", "23.1 ms", "61.33 kB"],
+              ["Stepper before", "21.7 ms", "89.6 ms", "78.53 kB"],
+              ["Stepper candidate", "19.0 ms", "81.9 ms", "78.55 kB"],
+              ["Ark UI", "32.1 ms", "104.7 ms", "69.31 kB"],
+              ["Stepperize", "18.0 ms", "61.2 ms", "66.70 kB"],
+            ].map(([name,desktop,mobile,gzip]) => <tr key={name} className="border-b"><th scope="row" className="py-3 font-medium">{name}</th><td className="text-right">{desktop}</td><td className="text-right">{mobile}</td><td className="text-right">{gzip}</td></tr>)}</tbody>
+          </table>
+        </div>
+        <p className="text-xs leading-relaxed text-muted-foreground">One exploratory run; samples overlap. Mobile is emulated, not a physical device. The fastest library on the throttled profile was Stepperize. <a className="underline underline-offset-2" href="https://github.com/francozeta/stepper/blob/7a33c69c2e9db40cf6880f9d75d5785cd18c2945/benchmarks/browser/results/2026-11-27-vercel-v2.json">Captured measurements</a>.</p>
+      </section>
+      <section aria-labelledby="incremental" className="grid gap-4 border-t pt-5">
+        <h2 id="incremental" className="text-lg font-medium">Pay for what you add.</h2>
+        <p className="text-sm text-muted-foreground">The same Stepper source has a different incremental cost depending on the consumer's existing class helper.</p>
+        {[
+          { name: "Plain React", bytes: 17229 },
+          { name: "Shared cn", bytes: 6056 },
+          { name: "App-fitted cn", bytes: 6002 },
+        ].map(item => <div className="grid gap-2" key={item.name}>
+          <div className="flex justify-between gap-2 text-sm"><span>{item.name}</span><span className="font-medium tabular-nums">{(item.bytes / 1000).toFixed(2)} kB</span></div>
+          <div className="h-3 rounded-sm bg-muted"><div aria-hidden="true" className="h-full rounded-sm bg-foreground" style={{ width: (item.bytes / 17229 * 100) + "%" }} /></div>
+        </div>)}
+        <p className="text-xs leading-relaxed text-muted-foreground">Incremental gzip bytes over the corresponding native control. Synthetic production bundle, not an installed shadcn application. App-fitted tables preserved ten scanned overrides. Sharing the legacy helper reduced duplicate bytes but differed on logical insets, so it is not an equivalent default. No core size reduction claimed.</p>
+        <a href="https://github.com/francozeta/stepper/tree/refactor/reduction-pass/benchmarks/browser/results" className="w-fit text-sm underline underline-offset-2">Measurements and limitations</a>
       </section>
       <section aria-labelledby="race" className="grid gap-4 border-t pt-5">
         <h2 id="race" className="text-lg font-medium">When intent changes</h2>
@@ -77,7 +108,7 @@ export default function BenchmarkPage() {
       <section aria-labelledby="reproduce" className="grid gap-3 border-t pt-5">
         <h2 id="reproduce" className="text-lg font-medium">Reproduce it.</h2>
         <pre className="overflow-x-auto rounded-lg border bg-muted/30 p-3 text-sm"><code>pnpm benchmark</code></pre>
-        <p className="text-xs leading-relaxed text-muted-foreground">Full Git checkout and installed dependencies required. Next comparison: identical controlled form, asynchronous guard, interruption, conditional step and keyboard tasks; record adapter code, incremental gzip, render work and recovery. Competitor execution and external-agent access are not yet verified.</p>
+        <p className="text-xs leading-relaxed text-muted-foreground">Full Git checkout and installed dependencies required. Next comparison: identical controlled form, asynchronous guard, interruption, conditional step and keyboard tasks; record adapter code, incremental gzip, render work and recovery. Real installed consumer, repeated production measurements and external-agent access remain unverified.</p>
         <Link href="/drafts/onboarding" className="w-fit text-sm underline underline-offset-2">Explore the optional UI SDK experiment</Link>
       </section>
     </main>

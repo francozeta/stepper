@@ -27,3 +27,9 @@ Second successful exploratory run: [same-VM baseline and candidate results](resu
 ### Class-merging size study (opt-in)
 
 After installing the isolated benchmark dependencies, run `node cn-study.mjs` (no browser installation needed). It measures complete gzip bundles for native and actual Stepper under three synthetic consumer contexts: plain, a shared full cn helper, and a shared application-fitted cn helper. Both fitted builds share the same corpus to isolate addition of Stepper. It checks ten scanned class override cases and deletes generated files. No results yet; do not interpret this as full shadcn install or visual parity. Real consumer and custom theme validation remain required.
+
+### Measured class-merging results
+
+[Captured results](results/2026-11-27-cn-study.json): in the shared-full fixture, Stepper adds 6,056 gzip bytes, compared with 17,229 bytes in the plain fixture. Fitted tables retain 50/384 groups and match all ten scanned pairs. They reduce the full shared Stepper app from 78,605 to 75,472 gzip bytes, not a standalone core reduction.
+
+For legacy shadcn consumers, install optional dependencies only in this disposable fixture: `npm install --no-save --ignore-scripts --no-audit --no-fund clsx@2.1.1 tailwind-merge@3.5.0` and run `node cn-study.mjs --legacy`. The original legacy experiment was a temporary adaptation of the normal script and a separate parity probe; the consolidated flag is an unrerun equivalent. The duplicate engine path adds 16,814 bytes, whereas sharing the legacy helper adds 6,090. Legacy output differed for logical insets (9/10 string parity); do not automatically swap helpers or claim CSS equivalence. Full default cn remains the registry contract.

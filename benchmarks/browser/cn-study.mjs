@@ -14,7 +14,9 @@ const read = name => readFileSync(join(here, name), "utf8");
 const put = (name, source) => writeFileSync(join(dir, name), source);
 const core = readFileSync(join(root, "components/ui/stepper.tsx"), "utf8");
 const fixture = read("fixture.tsx.txt");
-const sharedFixture = 'import { cn } from "./merge.js";\n' +
+const legacy = process.argv.includes("--legacy");
+const modes = legacy ? ["legacy-duplicate", "legacy-shared"] : ["plain", "shared-full", "shared-fitted"];
+const sharedFixture = (legacy ? 'import { cn } from "./app-merge.js";\n' : 'import { cn } from "./merge.js";\n') +
   fixture.replace("<h1>Set up your business</h1>",
     '<h1 className={cn("text-sm font-medium rounded-md px-2", "text-lg px-4")}>Set up your business</h1>');
 if (sharedFixture.endsWith(fixture)) throw new Error("Fixture anchor missing");
@@ -48,10 +50,22 @@ try {
   for (const item of parity) {
     if (item.full !== item.fitted) throw new Error("Scanned override mismatch: " + JSON.stringify(item));
   }
-  for (const mode of ["plain", "shared-full", "shared-fitted"]) {
+  const legacyParity = legacy ? await (async () => {
+    const { clsx } = await import("clsx");
+    const { twMerge } = await import("tailwind-merge");
+    return cases.map(args => {
+      const full = cn(...args);
+      const merged = twMerge(clsx(args));
+      return { args, full, legacy: merged, match: full === merged };
+    });
+  })() : undefined;
+  for (const mode of modes) {
+    if (legacy) put("app-merge.js", 'import { clsx } from "clsx"; import { twMerge } from "tailwind-merge"; export const cn = (...args) => twMerge(clsx(args));\n');
     put("merge.js", mode === "shared-fitted"
       ? 'export { cn } from "./compiled.js";\n'
-      : 'export { cn } from "cn";\n');
+      : mode === "legacy-shared"
+        ? 'export { cn } from "./app-merge.js";\n'
+        : 'export { cn } from "cn";\n');
     for (const adapter of ["native", "stepper"]) {
       put("adapter.tsx", read(adapter + ".tsx.txt"));
       const result = await bundle({
@@ -64,7 +78,7 @@ try {
       metrics.push({ mode, adapter, minifiedBytes: bytes.length, gzipBytes: gzipSync(bytes, { level: 9 }).length });
     }
   }
-  const incremental = ["plain", "shared-full", "shared-fitted"].map(mode => {
+  const incremental = modes.map(mode => {
     const native = metrics.find(x => x.mode === mode && x.adapter === "native");
     const stepper = metrics.find(x => x.mode === mode && x.adapter === "stepper");
     return { mode, incrementalGzipBytes: stepper.gzipBytes - native.gzipBytes };
@@ -72,7 +86,7 @@ try {
   console.log(JSON.stringify({
     node: process.version,
     usedGroups: compiled.usedGroups, totalGroups: compiled.totalGroups,
-    warnings: compiled.warnings, parity, metrics, incremental,
+    warnings: compiled.warnings, parity, legacyParity, metrics, incremental,
     caveat: "Synthetic consumer, same source and dependencies. No browser or real shadcn installation in this study. Only scanned override cases tested. Fitted tables are application-local and never distributed.",
   }, null, 2));
 } finally {
