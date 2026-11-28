@@ -27,4 +27,4 @@ Use base-nova first, then radix-nova with a different UI alias in a disposable c
 
 ## Resources
 
-Sandbox stopped after 116.524 seconds; 60.599 seconds active CPU, 58.24 MB ingress. No Chromium download or second session. Follow-up: add a reproducible installed consumer CI task with a pinned full lock and real browser CSS/hydration check. Do not describe this as a visual or full template test.
+Sandbox stopped after 116.524 seconds; 60.599 seconds active CPU, 58.24 MB ingress. No Chromium download or second session. An opt-in consolidated reproduction script is available: `node scripts/verify-consumer-install.mjs` (Node 22+, npm, Linux/macOS, network access). It installs into a temporary directory, uses the actual quickstart from lib/docs.ts, checks both installed styles and removes the directory. Its constituent commands were tested in the VM; the consolidated script itself has not been run. It resolves transitive versions at execution time. Follow-up: preserve a full lock and validate actual browser CSS/hydration. Do not describe this as a visual or full template test.
