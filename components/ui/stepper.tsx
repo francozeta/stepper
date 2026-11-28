@@ -66,7 +66,7 @@ type StepperCollection = {
   id: string;
   orientation: StepperOrientation;
   steps: StepperStep[];
-  register?: (step: StepperStep) => () => void;
+  register?: (registrationId: string, step?: StepperStep) => void;
 };
 
 type StepperContextValue = {
@@ -161,7 +161,10 @@ function warnDev(message: string) {
 }
 
 function getStepId(id: string, part: "trigger" | "content", value: StepperValue) {
-  return `${id}-${part}-${value.replace(/[^a-zA-Z0-9_-]/g, "-")}`;
+  const suffix = value.replace(/[^a-zA-Z0-9_-]/g, (character) =>
+    `%${character.charCodeAt(0).toString(16).padStart(4, "0")}`
+  );
+  return `${id}-${part}-${suffix}`;
 }
 
 function findEnabledIndex(steps: StepperStep[], from: number, direction: 1 | -1) {
@@ -323,15 +326,21 @@ function Stepper({
   ...props
 }: StepperProps) {
   const id = React.useId();
-  const [registrations, setRegistrations] = React.useState<StepperStep[]>([]);
-  const register = React.useCallback((step: StepperStep) => {
-    setRegistrations((registered) => [...registered, step]);
-    return () => setRegistrations((registered) => registered.filter((entry) => entry !== step));
+  const [registrations, setRegistrations] = React.useState(() => new Map<string, StepperStep>());
+  const register = React.useCallback((registrationId: string, step?: StepperStep) => {
+    setRegistrations((registered) => {
+      const previous = registered.get(registrationId);
+      if (previous?.value === step?.value && previous?.disabled === step?.disabled) return registered;
+      const next = new Map(registered);
+      if (step) next.set(registrationId, step);
+      else next.delete(registrationId);
+      return next;
+    });
   }, []);
   const registration = stepsProp === undefined ? register : undefined;
 
   const { steps, getStepIndex } = React.useMemo(() => {
-    const steps = (stepsProp ?? registrations).map(({ value, disabled }) => ({ value, disabled: !!disabled }));
+    const steps = (stepsProp ?? [...registrations.values()]).map(({ value, disabled }) => ({ value, disabled: !!disabled }));
     const indices = new Map<StepperValue, number>();
     steps.forEach(({ value }, index) => {
       if (!indices.has(value)) indices.set(value, index);
@@ -458,6 +467,7 @@ function StepperItem<TValue extends StepperValue = StepperValue>({
     api: { value: currentValue, currentIndex, setValue, getStepIndex },
     collection: { id, orientation, steps, register },
   } = useStepperContext("StepperItem");
+  const registrationId = React.useId();
   const isInsideStepperList = React.useContext(StepperListContext) === id;
   const index = getStepIndex(value);
   const isDisabled = steps[index]?.disabled ?? disabled;
@@ -489,8 +499,12 @@ function StepperItem<TValue extends StepperValue = StepperValue>({
   } as React.CSSProperties;
 
   React.useLayoutEffect(() => {
-    if (isInsideStepperList) return register?.({ value, disabled });
-  }, [disabled, isInsideStepperList, register, value]);
+    if (isInsideStepperList && register) return () => register(registrationId);
+  }, [isInsideStepperList, register, registrationId]);
+
+  React.useLayoutEffect(() => {
+    if (isInsideStepperList) register?.(registrationId, { value, disabled });
+  }, [disabled, isInsideStepperList, register, registrationId, value]);
 
   React.useEffect(() => {
     if (!isDevelopment || (isInsideStepperList && index >= 0)) return;
@@ -656,7 +670,7 @@ function StepperTrigger({
 
         const targetStepValue = getKeyboardTarget(event, orientation, steps, index);
 
-        if (!targetStepValue || targetStepValue === value) {
+        if (targetStepValue === undefined || targetStepValue === value) {
           return;
         }
 

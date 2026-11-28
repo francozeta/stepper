@@ -2,7 +2,7 @@
 
 ## Stepper modernization — review branch
 
-Active branch `refactor/base-ui-stepper`, PR #47. The owner-approved baseline for the final refinement is `b77468d`. The refinement consolidates navigation and step lookup, reduces Trigger subscriptions, and rejects stale guard or onboarding actions after human interruption.
+Active branch `refactor/base-ui-stepper`, PR #47. The final refinement from `b77468d` through `7dd530a` consolidates navigation and step lookup, reduces Trigger subscriptions, and rejects stale guard or onboarding actions after human interruption. The follow-up keeps mounted implicit steps in order when their metadata changes and gives distinct step values distinct accessibility IDs.
 
 The registry declares its `cn` dependency and requires Node.js 22 or newer. The app retains the compatibility re-exports. The UI SDK experiment stays in the onboarding lab. The app owns validation and final confirmation.
 

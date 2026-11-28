@@ -388,6 +388,115 @@ describe("Stepper", () => {
     expect(screen.getByText("Profile content")).toBeVisible();
   });
 
+  it("keeps implicit numbering and navigation when a mounted step is disabled and re-enabled", async () => {
+    const user = userEvent.setup();
+    const fixture = (disabled: boolean) => (
+      <React.StrictMode>
+        <Stepper defaultValue="account">
+          <StepperList>
+            <StepperItem value="account">Account</StepperItem>
+            <StepperItem value="profile" disabled={disabled}>Profile</StepperItem>
+            <StepperItem value="payment">Payment</StepperItem>
+          </StepperList>
+          <StepperNext>Continue</StepperNext>
+          <StepperPrevious>Back</StepperPrevious>
+        </Stepper>
+      </React.StrictMode>
+    );
+
+    const { rerender } = render(fixture(false));
+    const account = screen.getByRole("button", { name: /Account/ });
+    const profile = screen.getByRole("button", { name: /Step 2:\s*Profile/ });
+    const payment = screen.getByRole("button", { name: /Step 3:\s*Payment/ });
+    rerender(fixture(true));
+
+    expect(profile).toHaveAccessibleName(/Step 2:\s*Profile/);
+    expect(profile).toBeDisabled();
+    expect(payment).toHaveAccessibleName(/Step 3:\s*Payment/);
+    account.focus();
+    await user.keyboard("{ArrowRight}");
+    expect(payment).toHaveFocus();
+    expect(account).toHaveAttribute("aria-current", "step");
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+    expect(payment).toHaveAttribute("aria-current", "step");
+    await user.click(screen.getByRole("button", { name: "Back" }));
+    expect(account).toHaveAttribute("aria-current", "step");
+
+    rerender(fixture(false));
+    account.focus();
+    await user.keyboard("{ArrowRight}");
+    expect(profile).toHaveFocus();
+    expect(account).toHaveAttribute("aria-current", "step");
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+    expect(profile).toHaveAttribute("aria-current", "step");
+  });
+
+  it("replaces a mounted implicit step value in the same position", async () => {
+    const user = userEvent.setup();
+    const fixture = (value: string) => (
+      <Stepper defaultValue="account">
+        <StepperList>
+          <StepperItem value="account">Account</StepperItem>
+          <StepperItem value={value}>Details</StepperItem>
+          <StepperItem value="payment">Payment</StepperItem>
+        </StepperList>
+        <StepperContent value={value}>{value} content</StepperContent>
+        <StepperNext>Continue</StepperNext>
+        <StepperPrevious>Back</StepperPrevious>
+      </Stepper>
+    );
+
+    const { rerender } = render(fixture("profile"));
+    const account = screen.getByRole("button", { name: /Account/ });
+    const details = screen.getByRole("button", { name: /Step 2:\s*Details/ });
+    const payment = screen.getByRole("button", { name: /Step 3:\s*Payment/ });
+    rerender(fixture("shipping"));
+
+    expect(details).toHaveAccessibleName(/Step 2:\s*Details/);
+    expect(payment).toHaveAccessibleName(/Step 3:\s*Payment/);
+    account.focus();
+    await user.keyboard("{ArrowRight}");
+    expect(details).toHaveFocus();
+    const next = screen.getByRole("button", { name: "Continue" });
+    await user.click(next);
+    expect(screen.getByText("shipping content")).toBeVisible();
+    await user.click(next);
+    expect(payment).toHaveAttribute("aria-current", "step");
+    await user.click(screen.getByRole("button", { name: "Back" }));
+    expect(details).toHaveAttribute("aria-current", "step");
+  });
+
+  it("keeps keyboard and panel relationships distinct for punctuated and empty step values", async () => {
+    const user = userEvent.setup();
+    render(
+      <Stepper defaultValue="payment/card">
+        <StepperList>
+          <StepperItem value="payment/card">Card</StepperItem>
+          <StepperItem value="payment-card">Transfer</StepperItem>
+          <StepperItem value="">Summary</StepperItem>
+        </StepperList>
+        <StepperContent value="payment/card">Card content</StepperContent>
+        <StepperContent value="payment-card">Transfer content</StepperContent>
+      </Stepper>
+    );
+
+    const card = screen.getByRole("button", { name: /Card/ });
+    const transfer = screen.getByRole("button", { name: /Transfer/ });
+    const summary = screen.getByRole("button", { name: /Summary/ });
+    expect(card.id).not.toBe(transfer.id);
+    expect(card).toHaveAttribute("aria-controls", screen.getByText("Card content").id);
+    card.focus();
+    await user.keyboard("{ArrowRight}");
+    expect(transfer).toHaveFocus();
+    await user.keyboard("{Enter}");
+    const panel = screen.getByText("Transfer content");
+    expect(transfer).toHaveAttribute("aria-controls", panel.id);
+    expect(panel).toHaveAttribute("aria-labelledby", transfer.id);
+    await user.keyboard("{ArrowRight}");
+    expect(summary).toHaveFocus();
+    expect(transfer).toHaveAttribute("aria-current", "step");
+  });
+
   it("warns in development when step values are duplicated", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
 
