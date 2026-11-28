@@ -388,6 +388,115 @@ describe("Stepper", () => {
     expect(screen.getByText("Profile content")).toBeVisible();
   });
 
+  it("keeps implicit numbering and navigation when a mounted step is disabled and re-enabled", async () => {
+    const user = userEvent.setup();
+    const fixture = (disabled: boolean) => (
+      <React.StrictMode>
+        <Stepper defaultValue="account">
+          <StepperList>
+            <StepperItem value="account">Account</StepperItem>
+            <StepperItem value="profile" disabled={disabled}>Profile</StepperItem>
+            <StepperItem value="payment">Payment</StepperItem>
+          </StepperList>
+          <StepperNext>Continue</StepperNext>
+          <StepperPrevious>Back</StepperPrevious>
+        </Stepper>
+      </React.StrictMode>
+    );
+
+    const { rerender } = render(fixture(false));
+    const account = screen.getByRole("button", { name: /Account/ });
+    const profile = screen.getByRole("button", { name: /Step 2:\s*Profile/ });
+    const payment = screen.getByRole("button", { name: /Step 3:\s*Payment/ });
+    rerender(fixture(true));
+
+    expect(profile).toHaveAccessibleName(/Step 2:\s*Profile/);
+    expect(profile).toBeDisabled();
+    expect(payment).toHaveAccessibleName(/Step 3:\s*Payment/);
+    account.focus();
+    await user.keyboard("{ArrowRight}");
+    expect(payment).toHaveFocus();
+    expect(account).toHaveAttribute("aria-current", "step");
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+    expect(payment).toHaveAttribute("aria-current", "step");
+    await user.click(screen.getByRole("button", { name: "Back" }));
+    expect(account).toHaveAttribute("aria-current", "step");
+
+    rerender(fixture(false));
+    account.focus();
+    await user.keyboard("{ArrowRight}");
+    expect(profile).toHaveFocus();
+    expect(account).toHaveAttribute("aria-current", "step");
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+    expect(profile).toHaveAttribute("aria-current", "step");
+  });
+
+  it("replaces a mounted implicit step value in the same position", async () => {
+    const user = userEvent.setup();
+    const fixture = (value: string) => (
+      <Stepper defaultValue="account">
+        <StepperList>
+          <StepperItem value="account">Account</StepperItem>
+          <StepperItem value={value}>Details</StepperItem>
+          <StepperItem value="payment">Payment</StepperItem>
+        </StepperList>
+        <StepperContent value={value}>{value} content</StepperContent>
+        <StepperNext>Continue</StepperNext>
+        <StepperPrevious>Back</StepperPrevious>
+      </Stepper>
+    );
+
+    const { rerender } = render(fixture("profile"));
+    const account = screen.getByRole("button", { name: /Account/ });
+    const details = screen.getByRole("button", { name: /Step 2:\s*Details/ });
+    const payment = screen.getByRole("button", { name: /Step 3:\s*Payment/ });
+    rerender(fixture("shipping"));
+
+    expect(details).toHaveAccessibleName(/Step 2:\s*Details/);
+    expect(payment).toHaveAccessibleName(/Step 3:\s*Payment/);
+    account.focus();
+    await user.keyboard("{ArrowRight}");
+    expect(details).toHaveFocus();
+    const next = screen.getByRole("button", { name: "Continue" });
+    await user.click(next);
+    expect(screen.getByText("shipping content")).toBeVisible();
+    await user.click(next);
+    expect(payment).toHaveAttribute("aria-current", "step");
+    await user.click(screen.getByRole("button", { name: "Back" }));
+    expect(details).toHaveAttribute("aria-current", "step");
+  });
+
+  it("keeps keyboard and panel relationships distinct for punctuated and empty step values", async () => {
+    const user = userEvent.setup();
+    render(
+      <Stepper defaultValue="payment/card">
+        <StepperList>
+          <StepperItem value="payment/card">Card</StepperItem>
+          <StepperItem value="payment-card">Transfer</StepperItem>
+          <StepperItem value="">Summary</StepperItem>
+        </StepperList>
+        <StepperContent value="payment/card">Card content</StepperContent>
+        <StepperContent value="payment-card">Transfer content</StepperContent>
+      </Stepper>
+    );
+
+    const card = screen.getByRole("button", { name: /Card/ });
+    const transfer = screen.getByRole("button", { name: /Transfer/ });
+    const summary = screen.getByRole("button", { name: /Summary/ });
+    expect(card.id).not.toBe(transfer.id);
+    expect(card).toHaveAttribute("aria-controls", screen.getByText("Card content").id);
+    card.focus();
+    await user.keyboard("{ArrowRight}");
+    expect(transfer).toHaveFocus();
+    await user.keyboard("{Enter}");
+    const panel = screen.getByText("Transfer content");
+    expect(transfer).toHaveAttribute("aria-controls", panel.id);
+    expect(panel).toHaveAttribute("aria-labelledby", transfer.id);
+    await user.keyboard("{ArrowRight}");
+    expect(summary).toHaveFocus();
+    expect(transfer).toHaveAttribute("aria-current", "step");
+  });
+
   it("warns in development when step values are duplicated", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
 
@@ -526,6 +635,57 @@ describe("Stepper", () => {
     );
 
     expect(screen.getAllByRole("button", { name: /Account/ })).toHaveLength(1);
+  });
+
+  it("composes Base UI render buttons and preserves native semantics", async () => {
+    const user = userEvent.setup();
+    render(
+      <Stepper defaultValue="account">
+        <StepperList>
+          <StepperItem value="account">Account</StepperItem>
+          <StepperItem value="payment" defaultTrigger={false}>
+            <StepperTrigger render={<button className="custom-trigger" />}>
+              Payment
+            </StepperTrigger>
+          </StepperItem>
+        </StepperList>
+        <StepperContent value="account">Account content</StepperContent>
+        <StepperContent value="payment" render={<section />}>Payment content</StepperContent>
+        <StepperNext render={<button>Continue</button>} />
+      </Stepper>
+    );
+    const next = screen.getByRole("button", { name: "Continue" });
+    expect(next).toHaveAttribute("type", "button");
+    await user.click(next);
+    const trigger = screen.getByRole("button", { name: "Payment" });
+    expect(trigger).toHaveClass("custom-trigger");
+    expect(trigger).toHaveAttribute("aria-current", "step");
+    expect(screen.getByText("Payment content").tagName).toBe("SECTION");
+    expect(next).toBeDisabled();
+  });
+
+  it("keeps disabled render links from navigating", async () => {
+    const user = userEvent.setup();
+    render(
+      <Stepper defaultValue="account">
+        <StepperList>
+          <StepperItem value="account">Account</StepperItem>
+          <StepperItem value="payment" defaultTrigger={false} disabled>
+            <StepperTrigger nativeButton={false} render={<a href="/payment" />}>
+              Payment
+            </StepperTrigger>
+          </StepperItem>
+        </StepperList>
+        <StepperContent value="account">Account content</StepperContent>
+        <StepperContent value="payment">Payment content</StepperContent>
+      </Stepper>
+    );
+    const link = screen.getByRole("link", { name: "Payment" });
+    expect(link).toHaveAttribute("aria-disabled", "true");
+    expect(link).toHaveAttribute("tabindex", "-1");
+    expect(link).not.toHaveAttribute("type");
+    await user.click(link);
+    expect(screen.getByText("Account content")).toBeVisible();
   });
 
   it("keeps disabled asChild triggers unfocusable and prevents navigation", async () => {
@@ -966,7 +1126,90 @@ describe("Stepper", () => {
     });
   });
 
-  it("moves focus between triggers with keyboard navigation without changing the current step", async () => {
+  it("ignores a guard that resolves after the user changes steps", async () => {
+    let resolveGuard: ((allowed: boolean) => void) | undefined;
+    const guard = () => new Promise<boolean>((resolve) => { resolveGuard = resolve; });
+    const user = userEvent.setup();
+    render(
+      <Stepper defaultValue="account">
+        <StepperList>
+          <StepperItem value="account">Account</StepperItem>
+          <StepperItem value="profile">Profile</StepperItem>
+          <StepperItem value="review">Review</StepperItem>
+        </StepperList>
+        <StepperContent value="account">Account content</StepperContent>
+        <StepperContent value="profile">Profile content</StepperContent>
+        <StepperContent value="review">Review content</StepperContent>
+        <StepperNext onBeforeNext={guard}>Continue</StepperNext>
+      </Stepper>
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+    await user.click(screen.getByRole("button", { name: /Review/ }));
+    resolveGuard?.(true);
+    await waitForSettledEffects();
+    expect(screen.getByText("Review content")).toBeVisible();
+    expect(screen.queryByText("Profile content")).not.toBeInTheDocument();
+  });
+
+  it("ignores a guard when its destination is replaced", async () => {
+    let resolveGuard: ((allowed: boolean) => void) | undefined;
+    const guard = () => new Promise<boolean>((resolve) => { resolveGuard = resolve; });
+    const onValueChange = vi.fn();
+    const fixture = (middle: string) => (
+      <Stepper value="account" onValueChange={onValueChange}
+        steps={[{ value: "account" }, { value: middle }, { value: "review" }]}>
+        <StepperList>
+          <StepperItem value="account">Account</StepperItem>
+          <StepperItem value={middle}>{middle}</StepperItem>
+          <StepperItem value="review">Review</StepperItem>
+        </StepperList>
+        <StepperNext onBeforeNext={guard}>Continue</StepperNext>
+      </Stepper>
+    );
+    const { rerender } = render(fixture("profile"));
+    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+    rerender(fixture("shipping"));
+    resolveGuard?.(true);
+    await waitFor(() => expect(screen.getByRole("button", { name: "Continue" })).toBeEnabled());
+    expect(onValueChange).not.toHaveBeenCalled();
+  });
+
+  it.each(["next", "previous"] as const)("ignores %s validation after the control is disabled", async (direction) => {
+    let resolveGuard: ((allowed: boolean) => void) | undefined;
+    const guard = () => new Promise<boolean>((resolve) => { resolveGuard = resolve; });
+    const onValueChange = vi.fn();
+    const steps = [{ value: "account" }, { value: "profile" }];
+    const value = direction === "next" ? "account" : "profile";
+    const fixture = (disabled: boolean) => (
+      <Stepper value={value} steps={steps} onValueChange={onValueChange}>
+        {direction === "next" ? (
+          <StepperNext disabled={disabled} onBeforeNext={guard}>Go</StepperNext>
+        ) : (
+          <StepperPrevious disabled={disabled} onBeforePrevious={guard}>Go</StepperPrevious>
+        )}
+      </Stepper>
+    );
+
+    const { rerender } = render(fixture(false));
+    const button = screen.getByRole("button", { name: "Go" });
+    fireEvent.click(button);
+    rerender(fixture(true));
+    rerender(fixture(false));
+    resolveGuard?.(true);
+
+    await waitFor(() => expect(button).toBeEnabled());
+    expect(onValueChange).not.toHaveBeenCalled();
+    fireEvent.click(button);
+    resolveGuard?.(true);
+    await waitFor(() => expect(onValueChange).toHaveBeenCalledWith(
+      direction === "next" ? "profile" : "account"
+    ));
+  });
+
+  it.each([
+    ["ltr", "ArrowRight"],
+    ["rtl", "ArrowLeft"],
+  ])("moves focus in %s without changing the current step", async (direction, forwardKey) => {
     const user = userEvent.setup();
 
     render(
@@ -988,8 +1231,9 @@ describe("Stepper", () => {
     const account = screen.getByRole("button", { name: /Account/ });
     const profile = screen.getByRole("button", { name: /Profile/ });
 
+    account.style.direction = direction;
     account.focus();
-    await user.keyboard("{ArrowRight}");
+    await user.keyboard(`{${forwardKey}}`);
 
     expect(profile).toHaveFocus();
     expect(screen.getByText("Account content")).toBeVisible();
@@ -1040,15 +1284,26 @@ describe("Stepper", () => {
       '[data-slot="stepper-separator"]'
     );
 
-    expect(separator).toHaveClass(
-      "group-data-[completed]/stepper-item:after:scale-x-100"
-    );
+    expect(separator?.closest('[data-slot="stepper-item"]')).toHaveStyle("--stepper-connector-fill: 1");
   });
 
-  it("staggers connector transitions when jumping across multiple steps", async () => {
+  it("uses one shared progress cursor for forward and reverse jumps", async () => {
     const user = userEvent.setup();
+    const layoutReads = new Map<number, string>();
+
+    function ReadConnectorTiming() {
+      const { currentIndex } = useStepper();
+      const marker = React.useRef<HTMLSpanElement>(null);
+      React.useLayoutEffect(() => {
+        const root = marker.current?.closest<HTMLElement>('[data-slot="stepper"]');
+        if (root) layoutReads.set(currentIndex, root.style.transitionDuration);
+      }, [currentIndex]);
+      return <span ref={marker} />;
+    }
+
     const { container } = render(
       <Stepper defaultValue="account">
+        <ReadConnectorTiming />
         <StepperList>
           <StepperItem value="account">Account</StepperItem>
           <StepperItem value="profile">Profile</StepperItem>
@@ -1057,16 +1312,33 @@ describe("Stepper", () => {
         </StepperList>
       </Stepper>
     );
-
-    await user.click(screen.getByRole("button", { name: /Step 4:\s*Payment/ }));
-
+    const root = container.querySelector('[data-slot="stepper"]') as HTMLElement;
     const items = container.querySelectorAll('[data-slot="stepper-item"]');
+    expect(root.style.getPropertyValue("--stepper-progress")).toBe("0");
+    await user.click(screen.getByRole("button", { name: /Step 4:\s*Payment/ }));
+    expect(root.style.getPropertyValue("--stepper-progress")).toBe("3");
+    expect(root.style.transitionDuration).toBe("330ms");
+    expect(layoutReads.get(3)).toBe("330ms");
+    expect(items[1]).toHaveStyle("--stepper-connector-index: 1");
+    expect(items[2]).toHaveStyle("--stepper-connector-index: 2");
+    await user.click(screen.getByRole("button", { name: /Step 1:\s*Account/ }));
+    expect(root.style.getPropertyValue("--stepper-progress")).toBe("0");
+    expect(root.style.transitionDuration).toBe("330ms");
+    expect(root).toHaveClass("motion-reduce:transition-none");
+    await user.click(screen.getByRole("button", { name: /Step 2:\s*Profile/ }));
+    expect(root.style.transitionDuration).toBe("110ms");
+  });
 
-    await waitFor(() => {
-      expect(items[0]).toHaveStyle("--stepper-separator-delay: 0ms");
-      expect(items[1]).toHaveStyle("--stepper-separator-delay: 80ms");
-      expect(items[2]).toHaveStyle("--stepper-separator-delay: 160ms");
-    });
+  it("uses an inset visible outline for keyboard focus without changing selection", async () => {
+    const user = userEvent.setup();
+    render(<BasicStepper />);
+    const account = screen.getByRole("button", { name: /Account/ });
+    const profile = screen.getByRole("button", { name: /Profile/ });
+    account.focus();
+    await user.keyboard("{ArrowRight}");
+    expect(profile).toHaveFocus();
+    expect(profile).toHaveClass("focus-visible:outline-offset-[-2px]", "focus-visible:outline-ring");
+    expect(account).toHaveAttribute("aria-current", "step");
   });
 
   it("lets consumers opt out of the default separator explicitly", () => {

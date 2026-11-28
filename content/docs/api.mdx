@@ -42,6 +42,21 @@ import {
   <InfoGrid items={controlledBehaviorNotes} />
 </Section>
 
+<Section title="Base UI composition" description="Prefer render={<CustomButton />} over asChild for new code. Set nativeButton={false} when rendering a link. The render prop also accepts a Base UI render callback.">
+  <InfoGrid items={asChildRequirements} />
+</Section>
+
+<Section title="Anatomy" description="Use these names when discussing visuals or behavior. Connector refers to StepperSeparator: the Track is the unfilled line and the Fill is the progress overlay. The Trigger is the interactive hit area; the Focus outline marks keyboard focus, not the active step.">
+  <InfoGrid items={[
+    { label: "Indicator", value: "StepperIndicator", help: "Number or status symbol." },
+    { label: "Connector", value: "StepperSeparator", help: "Track and Fill between adjacent steps." },
+    { label: "Trigger", value: "StepperTrigger", help: "Interactive target, distinct from its focus outline." },
+    { label: "Label / Description", value: "StepperLabel / StepperDescription", help: "Visible step name and supporting text." },
+    { label: "Panel", value: "StepperContent", help: "Content associated with the active step." },
+    { label: "Navigation", value: "StepperPrevious / StepperNext", help: "Persistent previous and next controls." },
+  ]} />
+</Section>
+
 <Section title="List props">
   <PropsTable rows={listProps} />
 </Section>
@@ -56,7 +71,7 @@ import {
 
 <Section
   title="asChild requirements"
-  description="StepperTrigger and navigation helpers use Radix Slot composition. The child owns the final element, so it must accept the props Stepper passes."
+  description="Stepper uses Base UI render composition. Existing asChild usage is supported as a compatibility alias. Custom elements must forward props and refs."
 >
   <InfoGrid items={asChildRequirements} />
 </Section>

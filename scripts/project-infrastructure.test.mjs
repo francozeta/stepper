@@ -127,6 +127,9 @@ describe("project infrastructure", () => {
     expect(normalizeLineEndings(publicSource)).toBe(
       normalizeLineEndings(source)
     );
+    expect(registrySource).toContain('import { cn } from "cn"');
+    expect(publicItem.dependencies).toContain("cn@^0.5.2");
+    expect(publicItem.dependencies).not.toContain("@ui-sdk/react");
     expect(registrySource).toContain("function Stepper(");
     expect(registrySource).toContain("function StepperItem<");
     expect(registrySource).toContain("export type {");
@@ -170,11 +173,6 @@ describe("project infrastructure", () => {
     ].forEach((section) => {
       expect(stepperSource).toContain(section);
     });
-
-    expect(stepperSource).toContain("function useRegisteredSteps");
-    expect(stepperSource).toContain("function useStepperSteps");
-    expect(stepperSource).toContain("function useStepperValue");
-    expect(stepperSource).toContain("function useNavigationButton");
   });
 
   it("automates registry version releases without npm publishing", async () => {

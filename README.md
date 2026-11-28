@@ -7,6 +7,8 @@ source into your app, so you own the code and can customize it directly.
 
 ## Install
 
+Use Node.js 22 or newer for the `cn` dependency.
+
 ```bash
 pnpm dlx shadcn@latest add @stepper/stepper
 ```
@@ -44,6 +46,9 @@ Stepper does not own your form state, routing, validation, persistence, or
 server actions.
 
 Your app owns the workflow. Stepper reflects that workflow in the UI.
+
+Stepper uses Base UI `useRender` for composition. Existing `asChild` usage is
+supported for compatibility; prefer `render` for new code.
 
 ## Development
 
