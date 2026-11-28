@@ -166,6 +166,20 @@ body {
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
+/* Keep Safari from zooming when a touch user focuses a form field. */
+@media (pointer: coarse) {
+  :where(
+    input:is(
+      :not([type]), [type="text"], [type="email"], [type="password"],
+      [type="search"], [type="tel"], [type="url"], [type="number"]
+    ),
+    select,
+    textarea
+  ) {
+    font-size: max(1rem, 16px);
+  }
+}
+
 .stepper-home-title {
   font-family: Georgia, "Times New Roman", serif;
   font-size: clamp(2.625rem, 9vw, 4rem);
