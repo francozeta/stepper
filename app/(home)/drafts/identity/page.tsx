@@ -201,12 +201,14 @@ function Mark({ className = "", construction = false }: {className?: string; con
 
 const markStyles = `
   .identity-mark [data-mark-fill] {
-    clip-path: inset(0 0 0 0);
-    transition: clip-path 260ms cubic-bezier(.2,.8,.2,1);
+    transform-box: fill-box;
+    transform-origin: left center;
+    transform: scaleX(1);
+    transition: transform 260ms cubic-bezier(.2,.8,.2,1);
   }
-  .identity-mark:has([data-slot="stepper-trigger"][aria-current="step"][data-mark-stage="account"]) [data-mark-fill] { clip-path: inset(0 62.5% 0 0); }
-  .identity-mark:has([data-slot="stepper-trigger"][aria-current="step"][data-mark-stage="details"]) [data-mark-fill] { clip-path: inset(0 35.42% 0 0); }
-  .identity-mark:has([data-slot="stepper-trigger"][aria-current="step"][data-mark-stage="confirm"]) [data-mark-fill] { clip-path: inset(0 0 0 0); }
+  .identity-mark:has([data-slot="stepper-trigger"][aria-current="step"][data-mark-stage="account"]) [data-mark-fill] { transform: scaleX(.3421052632); }
+  .identity-mark:has([data-slot="stepper-trigger"][aria-current="step"][data-mark-stage="details"]) [data-mark-fill] { transform: scaleX(.6842105263); }
+  .identity-mark:has([data-slot="stepper-trigger"][aria-current="step"][data-mark-stage="confirm"]) [data-mark-fill] { transform: scaleX(1); }
   .identity-mark:not(:has(#identity-mark-grid:checked)) [data-mark-grid] { visibility: hidden; }
   @media (prefers-reduced-motion: reduce) {
     .identity-mark [data-mark-fill] { transition: none; }
@@ -234,8 +236,9 @@ function MarkStudy() {
                 <path d="M26 105h110m-110-4v8m110-8v8" strokeDasharray="2 2"/>
               </g>
               <g transform="translate(32 6) scale(2)">
+                <defs><clipPath id="identity-mark-reveal"><rect data-mark-fill="" x="5" y="12" width="38" height="31"/></clipPath></defs>
                 <path d={markPath} fill="currentColor" opacity=".10"/>
-                <path data-mark-fill="" d={markPath} fill="currentColor"/>
+                <path d={markPath} fill="currentColor" clipPath="url(#identity-mark-reveal)"/>
                 <path d={markPath} stroke="currentColor" strokeWidth=".45" strokeLinejoin="round"/>
                 <path d="M11 39h7m6-11h7m6-11h6" stroke={paper} strokeWidth="1.2"/>
               </g>
