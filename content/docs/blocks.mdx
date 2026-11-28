@@ -1,18 +1,26 @@
 ---
 title: "Blocks"
-description: "Copyable Stepper surfaces built around real product workflows."
+description: "Installable examples and research previews built around real product workflows."
 eyebrow: "api"
 navTitle: "Blocks"
 navIcon: "boxes"
 ---
 
 import { BlockPreviewCard } from "@/components/block-preview-card";
+import { CodeBlockCommand } from "@/components/code-block-command";
 import { Section } from "@/components/docs-content";
 
 <div className="flex flex-col gap-6">
   <Section
-    title="Checkout block"
-    description="A full product surface that shows Stepper doing real workflow work, without embedding a large demo route in the page."
+    title="Installable demo"
+    description="A self-contained styled checkout example. Installs the Stepper source and a demo component into your project. No payment integration."
+  >
+    <CodeBlockCommand pnpm="pnpm dlx shadcn@latest add @stepper/stepper-demo" npm="npx shadcn@latest add @stepper/stepper-demo" yarn="yarn dlx shadcn@latest add @stepper/stepper-demo" bun="bunx shadcn@latest add @stepper/stepper-demo" />
+    <p className="text-sm text-muted-foreground">Render the default export from stepper-demo.tsx in your components alias. The registry item exists; this block has not yet passed the separate consumer installation smoke test.</p>
+  </Section>
+  <Section
+    title="Checkout preview"
+    description="A research preview with account, payment and confirmation UI. Source is available for inspection, but this preview is not a published registry item or a payment integration."
   >
     <BlockPreviewCard
       imageSrc="/previews/stepper-checkout@2x.png"
@@ -20,12 +28,10 @@ import { Section } from "@/components/docs-content";
       demoHref="/blocks/subscription-checkout"
       codePath="components/stepper-checkout-draft.tsx"
       filename="stepper-checkout.tsx"
-      installCommands={{
-        pnpm: "pnpm dlx shadcn@latest add @stepper/stepper-checkout",
-        npm: "npx shadcn@latest add @stepper/stepper-checkout",
-        yarn: "yarn dlx shadcn@latest add @stepper/stepper-checkout",
-        bun: "bunx --bun shadcn@latest add @stepper/stepper-checkout",
-      }}
     />
+  </Section>
+  <Section title="Intent onboarding" description="An installable example with local form state and simulated setup. It does not create accounts or perform real verification.">
+    <CodeBlockCommand pnpm="pnpm dlx shadcn@latest add @stepper/stepper-intent-onboarding" npm="npx shadcn@latest add @stepper/stepper-intent-onboarding" yarn="yarn dlx shadcn@latest add @stepper/stepper-intent-onboarding" bun="bunx shadcn@latest add @stepper/stepper-intent-onboarding" />
+    <p className="text-sm text-muted-foreground">This block includes form and icon dependencies; it is not required by the core. Separate consumer install validation remains pending.</p>
   </Section>
 </div>

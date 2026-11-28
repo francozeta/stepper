@@ -25,3 +25,7 @@
 Establish a baseline with the current preview and the same task, content, viewport and input mode. Change one justified variable. Compare before/after at narrow mobile (including keyboard), desktop, keyboard-only, rapid forward/back, interrupted async guard, reduced motion, long labels and custom composition. Check actual screenshots and interactions, not only build output. Record user feedback, rejected alternatives, trade-offs and unverified limits in the existing PR. Do not declare visual acceptance for the owner.
 
 A new animation or abstraction must address a specific observed friction. Prefer no change if the evidence is weak. Keep the current approved appearance during cn migration. Use the vocabulary above when reporting defects so humans and coding agents refer to the same surface.
+
+## Consumer ownership
+
+Keep the consumer's existing preset, component aliases, theme and workflow ownership. Base UI is an implementation detail of composition, not a reason to require Base Nova. Validate the installed output of registry transforms rather than assuming source parity. Do not advertise an install command without a matching registry item. Human and agent-facing documentation should describe the same behavior and limitations.

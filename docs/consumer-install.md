@@ -28,3 +28,7 @@ Use base-nova first, then radix-nova with a different UI alias in a disposable c
 ## Resources
 
 Sandbox stopped after 116.524 seconds; 60.599 seconds active CPU, 58.24 MB ingress. No Chromium download or second session. An opt-in consolidated reproduction script is available: `node scripts/verify-consumer-install.mjs` (Node 22+, npm, Linux/macOS, network access). It installs into a temporary directory, uses the actual quickstart from lib/docs.ts, checks both installed styles and removes the directory. Its constituent commands were tested in the VM; the consolidated script itself has not been run. It resolves transitive versions at execution time. Follow-up: preserve a full lock and validate actual browser CSS/hydration. Do not describe this as a visual or full template test.
+
+## Preset independence
+
+Keep the consumer's current preset and UI alias. Base UI is a composition dependency, not a Base Nova preset requirement. The tested Base Nova and Radix Nova cases do not establish support for all presets. Published demo/onboarding items are distinct from the subscription-checkout research preview, which has no registry item. Documentation now avoids advertising its nonexistent command. No additional sandbox or browser execution in this documentation pass.

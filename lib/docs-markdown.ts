@@ -12,7 +12,6 @@ import {
   registryInstallSnippet,
   stepperCompositionTree,
   stepperUsageSnippet,
-  usageSnippet,
   useStepperRows,
   worksWith,
 } from "@/lib/docs";
@@ -89,6 +88,7 @@ const markdownDocs: MarkdownDoc[] = [
     description:
       "Copyable Stepper surfaces built around real product workflows.",
     file: "blocks.mdx",
+    body: getBlocksMarkdown,
   },
   {
     slug: "forms",
@@ -324,29 +324,49 @@ function getGettingStartedMarkdown() {
   return [
     "## Install",
     "",
-    "Stepper is installed through the shadcn registry. The CLI copies the component source into your project, so you can customize it directly.",
+    "Start in an existing TypeScript React project with shadcn/ui and Tailwind CSS v4. Node.js 22 or newer is required. Keep your current preset; Base Nova is not required. Base UI is an internal composition dependency.",
     "",
     codeBlock("bash", registryInstallSnippet),
     "",
+    "If the namespace cannot be resolved, install from the direct registry URL:",
+    "",
+    codeBlock("bash", "npx shadcn@latest add " + absoluteUrl("/r/stepper.json")),
+    "",
+    "## Your first flow",
+    "",
+    codeBlock("tsx", controlledSnippet),
+    "",
+    "Render SetupStepper in your page. This example demonstrates navigation, not form validation.",
+    "",
     "## What gets added",
     "",
-    "The registry installs the Stepper source into your app:",
-    "",
-    "- `components/ui/stepper.tsx`",
-    "",
-    "Import it from your local app code:",
-    "",
-    codeBlock("tsx", usageSnippet),
-    "",
-    "Stepper does not install as a runtime package. After installation, the source belongs to your project.",
+    "One editable component, normally components/ui/stepper.tsx, using your components.json UI alias. The CLI installs or reuses Base UI and cn. No mandatory form library, Motion, or agent SDK. Base Nova and Radix Nova passed local registry install, TypeScript and markup checks. Other presets are unverified.",
     "",
     "## Uncontrolled usage",
     "",
     codeBlock("tsx", gettingStartedSnippet),
     "",
-    "## Controlled usage",
+    "## Workflow ownership",
     "",
-    codeBlock("tsx", controlledSnippet),
+    "Use steps, value and onValueChange for dynamic or externally controlled flows. A missing or disabled controlled value displays the first enabled step without emitting onValueChange. Keep field state, authorization and submission in the app. onBeforeNext only guards that control, not every navigation path. Use render for new custom composition; asChild is deprecated."
+  ].join("\n");
+}
+
+function getBlocksMarkdown() {
+  return [
+    "## Installable examples",
+    "",
+    codeBlock("bash", "npx shadcn@latest add @stepper/stepper-demo"),
+    "",
+    "A styled checkout demo; no payment integration. Render its default export. Separate installed-block smoke testing remains pending.",
+    "",
+    codeBlock("bash", "npx shadcn@latest add @stepper/stepper-intent-onboarding"),
+    "",
+    "An example with local form state and simulated setup; no real account creation or verification. Form and icon dependencies belong to the block, not the core. Separate installed-block smoke testing remains pending.",
+    "",
+    "## Research preview",
+    "",
+    "[Subscription checkout](" + absoluteUrl("/blocks/subscription-checkout") + ") is a research preview, not an installable registry item. Do not invent an install command for it.",
   ].join("\n");
 }
 
@@ -358,6 +378,10 @@ function getApiMarkdown() {
       (component) =>
         `- \`${component.name}\` (${component.element}): ${component.description}`
     ),
+    "",
+    "## Controlled fallback",
+    "",
+    "A missing or disabled controlled value displays the first enabled step without emitting onValueChange. A guard attached to Continue does not validate direct requests or every other navigation control. The app owns validation and final submission.",
     "",
     "## useStepper",
     "",

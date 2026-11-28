@@ -23,6 +23,9 @@ import {
   description="Start in an existing TypeScript React project configured with shadcn/ui and Tailwind CSS v4. Use Node.js 22 or newer. The CLI copies the source into your app."
 >
   <CodeBlockCommand {...registryInstallCommands} />
+  <p className="text-sm leading-relaxed text-muted-foreground">
+    Keep your existing shadcn preset. Stepper uses Base UI internally for composition, but Base Nova is not required. The installed source uses your theme tokens and UI alias. Base Nova and Radix Nova have passed local registry install, TypeScript and markup checks; other presets have not yet been verified.
+  </p>
   <p className="text-sm text-muted-foreground">
     If the namespace cannot be resolved, use the direct registry URL:
   </p>

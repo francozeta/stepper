@@ -8,7 +8,7 @@ source into your app, so you own the code and can customize it directly.
 ## Install
 
 Start in a TypeScript React project with shadcn/ui and Tailwind CSS v4.
-Use Node.js 22 or newer for the `cn` dependency.
+Use Node.js 22 or newer for the `cn` dependency. Keep your existing shadcn preset; Base UI is an internal composition dependency, not a requirement to use Base Nova. Base Nova and Radix Nova have passed local CLI installation and markup checks; other presets are unverified.
 
 ```bash
 pnpm dlx shadcn@latest add @stepper/stepper
