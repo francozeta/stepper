@@ -231,3 +231,18 @@ Decision: preserve default full cn and registry dependencies, no new runtime API
 ## Reactive work isolation — candidate
 
 Keep item visual context independent of the owner callback. The root provides the current setValue separately; StepperTrigger and useStepperItem subscribe to both the visual data and action, while Indicator, Label, Description and Separator subscribe only to item visual data. No ref-based stale callback workaround or external store. Public useStepperItem still exposes the same fields and memoizes the combined object. A regression verifies both a custom action and native trigger call the latest controlled callback after owner replacement. Isolate the render-phase connector cursor update in the host StepperProgress component, rather than retrying the root navigation provider. Existing DOM, classes, motion, root-owned intent guards and implicit/explicit collection behavior are intended to remain unchanged. No dependencies added; registry sources and public JSON are updated together. Fix the prior benchmark page JSX apostrophe lint error. Browser harness now includes the actual 4cc8f9e fast-path revision so the incremental effect can be distinguished from earlier changes. CI, browser timing, visual validation and installed shadcn validation pending; no speed or bundle claim yet.
+
+## Reactive isolation — measured and rejected
+
+[Captured third run](../benchmarks/browser/results/2026-11-27-vercel-v3.json), candidate `d838361`, previous `4cc8f9e`, earlier `5cd44a9`. CI [109](https://github.com/francozeta/stepper/actions/runs/46103982751) passed 100 tests and the separate internal benchmark (1,920 → 160 callbacks vs the historical baseline). All six production integrations passed five checks per profile (60/60), no page errors. Same 1 vCPU/2 GB VM, Node 24.22.3, Chromium 159.0.8154.6, 4x mobile CPU slowdown, seven samples after two warmups.
+
+| Integration | Full gzip bytes | Desktop median ms | Mobile median ms |
+| --- | ---: | ---: | ---: |
+| Native | 61,325 | 6.7 | 31.1 |
+| Stepper before | 78,528 | 35.6 | 99.4 |
+| Stepper previous | 78,554 | 35.2 | 124.3 |
+| Reactive candidate | 78,593 | 30.8 | 166.4 |
+| Ark UI | 69,311 | 50.7 | 218.3 |
+| Stepperize | 66,695 | 43.1 | 99.4 |
+
+The candidate's desktop median was 12.5% lower, but mobile median 33.9% higher than the immediately previous revision; gzip increased 39 bytes and core source grew from 34,330 to 35,375 bytes. The previous fast path also varied relative to the earlier baseline across runs; sample overlap and fixed/reversed order mean this is not established causal regression. Conservative decision: restore the previous verified core and all registry payloads byte-for-byte; retain new callback regression test, JSX lint correction, and measurements. Keep rejected revision accessible in Git, not in the default registry. Future benchmark can isolate the two experimental changes independently and counterbalance repeated runs before accepting extra context/providers. Do not add an external store or claim a performance win without evidence. VM stopped (121.639 s wall, 75.358 s active CPU). Full lock/metafiles not retained, direct versions, lock checksum and samples captured. No merge or release. Revert CI pending.

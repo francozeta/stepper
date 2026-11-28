@@ -13,16 +13,14 @@ mkdirSync(out, { recursive: true });
 const corePath = "components/ui/stepper.tsx";
 const baselineRevision = "5cd44a9512fa92c979dddaa30beefdd74fcd218c";
 const baselineSource = execFileSync("git", ["show", baselineRevision + ":" + corePath], { cwd: root, encoding: "utf8" });
-const previousRevision = "4cc8f9e1ec0c0302a841af5d842e7a2b43a3ebf8";
-const previousSource = execFileSync("git", ["show", previousRevision + ":" + corePath], { cwd: root, encoding: "utf8" });
 const candidateSource = readFileSync(join(root, corePath), "utf8");
 const html = name => '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Stepper comparison</title><style>*{box-sizing:border-box}body{font:16px system-ui;margin:16px}main{max-width:540px;margin:auto}button,input{font:inherit}button{padding:8px 12px}label{display:block;margin:16px 0}input:not([type=checkbox]){display:block;width:100%;padding:8px}ol,[data-part=list],[data-component=stepper-list]{display:flex;gap:6px;flex-wrap:wrap;padding:0;list-style:none}footer,[data-component=stepper-actions]{display:flex;gap:8px;margin-top:16px}button:focus-visible{outline:2px solid #555} [hidden]{display:none!important}</style><div id="root"></div><script src="./'+name+'.js"></script></html>';
-const libraries = ["native", "stepper-before", "stepper-previous", "stepper", "ark", "stepperize"];
+const libraries = ["native", "stepper-before", "stepper", "ark", "stepperize"];
 const results = [];
 const median = xs => xs.toSorted((a,b)=>a-b)[Math.floor(xs.length/2)];
 const browser = await chromium.launch({headless:true});
 const versions = Object.fromEntries(Object.entries(JSON.parse(readFileSync(join(here,"package-lock.json"),"utf8")).packages).filter(([p])=>["node_modules/@ark-ui/react","node_modules/@stepperize/react","node_modules/@base-ui/react","node_modules/react","node_modules/react-dom","node_modules/cn","node_modules/esbuild","node_modules/playwright"].includes(p)).map(([p,v])=>[p,v.version]));
-const report = { revision:execFileSync("git",["rev-parse","HEAD"],{cwd:root,encoding:"utf8"}).trim(),node:process.version,browser:browser.version(),baselineRevision,previousRevision,versions,results };
+const report = { revision:execFileSync("git",["rev-parse","HEAD"],{cwd:root,encoding:"utf8"}).trim(),node:process.version,browser:browser.version(),baselineRevision,versions,results };
 async function test(name, mobile) {
   const context=await browser.newContext({viewport:mobile?{width:390,height:844}:{width:1280,height:900},isMobile:mobile,hasTouch:mobile,reducedMotion:"reduce"});
   const page=await context.newPage();
@@ -81,8 +79,8 @@ try {
   for(const name of libraries){
     const record={name};results.push(record);
     try{
-      const adapter=readFileSync(join(here,(name.startsWith("stepper-")?"stepper":name)+".tsx.txt"),"utf8");
-      writeFileSync(join(here,"core.tsx"),name==="stepper-before"?baselineSource:name==="stepper-previous"?previousSource:candidateSource);
+      const adapter=readFileSync(join(here,(name==="stepper-before"?"stepper":name)+".tsx.txt"),"utf8");
+      writeFileSync(join(here,"core.tsx"),name==="stepper-before"?baselineSource:candidateSource);
       writeFileSync(join(here,"adapter.tsx"),adapter);
       writeFileSync(join(here,"fixture.tsx"),readFileSync(join(here,"fixture.tsx.txt"),"utf8"));
       const started=performance.now();
