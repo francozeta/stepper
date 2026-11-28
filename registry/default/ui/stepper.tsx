@@ -74,7 +74,8 @@ type StepperContextValue = {
   collection: StepperCollection;
   previousValue: StepperValue | undefined;
   nextValue: StepperValue | undefined;
-  navigationEpoch: React.RefObject<number>;
+  readIntent: () => number;
+  advanceIntent: () => number;
 };
 
 type StepperProps<TValue extends StepperValue = StepperValue> =
@@ -361,15 +362,17 @@ function Stepper({
   const nextValue = currentIndex < 0 ? undefined : steps[findEnabledIndex(steps, currentIndex, 1)]?.value;
 
   // One root-scoped intent clock covers direct requests and both guarded directions.
-  const navigationEpoch = React.useRef(0);
-  React.useLayoutEffect(() => () => { navigationEpoch.current += 1; }, [currentValue]);
+  const navigationEpochRef = React.useRef(0);
+  const readIntent = React.useCallback(() => navigationEpochRef.current, []);
+  const advanceIntent = React.useCallback(() => ++navigationEpochRef.current, []);
+  React.useLayoutEffect(() => () => { advanceIntent(); }, [currentValue, advanceIntent]);
 
   const setValue = React.useCallback((nextValue: StepperValue) => {
     if (steps[getStepIndex(nextValue)]?.disabled !== false) return;
-    navigationEpoch.current += 1;
+    advanceIntent();
     if (!controlled) setUncontrolledValue(nextValue);
     onValueChange?.(nextValue);
-  }, [controlled, getStepIndex, onValueChange, steps]);
+  }, [advanceIntent, controlled, getStepIndex, onValueChange, steps]);
   const goPrevious = React.useCallback(() => {
     if (previousValue !== undefined) setValue(previousValue);
   }, [previousValue, setValue]);
@@ -396,8 +399,9 @@ function Stepper({
     collection,
     previousValue,
     nextValue,
-    navigationEpoch,
-  }), [collection, currentIndex, currentValue, getStepIndex, goNext, goPrevious, nextValue, orientation, previousValue, setValue, steps]);
+    readIntent,
+    advanceIntent,
+  }), [advanceIntent, collection, currentIndex, currentValue, getStepIndex, goNext, goPrevious, nextValue, orientation, previousValue, readIntent, setValue, steps]);
 
   return (
     <StepperContext.Provider value={context}>
@@ -880,7 +884,7 @@ function StepperNavigationButton({
   onBeforeNavigate?: StepperNavigationGuard;
 }) {
   const previous = direction === "previous";
-  const { api: { value, goPrevious, goNext }, previousValue, nextValue, navigationEpoch } =
+  const { api: { value, goPrevious, goNext }, previousValue, nextValue, readIntent, advanceIntent } =
     useStepperContext(previous ? "StepperPrevious" : "StepperNext");
   const target = previous ? previousValue : nextValue;
   const navigate = previous ? goPrevious : goNext;
@@ -896,9 +900,9 @@ function StepperNavigationButton({
 
   async function handleClick(event: React.MouseEvent<HTMLButtonElement>) {
     const request = epoch.current;
-    const beforeClick = navigationEpoch.current;
+    const beforeClick = readIntent();
     onClick?.(event);
-    if (isDisabled || pendingRef.current || request !== epoch.current || beforeClick !== navigationEpoch.current) {
+    if (isDisabled || pendingRef.current || request !== epoch.current || beforeClick !== readIntent()) {
       event.preventDefault();
       return;
     }
@@ -908,11 +912,11 @@ function StepperNavigationButton({
       return;
     }
 
-    const intent = ++navigationEpoch.current;
+    const intent = advanceIntent();
     pendingRef.current = true;
     setPending(true);
     try {
-      if ((await onBeforeNavigate()) !== false && request === epoch.current && intent === navigationEpoch.current) {
+      if ((await onBeforeNavigate()) !== false && request === epoch.current && intent === readIntent()) {
         navigate();
       }
     } finally {
