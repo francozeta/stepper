@@ -2,7 +2,7 @@
 
 ## Reduction and comparison — draft PR #48
 
-CI run 100 passed the full check and reproducible baseline benchmark; documented results and a noindex /drafts/benchmark study distinguish internal measurements from competitive documentation. External library execution, real-agent, visual and physical-device validation remain pending. No merge or release.
+CI run 100 passed the full check and reproducible baseline benchmark; documented results and a noindex /drafts/benchmark study distinguish internal measurements from competitive documentation. Browser comparison run 1 failed at Playwright installation on Ubuntu 26.04, before any measurements. The opt-in browser workflow now targets Ubuntu 24.04 with seven-day artifact retention; the fix has not been rerun. External library execution, real-agent, visual and physical-device validation remain pending. No merge or release.
 
 ## Stepper modernization — review branch
 

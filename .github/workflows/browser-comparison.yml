@@ -1,16 +1,14 @@
 name: Browser comparison
 on:
-  pull_request:
-    paths:
-      - 'benchmarks/browser/**'
-      - 'components/ui/stepper.tsx'
-      - '.github/workflows/browser-comparison.yml'
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: browser-comparison-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   browser:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v6
@@ -35,6 +33,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: browser-comparison
+          retention-days: 7
           path: |
             ${{ runner.temp }}/stepper-comparison/results/report.json
             ${{ runner.temp }}/stepper-comparison/package-lock.json
