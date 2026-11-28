@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import type { CSSProperties } from "react";
-import { ArrowRight, ArrowUpRight, Code2 } from "lucide-react";
-import { StepperLogo } from "@/components/stepper-logo";
-import { CodeBlockCommand } from "@/components/code-block-command";
+import { ArrowRight, ArrowUpRight, BookOpen, Code2, FlaskConical, Layers, ListChecks, ShoppingBag, UserRoundPlus } from "lucide-react";
 import { CopyButton } from "@/components/copy-button";
-import { registryInstallCommands } from "@/lib/docs";
+import { registryInstallSnippet } from "@/lib/docs";
 import Link from "next/link";
 import {
   Stepper, StepperContent, StepperItem, StepperList,
@@ -12,11 +10,12 @@ import {
 } from "@/components/ui/stepper";
 
 export const metadata: Metadata = {
-  title: "Identity study 001",
-  description: "Expressive by identity. Neutral by design.",
+  title: "Identity study 006",
+  description: "A composable React stepper for onboarding, checkout and multi-step forms.",
   robots: { index: false, follow: false },
 };
 
+const paper = "#f2efeb";
 const neutral = {
   "--background": "#fff", "--foreground": "#222", "--primary": "#272727",
   "--primary-foreground": "#fff", "--muted": "#f4f4f4",
@@ -25,79 +24,61 @@ const neutral = {
   "--destructive": "#b91c1c", colorScheme: "light",
 } as CSSProperties;
 const serif = "[font-family:Georgia,'Times_New_Roman',serif] font-normal tracking-[-.055em]";
+const rule = "border-[#bd171c]/35";
 const field = "h-10 w-full min-w-0 rounded-md border border-border bg-background px-3 text-base text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring ";
 const stages = [{value:"account"}, {value:"details"}, {value:"confirm"}] as const;
-const anatomyCode = `const steps = [
+const anatomyCode = `import {
+  Stepper, StepperList, StepperItem, StepperTrigger,
+  StepperIndicator, StepperLabel, StepperSeparator,
+  StepperContent, StepperPrevious, StepperNext,
+} from "@/components/ui/stepper";
+
+const steps = [
   { value: "account", label: "Account" },
   { value: "details", label: "Details" },
   { value: "confirm", label: "Confirm" },
 ];
 
-<Stepper defaultValue="details">
-  <StepperList>
-    {steps.map(({ value, label }, index) => (
-      <StepperItem key={value} value={value}
-        defaultTrigger={false} separator={false}>
-        <StepperTrigger>
-          <StepperIndicator />
-          <StepperLabel>{label}</StepperLabel>
-        </StepperTrigger>
-        {index < steps.length - 1 && <StepperSeparator />}
-      </StepperItem>
-    ))}
-  </StepperList>
-  <StepperContent value="account">Account information</StepperContent>
-  <StepperContent value="details">Preferences and details</StepperContent>
-  <StepperContent value="confirm">Review your information</StepperContent>
-  <StepperPrevious>Back</StepperPrevious>
-  <StepperNext>Continue</StepperNext>
-</Stepper>`;
+export function Example() {
+  return (
+    <Stepper steps={steps} defaultValue="details">
+      <StepperList>
+        {steps.map(({ value, label }, index) => (
+          <StepperItem key={value} value={value}
+            defaultTrigger={false} separator={false}>
+            <StepperTrigger>
+              <StepperIndicator />
+              <StepperLabel>{label}</StepperLabel>
+            </StepperTrigger>
+            {index < steps.length - 1 && <StepperSeparator />}
+          </StepperItem>
+        ))}
+      </StepperList>
+      <StepperContent value="account">Account information</StepperContent>
+      <StepperContent value="details">Preferences and details</StepperContent>
+      <StepperContent value="confirm">Review your information</StepperContent>
+      <StepperPrevious>Back</StepperPrevious>
+      <StepperNext>Continue</StepperNext>
+    </Stepper>
+  );
+}`;
 
-const identityStyles = `
-  .stepper-identity {
-    --ink: #be151b;
-    --paper: #eae8e5;
-    --rule: #be151b70;
-  }
-  .identity-frame {
-    border-inline: 1px solid var(--rule);
-  }
-  .identity-rule {
-    position: relative;
-    border-bottom: 1px solid var(--rule);
-  }
-  .identity-rule::after {
-    content: "";
-    position: absolute;
-    width: 13px;
-    bottom: -1px;
-    left: -7px;
-    border-bottom: 1px solid var(--ink);
-    pointer-events: none;
-  }
-  .identity-rule::before {
-    content: "";
-    position: absolute;
-    width: 13px;
-    bottom: -1px;
-    right: -7px;
-    border-bottom: 1px solid var(--ink);
-    pointer-events: none;
+const inspectorStyles = `
+  .identity-inspector {
+    --annotation: #bd171c;
   }
   .identity-inspector:not(:has(#inspect-code:checked)) [data-inspector-code],
   .identity-inspector:has(#inspect-code:checked) [data-inspector-live],
   .identity-inspector:not(:has(#inspect-anatomy:checked)) :is([data-anatomy-note], [data-anatomy-description]) {
     display: none;
   }
-  .identity-inspector [data-inspector-live] {
-    --annotation: #be151b;
-  }
   .identity-inspector:has(#inspect-anatomy:checked) [data-inspector-live] {
-    background-image: linear-gradient(90deg, #be151b0a 1px, transparent 1px), linear-gradient(#be151b0a 1px, transparent 1px);
-    background-size: 16px 16px;
+    background-image: radial-gradient(#bd171c1a .65px, transparent .65px);
+    background-size: 12px 12px;
   }
+  /* Reserve annotation space in both modes to keep controls in place. */
   .identity-inspector [data-inspector-component] {
-    padding-block: 40px 38px;
+    padding-block: 36px 34px;
   }
   .identity-inspector [data-slot="stepper-list"] {
     overflow: visible;
@@ -116,53 +97,91 @@ const identityStyles = `
     pointer-events: none;
     font-family: var(--font-geist-mono), monospace;
     font-size: 11px;
-    line-height: 1.2;
-    padding: 3px 5px;
+    line-height: 1.3;
+    padding: 2px 5px;
     color: var(--annotation);
-    background: var(--paper);
-    border: 1px solid #be151b80;
+    background: #fff;
+    border: 1px solid #bd171c60;
+    border-radius: 2px;
   }
   .identity-inspector [data-anatomy-note]::after {
     content: "";
     position: absolute;
     left: 50%;
-    border-left: 1px dashed var(--annotation);
+    width: 0;
+    height: var(--leader);
+    border-left: 1px solid #bd171cb3;
+    transform: translateX(-.5px);
   }
-  [data-anatomy-note="indicator"], [data-anatomy-note="trigger"] {
+  .identity-inspector [data-anatomy-note]::before {
+    content: "";
+    position: absolute;
     left: 50%;
-    top: -29px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--annotation);
+    transform: translateX(-50%);
+  }
+  [data-anatomy-note="indicator"],
+  [data-anatomy-note="trigger"] {
+    --leader: 15px;
+    bottom: calc(100% + 15px);
+    left: 50%;
     transform: translateX(-50%);
   }
   [data-anatomy-note="indicator"]::after,
-  [data-anatomy-note="trigger"]::after { top: 100%; height: 12px; }
+  [data-anatomy-note="trigger"]::after,
+  [data-anatomy-note="content"]::after { top: 100%; }
+  [data-anatomy-note="indicator"]::before,
+  [data-anatomy-note="trigger"]::before,
+  [data-anatomy-note="content"]::before {
+    top: calc(100% + var(--leader) - 2px);
+  }
+  /* The midpoint between adjacent flex items follows the separator Y token. */
   [data-anatomy-note="connector"] {
+    --leader: 48px;
     left: 100%;
-    top: calc(var(--stepper-separator-y) + 43px);
+    top: calc(var(--stepper-separator-y) + 48px);
     transform: translateX(-50%);
   }
-  [data-anatomy-note="connector"]::after { bottom: 100%; height: 42px; }
   [data-anatomy-note="label"] {
+    --leader: 12px;
     left: 50%;
-    top: calc(100% + 7px);
+    top: calc(100% + 12px);
     transform: translateX(-50%);
   }
-  [data-anatomy-note="label"]::after { bottom: 100%; height: 15px; }
-  [data-anatomy-note="content"] { right: 9px; bottom: calc(100% + 7px); }
-  [data-anatomy-note="content"]::after { top: 100%; height: 7px; }
+  [data-anatomy-note="connector"]::after,
+  [data-anatomy-note="label"]::after,
+  [data-anatomy-note="navigation"]::after { bottom: 100%; }
+  [data-anatomy-note="connector"]::before,
+  [data-anatomy-note="label"]::before,
+  [data-anatomy-note="navigation"]::before {
+    bottom: calc(100% + var(--leader) - 2px);
+  }
+  [data-anatomy-note="content"] {
+    --leader: 10px;
+    right: 10px;
+    bottom: calc(100% + 10px);
+  }
   [data-anatomy-note="navigation"] {
+    --leader: 12px;
     top: calc(100% + 12px);
     left: 50%;
     transform: translateX(-50%);
   }
-  [data-anatomy-note="navigation"]::after { bottom: 100%; height: 12px; }
   .identity-inspector:has(#inspect-anatomy:checked) [data-anatomy-target]:not(:focus-visible),
   .identity-inspector:has(#inspect-anatomy:checked) [data-slot="stepper-content"],
   .identity-inspector:has(#inspect-anatomy:checked) [data-anatomy-navigation] {
-    outline: 1px dashed #be151ba0;
+    outline: 1px solid #bd171c8a;
     outline-offset: 3px;
   }
+  .identity-inspector:has(#inspect-anatomy:checked) [data-slot="stepper-trigger"][data-anatomy-target]:not(:focus-visible),
+  .identity-inspector:has(#inspect-anatomy:checked) [data-anatomy-navigation] {
+    outline-style: dashed;
+  }
   @media (min-width: 640px) {
-    .identity-inspector [data-anatomy-note] { font-size: 12px; padding-inline: 8px; }
+    .identity-inspector [data-anatomy-note] { font-size: 12px; padding-inline: 7px; }
   }
 `;
 
@@ -170,15 +189,23 @@ function AnatomyNote({ part, children }: { part: string; children: string }) {
   return <span aria-hidden="true" data-anatomy-note={part}>{children}</span>;
 }
 
+function Mark({ className = "" }: {className?: string}) {
+  return <svg viewBox="0 0 48 48" fill="none" aria-hidden="true" className={className}>
+    <path d="M5 34h13V23h13V12h12v24H30v7H5z" fill="currentColor"/>
+    <path d="M5 43V34h13V23h13V12h12M1 34h46M18 5v42M31 5v42" stroke="currentColor" strokeWidth=".65" opacity=".45"/>
+    <path d="M11 39h7m6-11h7m6-11h6" stroke={paper} strokeWidth="1.2"/>
+  </svg>;
+}
+
 function Demo() {
-  return <div style={neutral} className="min-w-0 border border-border bg-background p-4 text-foreground sm:p-7">
+  return <div style={neutral} className="rounded-xl border border-border bg-background p-4 text-foreground sm:p-7">
     <Stepper steps={stages} defaultValue="account" className="gap-5">
-      <StepperList className="[&>li]:min-w-0">
+      <StepperList>
         <StepperItem value="account">Account</StepperItem>
         <StepperItem value="details">Details</StepperItem>
         <StepperItem value="confirm">Confirm</StepperItem>
       </StepperList>
-      <div className="min-h-[124px]">
+      <div className="min-h-[168px]">
         <StepperContent value="account" keepMounted className="space-y-3 border-0 bg-transparent p-0 shadow-none">
           <h3 className="text-lg font-medium">Start with the essentials.</h3>
           <label className="grid gap-1.5 text-sm">Workspace name<input className={field} placeholder="Studio" autoComplete="organization"/></label>
@@ -203,20 +230,20 @@ function Demo() {
 }
 
 function Anatomy() {
-  return <div className="identity-inspector min-w-0">
-    
-    <fieldset className="flex items-center gap-0 border border-[#be151b]/50 w-fit">
+  return <div className="identity-inspector mt-7">
+    <style>{inspectorStyles}</style>
+    <fieldset className="mb-5 flex flex-wrap items-center gap-1 rounded-full border border-[#242424]/15 bg-white/40 p-1 w-fit">
       <legend className="sr-only">Component view</legend>
       {([{id:"preview", label:"Preview"}, {id:"anatomy", label:"Anatomy"}, {id:"code", label:"Code"}]).map(({id,label})=><label key={id} className="relative cursor-pointer">
         <input type="radio" name="inspector-view" id={"inspect-"+id} defaultChecked={id==="anatomy"} className="peer sr-only"/>
-        <span className="flex h-10 items-center justify-center px-3.5 text-sm font-medium text-[#be151b] peer-checked:bg-[#be151b] peer-checked:text-white peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#bd171c]">{label}</span>
+        <span className="flex h-10 items-center justify-center rounded-full px-3.5 text-sm font-medium text-[#555] peer-checked:bg-[#242424] peer-checked:text-white peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#bd171c]">{label}</span>
       </label>)}
     </fieldset>
     <div className="min-w-0">
       <div className="min-w-0">
-        <div data-inspector-live="" style={neutral} className="flex min-h-[356px] items-center justify-center border border-[#be151b]/50 bg-background px-3 py-4 text-foreground sm:p-7">
+        <div data-inspector-live="" style={neutral} className="flex min-h-[380px] items-center justify-center rounded-xl border border-border bg-background px-3 py-5 text-foreground sm:px-10 sm:py-6">
           <p data-anatomy-description="" className="sr-only">Indicator shows step state, Trigger selects a step, Label names it, Track and fill show progress, Content displays the active stage, and Navigation moves between enabled steps.</p>
-          <div data-inspector-component="" className="w-full max-w-xl px-1 sm:px-8">
+          <div data-inspector-component="" className="w-full max-w-2xl rounded-lg bg-background px-1 sm:px-8">
             <Stepper steps={stages} defaultValue="details" className="gap-5">
               <StepperList aria-label="Anatomy example">
                 {stages.map(({value},index)=><StepperItem key={value} value={value} defaultTrigger={false} separator={false}>
@@ -242,184 +269,85 @@ function Anatomy() {
             </Stepper>
           </div>
         </div>
-        <div data-inspector-code="" style={neutral} className="relative border border-[#be151b]/50 bg-background text-foreground">
+        <div data-inspector-code="" style={neutral} className="relative rounded-xl border border-border bg-background text-foreground">
           <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-2.5">
             <span className="flex items-center gap-2 text-sm"><Code2 aria-hidden="true" className="size-4"/> JSX</span>
             <CopyButton value={anatomyCode} label="Copy JSX" iconOnly className="size-9"/>
           </div>
-          <pre tabIndex={0} className="max-h-[356px] min-h-[310px] overflow-auto p-4 text-xs leading-6 focus-visible:outline-2 focus-visible:outline-[#bd171c] sm:text-sm"><code>{anatomyCode}</code></pre>
+          <pre tabIndex={0} className="h-[325px] overflow-auto p-4 text-xs leading-6 focus-visible:outline-2 focus-visible:outline-[#bd171c] sm:text-sm"><code>{anatomyCode}</code></pre>
         </div>
       </div>
     </div>
   </div>;
 }
 
-const checkoutSteps = [{value:"bag"}, {value:"shipping"}, {value:"review"}] as const;
-const setupSteps = [{value:"profile"}, {value:"preferences"}, {value:"finish"}] as const;
-
-function CheckoutExample() {
-  return <div style={neutral} className="min-w-0 border border-border bg-background p-4 text-foreground sm:p-6">
-    <Stepper steps={checkoutSteps} defaultValue="bag" className="gap-5">
-      <StepperList aria-label="Checkout steps" className="[&>li]:min-w-0">
-        <StepperItem value="bag">Bag</StepperItem>
-        <StepperItem value="shipping">Shipping</StepperItem>
-        <StepperItem value="review">Review</StepperItem>
-      </StepperList>
-      <div className="min-h-[116px]">
-        <StepperContent value="bag" keepMounted className="border-0 bg-transparent p-0 shadow-none">
-          <div className="flex items-center justify-between gap-3 border-b border-border pb-3"><div><p className="font-medium">Everyday tote</p><p className="text-muted-foreground">One item</p></div><p className="font-medium">$24.00</p></div>
-          <div className="flex justify-between pt-3 font-medium"><span>Subtotal</span><span>$24.00</span></div>
-        </StepperContent>
-        <StepperContent value="shipping" keepMounted className="border-0 bg-transparent p-0 shadow-none">
-          <label className="grid gap-2 text-sm font-medium">Delivery address<input className={field} placeholder="Street address" autoComplete="off"/></label>
-        </StepperContent>
-        <StepperContent value="review" keepMounted className="border-0 bg-transparent p-0 shadow-none">
-          <p className="font-medium">Review your order</p><p className="mt-2 text-muted-foreground">This is an example. No payment or order will be submitted.</p>
-        </StepperContent>
-      </div>
-      <div className="flex justify-between gap-2 border-t border-border pt-3"><StepperPrevious>Back</StepperPrevious><StepperNext>Continue</StepperNext></div>
-    </Stepper>
-  </div>;
-}
-
-function VerticalExample() {
-  return <div style={neutral} className="min-w-0 border border-border bg-background p-4 text-foreground sm:p-6">
-    <Stepper steps={setupSteps} defaultValue="profile" orientation="vertical" className="gap-5">
-      <StepperList aria-label="Setup steps">
-        <StepperItem value="profile" defaultTrigger={false}>
-          <StepperTrigger><StepperIndicator/><StepperLabel>Profile</StepperLabel></StepperTrigger>
-        </StepperItem>
-        <StepperItem value="preferences" defaultTrigger={false}>
-          <StepperTrigger><StepperIndicator/><StepperLabel>Preferences</StepperLabel></StepperTrigger>
-        </StepperItem>
-        <StepperItem value="finish" defaultTrigger={false}>
-          <StepperTrigger><StepperIndicator/><StepperLabel>Finish</StepperLabel></StepperTrigger>
-        </StepperItem>
-      </StepperList>
-      <div className="min-h-[62px]">
-        <StepperContent value="profile" keepMounted className="border-0 bg-transparent p-0 shadow-none"><label className="grid gap-2 font-medium">Display name<input className={field} placeholder="Your name" autoComplete="off"/></label></StepperContent>
-        <StepperContent value="preferences" keepMounted className="border-0 bg-transparent p-0 shadow-none"><label className="flex min-h-10 items-center gap-2"><input type="checkbox" className="size-4 accent-neutral-800"/>Receive product updates</label></StepperContent>
-        <StepperContent value="finish" keepMounted className="border-0 bg-transparent p-0 shadow-none"><p className="font-medium">Setup complete</p><p className="text-muted-foreground">Nothing is saved.</p></StepperContent>
-      </div>
-      <div className="flex justify-between gap-2 border-t border-border pt-3"><StepperPrevious>Back</StepperPrevious><StepperNext>Continue</StepperNext></div>
-    </Stepper>
-  </div>;
-}
-
-const basicCode = `import {
-  Stepper, StepperList, StepperItem,
-  StepperContent, StepperPrevious, StepperNext,
-} from "@/components/ui/stepper"
-
-export function Example() {
-  return (
-    <Stepper defaultValue="account">
-      <StepperList>
-        <StepperItem value="account">Account</StepperItem>
-        <StepperItem value="review">Review</StepperItem>
-      </StepperList>
-      <StepperContent value="account">Account details</StepperContent>
-      <StepperContent value="review">Review details</StepperContent>
-      <StepperPrevious>Back</StepperPrevious>
-      <StepperNext>Continue</StepperNext>
-    </Stepper>
-  )
-}`;
-
 export default function IdentityStudy() {
-  return <main className="stepper-identity min-h-dvh bg-[#eae8e5] text-[#242424] selection:bg-[#be151b] selection:text-white" style={{colorScheme:"light"}}>
-    <style>{identityStyles}</style>
-    <div className="identity-frame mx-4 max-w-[1320px] sm:mx-8 xl:mx-auto">
-      <header className="identity-rule flex flex-wrap items-center justify-between gap-3 px-3 py-3 text-[#be151b] sm:px-6">
-        <Link href="/drafts/identity" className="inline-flex h-11 items-center gap-2.5">
-          <StepperLogo className="h-9 w-7"/>
-          <span className="text-xl font-semibold tracking-tight">Stepper</span>
+  return <main className="min-h-dvh bg-[#f2efeb] text-[#242424] selection:bg-[#bd171c] selection:text-white" style={{colorScheme:"light"}}>
+    <div className="mx-auto max-w-[1440px] px-5 sm:px-10 lg:px-14">
+      <header className={`flex flex-wrap items-center justify-between gap-4 border-b py-5 ${rule}`}>
+        <Link href="/drafts/identity" className="flex items-center gap-2.5">
+          <Mark className="size-10 text-[#bd171c]"/>
+          <span className="text-xl leading-none font-semibold tracking-tight">Stepper</span>
         </Link>
-        <nav aria-label="Stepper" className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-medium sm:gap-x-6">
-          <Link href="#install" className="inline-flex min-h-11 items-center hover:underline">Install</Link>
-          <Link href="/docs" className="inline-flex min-h-11 items-center hover:underline">Docs</Link>
-          <a href="https://github.com/francozeta/stepper" className="inline-flex min-h-11 items-center gap-1 hover:underline">GitHub <ArrowUpRight aria-hidden="true" className="size-4"/></a>
+        <nav aria-label="Stepper" className="flex flex-wrap items-center gap-x-5 gap-y-3 text-sm">
+          <Link href="/docs" className="hover:text-[#bd171c]">Docs</Link>
+          <Link href="/drafts/interactions" className="hover:text-[#bd171c]">Research</Link>
+          <a href="https://github.com/francozeta/stepper" className="inline-flex items-center justify-center gap-1.5 rounded-full border border-[#242424]/30 px-3 py-1.5 hover:border-[#bd171c]">GitHub <ArrowUpRight aria-hidden="true" className="size-4 shrink-0"/></a>
         </nav>
       </header>
-      <section className="identity-rule grid min-w-0 lg:grid-cols-[1.15fr_1fr]">
-        <div className="relative min-w-0 px-3 pt-9 pb-8 sm:px-6 lg:py-14 lg:pr-8">
-          <h1 className={`${serif} text-[clamp(3rem,6.5vw,6.8rem)] leading-[.9] text-[#be151b]`}>Make progress<br/>feel <em className="font-normal">natural.</em></h1>
-          <p className="mt-6 max-w-[43ch] text-base leading-relaxed sm:text-lg">A composable React primitive for multi-step flows. Build onboarding, checkouts and forms with accessible navigation and progress.</p>
-          <div className="mt-6 flex flex-wrap gap-0">
-            <Link href="#install" className="inline-flex min-h-11 items-center justify-center gap-2 border border-[#be151b] bg-[#be151b] px-4 text-sm font-medium text-white hover:bg-[#a20e14]">Get started <ArrowRight aria-hidden="true" className="size-4"/></Link>
-            <Link href="/docs" className="inline-flex min-h-11 items-center justify-center gap-2 border-y border-r border-[#be151b] px-4 text-sm font-medium text-[#be151b] hover:bg-[#be151b]/5">Documentation</Link>
+      <section className={`grid gap-10 border-b py-10 lg:grid-cols-[1.12fr_1fr] lg:items-center lg:gap-12 lg:py-16 ${rule}`}>
+        <div className="relative isolate min-w-0">
+          <div aria-hidden="true" className="pointer-events-none absolute right-0 top-8 -z-10 h-[75%] w-[55%] opacity-10" style={{background:"repeating-linear-gradient(135deg,#bd171c 0 1px,transparent 1px 5px)",clipPath:"polygon(0 100%,0 70%,33% 70%,33% 38%,66% 38%,66% 0,100% 0,100% 100%)"}}/>
+          <h1 className={`${serif} text-[clamp(2.7rem,7vw,7.25rem)] leading-[.86] text-[#bd171c]`}>Make progress<br/>feel <em className="font-normal">natural.</em></h1>
+          <p className="mt-7 max-w-[37ch] text-base leading-relaxed sm:text-lg"><strong className="font-medium">A composable stepper for React.</strong> Build onboarding, checkout and multi-step forms. Stepper handles progress and navigation; you own the workflow.</p>
+          <div className="mt-7 flex flex-wrap gap-2.5">
+            <Link href="/docs/installation" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#bd171c] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#a20e14]">Get started <ArrowRight aria-hidden="true" className="size-4 shrink-0"/></Link>
+            <a href="https://github.com/francozeta/stepper" className="inline-flex items-center justify-center gap-2 rounded-full border border-[#242424]/30 px-5 py-2.5 text-sm hover:border-[#bd171c]">View source <ArrowUpRight aria-hidden="true" className="size-4 shrink-0"/></a>
           </div>
-          <div className="mt-7 border-t border-[#be151b]/40 pt-3">
-            <CodeBlockCommand {...registryInstallCommands} className="w-full"/>
+          <div style={neutral} className="mt-5 flex max-w-lg items-center gap-2 rounded-lg border border-[#242424]/15 bg-white/65 py-1.5 pr-1.5 pl-3 text-foreground">
+            <Code2 aria-hidden="true" className="size-4 shrink-0 text-muted-foreground"/>
+            <code className="min-w-0 flex-1 break-words font-mono text-xs leading-5 sm:text-sm">{registryInstallSnippet}</code>
+            <CopyButton value={registryInstallSnippet} label="Copy install command" iconOnly className="size-9 shrink-0"/>
           </div>
         </div>
-        <div className="min-w-0 border-t border-[#be151b]/45 lg:border-t-0 lg:border-l">
-          <div className="flex items-center justify-between border-b border-[#be151b]/45 px-3 py-2.5 text-sm text-[#be151b] sm:px-6">
-            <span className="font-medium">Live example</span><span className="font-mono">01</span>
-          </div>
-          <div className="grid min-h-[310px] items-center px-3 py-6 sm:px-6 lg:min-h-[calc(100%_-_42px)]"><Demo/></div>
-        </div>
-      </section>
-
-      <section id="anatomy" className="identity-rule scroll-mt-4">
-        <div className="grid min-w-0 lg:grid-cols-[.7fr_1.3fr]">
-          <div className="min-w-0 px-3 py-7 sm:px-6 lg:py-9">
-            <h2 className={`${serif} text-5xl text-[#be151b] sm:text-6xl`}>Anatomy.</h2>
-            <p className="mt-4 max-w-[36ch] leading-relaxed">The parts you see are the parts you compose. Select Anatomy to inspect the real component, or Code to see its JSX.</p>
-            <dl className="mt-6 grid gap-0 border-t border-[#be151b]/45 text-sm">
-              {[
-                ["Trigger","Selects a step."],
-                ["Indicator","Shows its state."],
-                ["Label","Names the stage."],
-                ["Separator","Track and fill show progress."],
-                ["Content","Renders the active panel."],
-                ["Navigation","Moves backward or forward."],
-              ].map(([name,desc])=><div key={name} className="grid grid-cols-[minmax(88px,.7fr)_1fr] gap-2 border-b border-[#be151b]/25 py-2.5"><dt className="font-medium text-[#be151b]">{name}</dt><dd>{desc}</dd></div>)}
-            </dl>
-            <Link href="/docs/api" className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-medium text-[#be151b] hover:underline">API reference <ArrowUpRight aria-hidden="true" className="size-4"/></Link>
-          </div>
-          <div className="min-w-0 border-t border-[#be151b]/45 px-3 py-5 sm:px-6 lg:border-t-0 lg:border-l lg:py-9"><Anatomy/></div>
+        <div className="min-w-0">
+          <Demo/>
         </div>
       </section>
-
-      <section id="examples" className="identity-rule scroll-mt-4">
-        <div className="px-3 py-7 sm:px-6 lg:py-9">
-          <h2 className={`${serif} text-5xl text-[#be151b] sm:text-6xl`}>One primitive.<br className="sm:hidden"/> Many forms.</h2>
-          <p className="mt-3 max-w-[55ch] leading-relaxed">The same Stepper adapts to the layout and language of your product.</p>
+      <section id="anatomy" className={`border-b py-10 lg:py-14 ${rule}`}>
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h2 className={`${serif} text-5xl text-[#bd171c] sm:text-6xl`}>Anatomy.</h2>
+            <p className="mt-4 max-w-[52ch] text-base leading-relaxed">See the parts of a real Stepper. The indicator shows state, the trigger moves between steps, and the connector shows progress.</p>
+          </div>
+          <Link href="/docs/api" className="inline-flex items-center gap-2 text-sm font-medium hover:text-[#bd171c]">API reference <ArrowUpRight aria-hidden="true" className="size-4"/></Link>
         </div>
-        <div className="grid min-w-0 border-t border-[#be151b]/45 md:grid-cols-2">
-          <div className="min-w-0 px-3 py-5 sm:px-6">
-            <h3 className="mb-3 flex items-center justify-between font-medium text-[#be151b]">Checkout <span className="font-mono text-sm">Horizontal</span></h3>
-            <CheckoutExample/>
-          </div>
-          <div className="min-w-0 border-t border-[#be151b]/45 px-3 py-5 sm:px-6 md:border-t-0 md:border-l">
-            <h3 className="mb-3 flex items-center justify-between font-medium text-[#be151b]">Account setup <span className="font-mono text-sm">Vertical</span></h3>
-            <VerticalExample/>
-          </div>
+        <Anatomy/>
+      </section>
+      <section className={`border-b py-10 lg:py-14 ${rule}`}>
+        <h2 className={`${serif} text-5xl text-[#bd171c] sm:text-6xl`}>Your flow. Your rules.</h2>
+        <p className="mt-4 max-w-[62ch] text-base leading-relaxed">Install the source with shadcn, compose it in JSX, and style it to fit your product. Form state, validation and submission stay in your application.</p>
+        <div className="mt-8 grid gap-6 sm:grid-cols-3">
+          {([
+            {Icon:UserRoundPlus,title:"Onboarding",description:"Guide people through setup.",href:"/drafts/onboarding"},
+            {Icon:ShoppingBag,title:"Checkout",description:"Show progress from details to confirmation.",href:"/docs"},
+            {Icon:ListChecks,title:"Multi-step forms",description:"Break complex tasks into manageable steps.",href:"/drafts/interactions"},
+          ]).map(({Icon,title,description,href})=><Link key={title} href={href} className="group flex items-start gap-3 border-t border-[#bd171c]/35 pt-4">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-md border border-[#bd171c]/30 text-[#bd171c]"><Icon aria-hidden="true" className="size-5"/></span>
+            <span className="min-w-0 flex-1"><span className="flex items-center justify-between gap-2 font-medium">{title}<ArrowUpRight aria-hidden="true" className="size-4 shrink-0 text-[#bd171c]"/></span><span className="mt-1 block text-sm leading-relaxed text-[#555]">{description}</span></span>
+          </Link>)}
         </div>
       </section>
-
-      <section id="install" className="identity-rule scroll-mt-4 grid min-w-0 lg:grid-cols-[.8fr_1.2fr]">
-        <div className="min-w-0 px-3 py-7 sm:px-6 lg:py-9">
-          <h2 className={`${serif} text-5xl text-[#be151b] sm:text-6xl`}>Make it yours.</h2>
-          <p className="mt-4 max-w-[40ch] leading-relaxed">Install Stepper with the shadcn CLI. The component source belongs to your project. No brand styles are imposed.</p>
-          <p className="mt-5 border-t border-[#be151b]/45 pt-3 text-sm">Requires an initialized shadcn project and Node.js 22 or newer.</p>
-          <CodeBlockCommand {...registryInstallCommands} className="mt-4 w-full"/>
-          <p className="mt-4 text-sm">Then import from <code className="break-all font-mono text-[#be151b]">@/components/ui/stepper</code>.</p>
-          <Link href="/docs/installation" className="mt-3 inline-flex min-h-11 items-center gap-2 text-sm font-medium text-[#be151b] hover:underline">Installation guide <ArrowUpRight aria-hidden="true" className="size-4"/></Link>
-        </div>
-        <div className="min-w-0 border-t border-[#be151b]/45 lg:border-t-0 lg:border-l">
-          <div style={neutral} className="flex min-h-11 items-center justify-between gap-2 border-b border-[#be151b]/45 px-3 text-[#be151b] sm:px-6">
-            <span className="flex items-center gap-2 text-sm font-medium"><Code2 aria-hidden="true" className="size-4"/> First component</span>
-            <CopyButton value={basicCode} label="Copy example" iconOnly className="size-9 shrink-0"/>
-          </div>
-          <pre tabIndex={0} className="max-h-[390px] overflow-auto px-3 py-5 font-mono text-xs leading-6 text-[#242424] focus-visible:outline-2 focus-visible:outline-[#be151b] sm:px-6 sm:text-sm"><code>{basicCode}</code></pre>
-        </div>
+      <section className={`flex flex-wrap gap-x-8 gap-y-4 border-b py-6 ${rule}`} aria-label="Explore Stepper">
+        {([
+          {Icon:BookOpen,title:"Documentation",href:"/docs"},
+          {Icon:FlaskConical,title:"Research",href:"/drafts/interactions"},
+          {Icon:Layers,title:"Handoff",href:"/drafts/handoff"},
+        ]).map(({Icon,title,href})=><Link key={href} href={href} className="inline-flex items-center gap-2 text-sm font-medium hover:text-[#bd171c]"><Icon aria-hidden="true" className="size-4 shrink-0 text-[#bd171c]"/>{title}<ArrowUpRight aria-hidden="true" className="size-3.5 shrink-0"/></Link>)}
       </section>
-
-      <footer className="flex flex-wrap items-center justify-between gap-4 px-3 py-5 sm:px-6">
-        <p className={`${serif} text-2xl italic text-[#be151b] sm:text-3xl`}>Expressive by identity. Neutral by design.</p>
-        <div className="flex flex-wrap items-center gap-4 text-sm font-medium text-[#be151b]"><Link href="/drafts/interactions" className="hover:underline">Research</Link><a href="https://github.com/francozeta" className="hover:underline">By francozeta</a></div>
+      <footer className="flex flex-wrap items-end justify-between gap-5 py-8">
+        <p className={`${serif} text-3xl italic text-[#bd171c] sm:text-4xl`}>Expressive by identity.<br/>Neutral by design.</p>
+        <a href="https://github.com/francozeta" className="text-sm hover:text-[#bd171c]">By francozeta</a>
       </footer>
     </div>
   </main>;
