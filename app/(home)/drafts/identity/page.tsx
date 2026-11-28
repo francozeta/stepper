@@ -27,19 +27,13 @@ const serif = "[font-family:Georgia,'Times_New_Roman',serif] font-normal trackin
 const rule = "border-[#bd171c]/35";
 const field = "h-10 w-full min-w-0 rounded-md border border-border bg-background px-3 text-base text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring ";
 const stages = [{value:"account"}, {value:"details"}, {value:"confirm"}] as const;
-const anatomyParts = [
-  { id: "root", name: "Stepper", detail: "Shares the current step and navigation state.", slot: "stepper" },
-  { id: "list", name: "StepperList", detail: "Groups the steps in their navigation order.", slot: "stepper-list" },
-  { id: "item", name: "StepperItem", detail: "Represents one stage and its state.", slot: "stepper-item" },
-  { id: "trigger", name: "StepperTrigger", detail: "Selects a step; supports keyboard navigation.", slot: "stepper-trigger" },
-  { id: "indicator", name: "StepperIndicator", detail: "Shows a number, completion mark or error.", slot: "stepper-indicator" },
-  { id: "label", name: "StepperLabel", detail: "Names the stage for the person using it.", slot: "stepper-label" },
-  { id: "separator", name: "StepperSeparator", detail: "Track and fill connect stages and express progress.", slot: "stepper-separator" },
-  { id: "content", name: "StepperContent", detail: "Displays the panel for the active stage.", slot: "stepper-content" },
-  { id: "navigation", name: "StepperPrevious / Next", detail: "Moves to the previous or next enabled stage.", slot: "stepper-next" },
-] as const;
+const anatomyCode = `const steps = [
+  { value: "account", label: "Account" },
+  { value: "details", label: "Details" },
+  { value: "confirm", label: "Confirm" },
+];
 
-const anatomyCode = `<Stepper defaultValue="details">
+<Stepper defaultValue="details">
   <StepperList>
     {steps.map(({ value, label }, index) => (
       <StepperItem key={value} value={value}
@@ -62,14 +56,97 @@ const anatomyCode = `<Stepper defaultValue="details">
 const inspectorStyles = `
   .identity-inspector:not(:has(#inspect-code:checked)) [data-inspector-code],
   .identity-inspector:has(#inspect-code:checked) [data-inspector-live],
-  .identity-inspector:not(:has(#inspect-anatomy:checked)) [data-inspector-parts] { display: none; }
-  .identity-inspector:has(#inspect-anatomy:checked) [data-inspector-live] { background-image: radial-gradient(#bd171c20 .65px, transparent .65px); background-size: 12px 12px; }
-  ${anatomyParts.filter(p=>p.id!=="navigation").map(p=>`.identity-inspector:has(#inspect-anatomy:checked):has(#part-${p.id}:checked) [data-inspector-component] [data-slot="${p.slot}"]:not([hidden]):not(:focus-visible) { outline: 1px solid #bd171c; outline-offset: -1px; }`).join("\n")}
-  .identity-inspector:has(#inspect-anatomy:checked):has(#part-navigation:checked) [data-inspector-component] :is([data-slot="stepper-previous"],[data-slot="stepper-next"]):not(:focus-visible) { outline: 1px solid #bd171c; outline-offset: 3px; }
-  .identity-inspector:has(#inspect-anatomy:checked):has(#part-separator:checked) [data-inspector-component] [data-slot="stepper-separator"] { outline: 2px solid #bd171c; outline-offset: 2px; }
-  .identity-inspector:has(#inspect-anatomy:checked):has(#part-indicator:checked) [data-inspector-component] [data-slot="stepper-indicator"],
-  .identity-inspector:has(#inspect-anatomy:checked):has(#part-label:checked) [data-inspector-component] [data-slot="stepper-label"] { outline-offset: 3px; }
+  .identity-inspector:not(:has(#inspect-anatomy:checked)) :is([data-anatomy-note], [data-anatomy-description]) { display: none; }
+
+  .identity-inspector:has(#inspect-anatomy:checked) {
+    --annotation: #bd171c;
+  }
+  .identity-inspector:has(#inspect-anatomy:checked) [data-inspector-live] {
+    background-image: radial-gradient(#bd171c20 .65px, transparent .65px);
+    background-size: 12px 12px;
+  }
+  .identity-inspector:has(#inspect-anatomy:checked) [data-inspector-component] {
+    padding-block: 38px 42px;
+  }
+  .identity-inspector:has(#inspect-anatomy:checked) [data-slot="stepper-list"] {
+    overflow: visible;
+    margin-bottom: 36px;
+  }
+  .identity-inspector:has(#inspect-anatomy:checked) [data-slot="stepper-item"] {
+    min-width: 0;
+  }
+  [data-anatomy-note] {
+    position: absolute;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    pointer-events: none;
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 11px;
+    line-height: 1.2;
+    padding: 3px 5px;
+    color: var(--annotation);
+    background: #f2efeb;
+    border: 1px solid #bd171c66;
+  }
+  [data-anatomy-note]::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    border-left: 1px dashed var(--annotation);
+  }
+  [data-anatomy-note="indicator"], [data-anatomy-note="trigger"] {
+    bottom: calc(100% + 14px);
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  [data-anatomy-note="indicator"]::after,
+  [data-anatomy-note="trigger"]::after { top: 100%; height: 14px; }
+  [data-anatomy-note="connector"] {
+    left: 100%;
+    top: calc(var(--stepper-separator-y) + 52px);
+    transform: translateX(-50%);
+  }
+  [data-anatomy-note="connector"]::after {
+    bottom: 100%;
+    height: 51px;
+  }
+  [data-anatomy-note="label"] {
+    left: 50%;
+    top: calc(100% + 10px);
+    transform: translateX(-50%);
+  }
+  [data-anatomy-note="label"]::after { bottom: 100%; height: 10px; }
+  [data-anatomy-note="content"] {
+    right: 9px;
+    bottom: calc(100% + 7px);
+  }
+  [data-anatomy-note="content"]::after { top: 100%; height: 7px; }
+  [data-anatomy-note="navigation"] {
+    top: calc(100% + 13px);
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  [data-anatomy-note="navigation"]::after { bottom: 100%; height: 13px; }
+  .identity-inspector:has(#inspect-anatomy:checked) [data-inspector-component] [data-anatomy-target]:not(:focus-visible),
+  .identity-inspector:has(#inspect-anatomy:checked) [data-inspector-component] [data-slot="stepper-content"] {
+    outline: 1px dashed #bd171c99;
+    outline-offset: 3px;
+  }
+  .identity-inspector:has(#inspect-anatomy:checked) [data-anatomy-navigation] {
+    outline: 1px dashed #bd171c99;
+    outline-offset: 5px;
+  }
+  @media (min-width: 640px) {
+    [data-anatomy-note] { font-size: 12px; padding-inline: 7px; }
+  }
 `;
+
+function AnatomyNote({ part, children }: { part: string; children: string }) {
+  return <span aria-hidden="true" data-anatomy-note={part}>{children}</span>;
+}
 
 function Mark({ className = "" }: {className?: string}) {
   return <svg viewBox="0 0 48 48" fill="none" aria-hidden="true" className={className}>
@@ -121,24 +198,30 @@ function Anatomy() {
         <span className="flex h-9 items-center justify-center rounded-full px-4 text-sm font-medium text-[#555] peer-checked:bg-[#242424] peer-checked:text-white peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#bd171c]">{label}</span>
       </label>)}
     </fieldset>
-    <div className="grid gap-5 lg:grid-cols-[1.2fr_1fr] lg:items-start">
+    <div className="min-w-0">
       <div className="min-w-0">
-        <div data-inspector-live="" style={neutral} className="flex min-h-[340px] items-center justify-center rounded-xl border border-border bg-background p-4 text-foreground sm:p-10">
-          <div data-inspector-component="" className="w-full max-w-lg rounded-lg bg-background p-2 sm:p-4">
+        <div data-inspector-live="" style={neutral} className="flex min-h-[360px] items-center justify-center rounded-xl border border-border bg-background px-4 py-7 text-foreground sm:p-10">
+          <p data-anatomy-description="" className="sr-only">Indicator shows step state, Trigger selects a step, Label names it, Track and fill show progress, Content displays the active stage, and Navigation moves between enabled steps.</p>
+          <div data-inspector-component="" className="w-full max-w-2xl rounded-lg bg-background px-2 sm:px-8">
             <Stepper steps={stages} defaultValue="details" className="gap-5">
               <StepperList aria-label="Anatomy example">
                 {stages.map(({value},index)=><StepperItem key={value} value={value} defaultTrigger={false} separator={false}>
-                  <StepperTrigger>
-                    <StepperIndicator/>
-                    <StepperLabel>{["Account","Details","Confirm"][index]}</StepperLabel>
+                  <StepperTrigger data-anatomy-target={index===1 ? "" : undefined}>
+                    <StepperIndicator data-anatomy-target={index===0 ? "" : undefined}/>
+                    <StepperLabel data-anatomy-target={index===2 ? "" : undefined}>{["Account","Details","Confirm"][index]}</StepperLabel>
                   </StepperTrigger>
                   {index<stages.length-1 && <StepperSeparator/>}
+                  {index===0 && <><AnatomyNote part="indicator">Indicator</AnatomyNote><AnatomyNote part="connector">Track / fill</AnatomyNote></>}
+                  {index===1 && <AnatomyNote part="trigger">Trigger</AnatomyNote>}
+                  {index===2 && <AnatomyNote part="label">Label</AnatomyNote>}
                 </StepperItem>)}
               </StepperList>
-              <div className="min-h-[76px]">
+              <div className="relative min-h-[76px]">
+                <AnatomyNote part="content">Content</AnatomyNote>
                 {([{value:"account",text:"Account information"},{value:"details",text:"Preferences and details"},{value:"confirm",text:"Review your information"}] as const).map(({value,text})=><StepperContent key={value} value={value} className="min-h-[76px] rounded-lg border border-border bg-muted/25 p-4 shadow-none"><p className="text-sm font-medium">{text}</p></StepperContent>)}
               </div>
-              <div className="flex justify-between gap-3">
+              <div data-anatomy-navigation="" className="relative flex justify-between gap-3">
+                <AnatomyNote part="navigation">Navigation</AnatomyNote>
                 <StepperPrevious className="rounded-full">Back</StepperPrevious>
                 <StepperNext className="rounded-full">Continue</StepperNext>
               </div>
@@ -153,18 +236,6 @@ function Anatomy() {
           <pre tabIndex={0} className="max-h-[520px] overflow-auto p-4 text-xs leading-6 focus-visible:outline-2 focus-visible:outline-[#bd171c] sm:text-sm"><code>{anatomyCode}</code></pre>
         </div>
       </div>
-      <fieldset data-inspector-parts="" className="min-w-0 border-t border-[#bd171c]/35">
-        <legend className="sr-only">Inspect a component part</legend>
-        {anatomyParts.map(({id,name,detail},i)=><label key={id} className="relative block cursor-pointer border-b border-[#bd171c]/20">
-          <input id={"part-"+id} type="radio" name="inspector-part" defaultChecked={id==="trigger"} className="peer sr-only"/>
-          <span className="grid grid-cols-[2ch_minmax(0,1fr)_1rem] items-center gap-x-3 px-3 py-3 text-sm peer-checked:bg-[#bd171c]/[.055] peer-checked:text-[#bd171c] peer-focus-visible:outline-2 peer-focus-visible:outline-[#bd171c]">
-            <span aria-hidden="true" className="font-mono text-xs tabular-nums text-[#bd171c]">{String(i+1).padStart(2,"0")}</span>
-            <span className="break-words font-mono text-[13px] font-medium sm:text-sm">{name}</span>
-            <ArrowRight aria-hidden="true" className="size-4"/>
-          </span>
-          <span className="hidden px-3 pt-0 pb-4 pl-[calc(2ch+1.5rem)] text-sm leading-relaxed text-[#555] peer-checked:block peer-checked:bg-[#bd171c]/[.055]">{detail}</span>
-        </label>)}
-      </fieldset>
     </div>
   </div>;
 }
@@ -206,7 +277,7 @@ export default function IdentityStudy() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h2 className={`${serif} text-5xl text-[#bd171c] sm:text-6xl`}>Anatomy.</h2>
-            <p className="mt-4 max-w-[52ch] text-base leading-relaxed">Explore how the parts fit together. Select a component to reveal its role in the live example.</p>
+            <p className="mt-4 max-w-[52ch] text-base leading-relaxed">See how progress, interaction and content fit together in a real Stepper.</p>
           </div>
           <Link href="/docs/api" className="inline-flex items-center gap-2 text-sm font-medium hover:text-[#bd171c]">API reference <ArrowUpRight aria-hidden="true" className="size-4"/></Link>
         </div>
