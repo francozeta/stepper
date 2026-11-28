@@ -69,6 +69,11 @@ export default function BenchmarkPage() {
         </div>
         <p className="text-xs leading-relaxed text-muted-foreground">One exploratory run; samples overlap. Mobile is emulated, not a physical device. The fastest library on the throttled profile was Stepperize. <a className="underline underline-offset-2" href="https://github.com/francozeta/stepper/blob/7a33c69c2e9db40cf6880f9d75d5785cd18c2945/benchmarks/browser/results/2026-11-27-vercel-v2.json">Captured measurements</a>.</p>
       </section>
+      <section aria-labelledby="mobile-study" className="grid gap-3 border-t pt-5">
+        <h2 id="mobile-study" className="text-lg font-medium">An optimization we chose not to ship.</h2>
+        <p className="text-sm leading-relaxed text-muted-foreground">The reactive split passed all 60 browser checks, but its throttled median rose from 124.3 to 166.4 ms in the third run. We restored the previous core. Samples overlap and the same revision varies between sessions, so the result is not a causal diagnosis.</p>
+        <a href="https://github.com/francozeta/stepper/blob/db95ad95311dd9d881742e9290f0b8b9259b5764/benchmarks/browser/results/2026-11-27-vercel-v3.json" className="w-fit text-sm underline underline-offset-2">Rejected experiment and raw samples</a>
+      </section>
       <section aria-labelledby="incremental" className="grid gap-4 border-t pt-5">
         <h2 id="incremental" className="text-lg font-medium">Pay for what you add.</h2>
         <p className="text-sm text-muted-foreground">The same Stepper source has a different incremental cost depending on the consumer&apos;s existing class helper.</p>
@@ -108,7 +113,7 @@ export default function BenchmarkPage() {
       <section aria-labelledby="reproduce" className="grid gap-3 border-t pt-5">
         <h2 id="reproduce" className="text-lg font-medium">Reproduce it.</h2>
         <pre className="overflow-x-auto rounded-lg border bg-muted/30 p-3 text-sm"><code>pnpm benchmark</code></pre>
-        <p className="text-xs leading-relaxed text-muted-foreground">Full Git checkout and installed dependencies required. Next comparison: identical controlled form, asynchronous guard, interruption, conditional step and keyboard tasks; record adapter code, incremental gzip, render work and recovery. Real installed consumer, repeated production measurements and external-agent access remain unverified.</p>
+        <p className="text-xs leading-relaxed text-muted-foreground">Full Git checkout and installed dependencies required. The optional individual-interaction study rotates execution order and measures visible panel transitions instead of only synchronous stress updates. It is prepared, not yet executed. Real installed consumer, physical device and external-agent access remain unverified.</p>
         <Link href="/drafts/onboarding" className="w-fit text-sm underline underline-offset-2">Explore the optional UI SDK experiment</Link>
       </section>
     </main>
