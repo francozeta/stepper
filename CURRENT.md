@@ -1,5 +1,9 @@
 # Current state
 
+## Reduction and comparison — draft PR #48
+
+CI run 100 passed the full check and reproducible baseline benchmark; documented results and a noindex /drafts/benchmark study distinguish internal measurements from competitive documentation. External library execution, real-agent, visual and physical-device validation remain pending. No merge or release.
+
 ## Stepper modernization — review branch
 
 Active branch `refactor/base-ui-stepper`, PR #47. The final refinement from `b77468d` through `7dd530a` consolidates navigation and step lookup, reduces Trigger subscriptions, and rejects stale guard or onboarding actions after human interruption. The follow-up keeps mounted implicit steps in order when their metadata changes and gives distinct step values distinct accessibility IDs.
