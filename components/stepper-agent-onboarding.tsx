@@ -55,7 +55,6 @@ export function StepperAgentOnboarding() {
   const [busy, setBusy] = React.useState(false);
   const [message, setMessage] = React.useState("");
   const [confirmed, setConfirmed] = React.useState(false);
-  const [inspect, setInspect] = React.useState("");
   const running = React.useRef<AbortController | null>(null);
 
   React.useEffect(() => () => running.current?.abort(), []);
@@ -99,7 +98,6 @@ export function StepperAgentOnboarding() {
       if (controller.signal.aborted) setMessage("Paused. Continue by hand or resume.");
       else if (result.ok) setMessage("Draft prepared. Review before confirming.");
       else setMessage((message) => message || "A change was blocked. Check the fields or open the action details.");
-      setInspect(JSON.stringify(result, null, 2));
     } catch {
       setMessage(controller.signal.aborted ? "Paused." : "The bridge could not finish. You can continue manually.");
     } finally {
@@ -124,7 +122,7 @@ export function StepperAgentOnboarding() {
       <header className="grid gap-3">
         <Link href="/drafts/handoff" className="w-fit text-xs text-muted-foreground hover:text-foreground">Stepper / Research / 006</Link>
         <h1 className="text-2xl font-medium tracking-tight">Set up your business.</h1>
-        <p className="text-sm text-muted-foreground">Do it yourself, or let the assistant prepare a sample. You stay in control.</p>
+        <p className="text-sm text-muted-foreground">Fill it in yourself or let the assistant prepare a sample. Review it before confirming.</p>
       </header>
       <section onPointerDownCapture={(event) => { if (event.nativeEvent.isTrusted) stop(); }} onKeyDownCapture={(event) => { if (event.nativeEvent.isTrusted) stop(); }} className="rounded-2xl border border-border p-4 sm:p-6">
         <AgentProgress aria-label="Onboarding progress" value={stage} onValueChange={(value, details) => {
@@ -172,34 +170,23 @@ export function StepperAgentOnboarding() {
                   <div className="flex justify-between gap-3"><dt className="text-muted-foreground">Currency</dt><dd>{currency.trim().toUpperCase()}</dd></div>
                   <div className="flex justify-between gap-3"><dt className="text-muted-foreground">QR payments</dt><dd>{qr ? "Enabled" : "Disabled"}</dd></div>
                 </dl>
-                <button type="button" onClick={() => setConfirmed(true)} disabled={confirmed} className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50">{confirmed ? "Confirmed locally" : "Confirm setup"}</button>
               </StepperContent>
             </div>
             <div className="flex justify-between gap-3 border-t pt-4">
               <StepperPrevious className="rounded-full">Back</StepperPrevious>
-              <StepperNext className="rounded-full">Continue</StepperNext>
+              {stage === "review" ? (
+                <button type="button" onClick={() => setConfirmed(true)} disabled={confirmed} className="inline-flex h-9 min-w-24 items-center justify-center rounded-full border border-primary bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none disabled:opacity-50">{confirmed ? "Confirmed locally" : "Confirm setup"}</button>
+              ) : <StepperNext className="rounded-full">Continue</StepperNext>}
             </div>
           </Stepper>
         </AgentProgress>
       </section>
       <div className="grid gap-2">
-        <div className="flex items-center gap-2">
-          <button type="button" disabled={busy || stage === "review"} onClick={prepare} className="rounded-full border border-border px-4 py-2 text-sm font-medium disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">{busy ? "Preparing…" : "Prepare example"}</button>
-          {busy && <button type="button" onClick={stop} className="rounded-full border px-3 py-2 text-sm">Stop</button>}
-        </div>
-        <p className="text-xs text-muted-foreground">Café Studio · PEN · QR enabled. Existing choices are preserved.</p>
-        <p role="status" className="min-h-5 text-xs text-muted-foreground">{message || (busy ? "Preparing your example…" : "")}</p>
+        <button type="button" disabled={!busy && stage === "review"} onClick={busy ? stop : prepare} className="w-fit rounded-full border border-border px-4 py-2 text-sm font-medium disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">{busy ? "Stop assistant" : "Fill with assistant"}</button>
+        <p className="text-sm text-muted-foreground">Uses sample details and keeps your existing choices.</p>
+        <p role="status" className="min-h-10 text-sm text-muted-foreground">{message || (busy ? "Preparing your example…" : "")}</p>
       </div>
-      <details className="border-t pt-4 text-sm text-muted-foreground">
-        <summary className="cursor-pointer">Developer details</summary>
-        <button type="button" onClick={() => setInspect(JSON.stringify(getBridge().snapshot(), null, 2))} className="mt-3 rounded-full border px-3 py-2 text-xs">Inspect SDK snapshot</button>
-        {inspect && (
-          <pre role="region" aria-label="SDK output" tabIndex={0} className="mt-3 max-h-64 overflow-auto whitespace-pre-wrap break-all text-[11px] focus-visible:outline-2 focus-visible:outline-ring">
-            {inspect}
-          </pre>
-        )}
-        <p className="mt-3 text-xs">Actual UI SDK actions; a deterministic local example, not an LLM. No external submissions.</p>
-      </details>
+      <p className="text-xs text-muted-foreground">Local demo using UI SDK actions. No external submissions.</p>
     </main>
   );
 }
