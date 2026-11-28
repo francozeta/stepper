@@ -1,0 +1,40 @@
+name: Browser comparison
+on:
+  pull_request:
+    paths:
+      - 'benchmarks/browser/**'
+      - 'components/ui/stepper.tsx'
+      - '.github/workflows/browser-comparison.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.15.0
+      - name: Isolate benchmark dependencies
+        run: |
+          mkdir -p "$RUNNER_TEMP/stepper-comparison"
+          cp benchmarks/browser/* "$RUNNER_TEMP/stepper-comparison/"
+          cd "$RUNNER_TEMP/stepper-comparison"
+          npm install --ignore-scripts --no-audit --no-fund
+          npx --no-install playwright install --with-deps chromium
+      - name: Run production React in Chromium
+        env:
+          STEPPER_REPO: ${{ github.workspace }}
+        run: node "$RUNNER_TEMP/stepper-comparison/run.mjs"
+      - name: Preserve measurements and resolved dependency graph
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-comparison
+          path: |
+            ${{ runner.temp }}/stepper-comparison/results/report.json
+            ${{ runner.temp }}/stepper-comparison/package-lock.json

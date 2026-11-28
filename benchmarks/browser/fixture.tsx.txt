@@ -1,0 +1,59 @@
+import * as React from "react";
+import { createRoot } from "react-dom/client";
+import { flushSync } from "react-dom";
+import { Adapter } from "./adapter";
+export const names = ["Business", "Preferences", "Review"];
+export const ids = ["business", "preferences", "review"];
+function App() {
+  const [step, setStep] = React.useState(0);
+  const [name, setName] = React.useState("");
+  const [currency, setCurrency] = React.useState("");
+  const [qr, setQr] = React.useState(false);
+  const [status, setStatus] = React.useState("");
+  const [confirmed, setConfirmed] = React.useState(false);
+  const current = React.useRef(0);
+  const pending = React.useRef(null);
+  const revision = React.useRef(0);
+  const valid = (index) => index === 0 ? name.trim().length > 0 : index === 1 ? /^(PEN|USD)$/i.test(currency.trim()) : true;
+  function commit(target) {
+    if (target < 0 || target > 2) return;
+    current.current = target;
+    revision.current++;
+    setStep(target);
+    setConfirmed(false);
+  }
+  function request(target) {
+    if (target > current.current && (target !== current.current + 1 || !valid(current.current))) {
+      setStatus("Check the required field."); return;
+    }
+    commit(target);
+  }
+  async function guard(from, to) {
+    if (to <= from) return true;
+    if (to !== from + 1 || !valid(from)) { setStatus("Check the required field."); return false; }
+    if (pending.current) return false;
+    const version = revision.current;
+    setStatus("Checking");
+    await new Promise(resolve => { pending.current = resolve; });
+    pending.current = null;
+    setStatus("");
+    // Application-owned revision protection is used only by Ark's async adapter.
+    return true;
+  }
+  function edit(set, value) { revision.current++; set(value); }
+  function release() { pending.current?.(); }
+  async function guardedRequest(target) {
+    if (target <= current.current) { request(target); return; }
+    const version = revision.current;
+    if (await guard(current.current, target) && version === revision.current) request(target);
+  }
+  const panels = [
+    <label key="name">Business name<input value={name} onChange={e=>edit(setName,e.target.value)} /></label>,
+    <div key="preferences"><label>Currency<input value={currency} onChange={e=>edit(setCurrency,e.target.value)} /></label><label><input type="checkbox" checked={qr} onChange={e=>edit(setQr,e.target.checked)} />QR payments</label></div>,
+    <div key="review"><p>Business: {name}</p><p>Currency: {currency}</p><p>QR: {qr ? "Enabled" : "Disabled"}</p><button type="button" onClick={()=>setConfirmed(true)}>Confirm setup</button></div>
+  ];
+  // Controlled owner writes are separate from the library navigation API.
+  window.__bench = { set: n => flushSync(()=>commit(n)), release, state: ()=>current.current };
+  return <main><h1>Set up your business</h1><Adapter step={step} panels={panels} request={request} guardedRequest={guardedRequest} guard={guard} valid={valid} /><p role="status">{status}</p><p data-current={step}>Step {step + 1} / 3</p>{confirmed && <p>Confirmed locally</p>}</main>;
+}
+createRoot(document.getElementById("root")).render(<App />);

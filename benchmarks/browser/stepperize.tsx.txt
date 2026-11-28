@@ -1,0 +1,12 @@
+import * as React from "react";
+import { defineStepper } from "@stepperize/react";
+const ids = ["business", "preferences", "review"];
+const names = ["Business", "Preferences", "Review"];
+const {Stepper} = defineStepper([{id:"business"},{id:"preferences"},{id:"review"}]);
+export function Adapter({step, panels, request, guard}) {
+  return <Stepper.Root step={ids[step]} onStepChange={value=>request(ids.indexOf(value))} beforeStepChange={({fromIndex,toIndex})=>guard(fromIndex,toIndex)} linear>
+    <Stepper.List>{ids.map((id,index)=><Stepper.Item key={id} step={id}><Stepper.Trigger><Stepper.Indicator/>{names[index]}</Stepper.Trigger><Stepper.Separator/></Stepper.Item>)}</Stepper.List>
+    {ids.map((id,index)=><Stepper.Content key={id} step={id}>{panels[index]}</Stepper.Content>)}
+    <Stepper.Actions><Stepper.Prev>Back</Stepper.Prev><Stepper.Next>Continue</Stepper.Next></Stepper.Actions>
+  </Stepper.Root>;
+}

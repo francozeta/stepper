@@ -1,0 +1,15 @@
+{
+  "name": "stepper-browser-comparison",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@ark-ui/react": "5.40.0",
+    "@stepperize/react": "8.0.0",
+    "@base-ui/react": "1.9.0",
+    "cn": "0.5.2",
+    "react": "19.2.5",
+    "react-dom": "19.2.5",
+    "esbuild": "0.28.1",
+    "playwright": "1.56.1"
+  }
+}

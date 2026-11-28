@@ -1,0 +1,10 @@
+import * as React from "react";
+import { Steps } from "@ark-ui/react/steps";
+const names = ["Business", "Preferences", "Review"];
+export function Adapter({step, panels, guardedRequest}) {
+  return <Steps.Root count={3} step={step} onStepChange={({step: target})=>{ if(target<3) void guardedRequest(target); }}>
+    <Steps.List>{names.map((name,index)=><Steps.Item key={name} index={index}><Steps.Trigger><Steps.Indicator>{index+1}</Steps.Indicator>{name}</Steps.Trigger><Steps.Separator/></Steps.Item>)}</Steps.List>
+    {panels.map((panel,index)=><Steps.Content key={index} index={index}>{panel}</Steps.Content>)}
+    <footer><Steps.PrevTrigger>Back</Steps.PrevTrigger><Steps.NextTrigger disabled={step===2}>Continue</Steps.NextTrigger></footer>
+  </Steps.Root>;
+}

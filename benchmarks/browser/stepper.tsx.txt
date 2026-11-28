@@ -1,0 +1,12 @@
+import * as React from "react";
+import { Stepper, StepperItem, StepperList, StepperContent, StepperNext, StepperPrevious } from "./core";
+const ids = ["business", "preferences", "review"];
+const names = ["Business", "Preferences", "Review"];
+const steps = ids.map(value => ({value}));
+export function Adapter({step, panels, request, guard}) {
+  return <Stepper steps={steps} value={ids[step]} onValueChange={value=>request(ids.indexOf(value))}>
+    <StepperList>{ids.map((value,i)=><StepperItem key={value} value={value}>{names[i]}</StepperItem>)}</StepperList>
+    {ids.map((value,i)=><StepperContent key={value} value={value}>{panels[i]}</StepperContent>)}
+    <footer><StepperPrevious>Back</StepperPrevious><StepperNext onBeforeNext={()=>guard(step,step+1)}>Continue</StepperNext></footer>
+  </Stepper>;
+}
