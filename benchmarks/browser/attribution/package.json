@@ -1,0 +1,19 @@
+{
+  "name": "stepper-cloud-attribution",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@base-ui/react": "1.4.1",
+    "@jridgewell/trace-mapping": "0.3.31",
+    "@tailwindcss/cli": "4.2.4",
+    "base-ui-1-9": "npm:@base-ui/react@1.9.0",
+    "cn": "0.5.2",
+    "esbuild": "0.28.1",
+    "playwright": "1.65.1",
+    "react": "19.3.1",
+    "react-19-2": "npm:react@19.2.5",
+    "react-dom": "19.3.1",
+    "react-dom-19-2": "npm:react-dom@19.2.5",
+    "tailwindcss": "4.2.4"
+  }
+}

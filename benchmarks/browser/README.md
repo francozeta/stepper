@@ -69,3 +69,7 @@ The measurement commands write `timing.json`, `cpu.json`, `react.json` and `guar
 The fixtures hold React, React DOM, shared app code, fixtures, CSS and workflow rules constant. The source copy for Dice UI is pinned to `391f1ef1`. Its local import paths and Lucide icon use match the registry transform. All third-party sources are obtained through official packages or the pinned public source. The isolated dependencies and fixture are excluded from the production app and registry.
 
 See [the final comparative report](competitive-validation.md) for the captured measurements and integration findings.
+
+### Codex Cloud attribution
+
+The [controlled follow-up](cloud-attribution.md) measures dependency versions, render composition, form updates, step counts and actual Tailwind motion. It uses a separate lock and an opt-in runner. See the report for commands, raw round data and the distinction between React commit and Chromium presentation.
