@@ -34,6 +34,11 @@ jobs:
           node-version: 24.15.0
           cache: pnpm
 
+      - name: Check benchmark protocol
+        run: |
+          node --check benchmarks/browser/run.mjs
+          node --test benchmarks/browser/interaction-study.test.mjs
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
