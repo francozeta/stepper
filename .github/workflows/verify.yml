@@ -39,3 +39,6 @@ jobs:
 
       - name: Verify
         run: pnpm check
+
+      - name: Benchmark
+        run: pnpm benchmark

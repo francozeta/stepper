@@ -1,0 +1,71 @@
+import * as React from "react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import { expect, it } from "vitest";
+import * as before from "./baseline";
+import * as after from "../../components/ui/stepper";
+
+type Implementation = typeof after;
+const steps = Array.from({ length: 24 }, (_, index) => ({ value: String(index) }));
+const noop = () => {};
+
+function sample(impl: Implementation) {
+  const { Stepper, StepperList, StepperItem, StepperTrigger, StepperLabel } = impl;
+  let calls = 0;
+  const children = <StepperList>{steps.map(({ value }) =>
+    <StepperItem key={value} value={value} defaultTrigger={false}>
+      <StepperTrigger render={(props) => { calls++; return <button {...props} />; }}>
+        <StepperLabel>{value}</StepperLabel>
+      </StepperTrigger>
+    </StepperItem>
+  )}</StepperList>;
+  const view = (value: string) => <Stepper steps={steps} value={value} onValueChange={noop}>{children}</Stepper>;
+  const mounted = render(view("0"));
+  for (let i = 0; i < 10; i++) mounted.rerender(view(i % 2 ? "0" : "1"));
+  calls = 0;
+  const started = performance.now();
+  for (let i = 0; i < 80; i++) mounted.rerender(view(i % 2 ? "0" : "1"));
+  const elapsed = performance.now() - started;
+  expect(mounted.container.querySelector('[aria-current="step"]')?.textContent).toContain("0");
+  mounted.unmount();
+  return { calls, elapsed };
+}
+
+async function competingRequests(impl: Implementation) {
+  const { Stepper, StepperNext, useStepper } = impl;
+  const requests: string[] = [];
+  let resolve!: (allowed: boolean) => void;
+  const guard = () => new Promise<boolean>(done => { resolve = done; });
+  function Direct() {
+    const { setValue } = useStepper();
+    return <button onClick={() => setValue("2")}>Direct request</button>;
+  }
+  const mounted = render(<Stepper value="0" steps={steps} onValueChange={value => requests.push(value)}>
+    <StepperNext onBeforeNext={guard}>Continue</StepperNext><Direct />
+  </Stepper>);
+  fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+  fireEvent.click(screen.getByRole("button", { name: "Direct request" }));
+  await act(async () => { resolve(true); });
+  mounted.unmount();
+  return requests;
+}
+
+it("compares render work and navigation races in the same runtime", async () => {
+  const baseline: ReturnType<typeof sample>[] = [];
+  const candidate: ReturnType<typeof sample>[] = [];
+  // Alternate order to reduce systematic warm-up bias. Timing is exploratory jsdom, not browser paint.
+  for (let i = 0; i < 7; i++) {
+    if (i % 2) { candidate.push(sample(after)); baseline.push(sample(before as Implementation)); }
+    else { baseline.push(sample(before as Implementation)); candidate.push(sample(after)); }
+  }
+  const median = (values: number[]) => values.toSorted((a, b) => a - b)[Math.floor(values.length / 2)];
+  const baselineRace = await competingRequests(before as Implementation);
+  const candidateRace = await competingRequests(after);
+  console.log("STEPPER_BENCHMARK", JSON.stringify({
+    environment: "Vitest / jsdom / development React",
+    steps: 24, updates: 80, warmup: 10, samples: 7,
+    baseline: { renders: median(baseline.map(x => x.calls)), medianMs: median(baseline.map(x => x.elapsed)), raceRequests: baselineRace },
+    candidate: { renders: median(candidate.map(x => x.calls)), medianMs: median(candidate.map(x => x.elapsed)), raceRequests: candidateRace },
+  }));
+  expect(median(candidate.map(x => x.calls))).toBeLessThan(median(baseline.map(x => x.calls)));
+  expect(candidateRace).toEqual(["2"]);
+});

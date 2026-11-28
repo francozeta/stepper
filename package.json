@@ -24,6 +24,7 @@
     "registry:build": "node scripts/build-stepper-registry.mjs && shadcn registry validate && shadcn build --output public",
     "registry:check": "node scripts/build-stepper-registry.mjs --check && shadcn registry validate && shadcn build --output public",
     "test": "vitest run",
+    "benchmark": "node scripts/benchmark-stepper.mjs",
     "typecheck": "pnpm docs:source && tsc --noEmit",
     "check": "pnpm registry:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "commitlint": "commitlint",
