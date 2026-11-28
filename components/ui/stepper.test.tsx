@@ -114,6 +114,31 @@ describe("Stepper", () => {
     ).toHaveTextContent("3");
   });
 
+  it("keeps item actions current when the controlled owner replaces its callback", () => {
+    const steps = [{ value: "account" }, { value: "profile" }];
+    const first = vi.fn();
+    const latest = vi.fn();
+    function Action() {
+      const { setValue } = useStepperItem();
+      return <button onClick={() => setValue("profile")}>Custom action</button>;
+    }
+    const children = (
+      <StepperList>
+        <StepperItem value="account" defaultTrigger={false}><StepperTrigger>Account</StepperTrigger><Action /></StepperItem>
+        <StepperItem value="profile">Profile</StepperItem>
+      </StepperList>
+    );
+    const view = (onValueChange: (value: string) => void) => (
+      <Stepper steps={steps} value="account" onValueChange={onValueChange}>{children}</Stepper>
+    );
+    const { rerender } = render(view(first));
+    rerender(view(latest));
+    fireEvent.click(screen.getByRole("button", { name: "Custom action" }));
+    fireEvent.click(screen.getByRole("button", { name: /Profile/ }));
+    expect(first).not.toHaveBeenCalled();
+    expect(latest.mock.calls).toEqual([["profile"], ["profile"]]);
+  });
+
   it("exposes item state for custom composed indicators", async () => {
     function ItemState() {
       const { completed, index, isActive, stepPosition, stepState, value } =

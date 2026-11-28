@@ -71,7 +71,7 @@ export default function BenchmarkPage() {
       </section>
       <section aria-labelledby="incremental" className="grid gap-4 border-t pt-5">
         <h2 id="incremental" className="text-lg font-medium">Pay for what you add.</h2>
-        <p className="text-sm text-muted-foreground">The same Stepper source has a different incremental cost depending on the consumer's existing class helper.</p>
+        <p className="text-sm text-muted-foreground">The same Stepper source has a different incremental cost depending on the consumer&apos;s existing class helper.</p>
         {[
           { name: "Plain React", bytes: 17229 },
           { name: "Shared cn", bytes: 6056 },

@@ -210,7 +210,8 @@ function setDisplayName(component: object, displayName: string) {
 
 const StepperContext = React.createContext<StepperContextValue | null>(null);
 const StepperCollectionContext = React.createContext<StepperCollection | null>(null);
-const StepperItemContext = React.createContext<StepperItemApi | null>(null);
+const StepperItemContext = React.createContext<Omit<StepperItemApi, "setValue"> | null>(null);
+const StepperActionContext = React.createContext<StepperApi["setValue"] | null>(null);
 const StepperListContext = React.createContext<string | null>(null);
 
 function useStepperContext(component: string) {
@@ -229,6 +230,12 @@ function useStepperCollection(component: string) {
     throw new Error(`${component} must be used within Stepper`);
   }
   return collection;
+}
+
+function useStepperAction(component: string) {
+  const setValue = React.useContext(StepperActionContext);
+  if (!setValue) throw new Error(`${component} must be used within Stepper`);
+  return setValue;
 }
 
 function useStepperItemContext(component: string) {
@@ -285,9 +292,9 @@ function useStepper<
 function useStepperItem<
   TValue extends StepperValue = StepperValue,
 >(): StepperItemApi<TValue> {
-  return useStepperItemContext(
-    "useStepperItem"
-  ) as unknown as StepperItemApi<TValue>;
+  const item = useStepperItemContext("useStepperItem");
+  const setValue = useStepperAction("useStepperItem");
+  return React.useMemo(() => ({ ...item, setValue }), [item, setValue]) as unknown as StepperItemApi<TValue>;
 }
 
 // ----------------------------------------------------------------------------
@@ -380,8 +387,6 @@ function Stepper({
     if (nextValue !== undefined) setValue(nextValue);
   }, [nextValue, setValue]);
 
-  const { progress, duration } = useConnectorProgress(currentIndex);
-
   const context = React.useMemo<StepperContextValue>(() => ({
     api: {
       value: currentValue,
@@ -405,18 +410,38 @@ function Stepper({
 
   return (
     <StepperContext.Provider value={context}>
-      <div
-        data-slot="stepper"
-        data-orientation={orientation}
-        className={cn("flex flex-col gap-6 transition-[--stepper-progress] ease-linear motion-reduce:transition-none", className)}
-        style={{ ...style, "--stepper-progress": progress, transitionDuration: duration + "ms" } as React.CSSProperties}
-        {...props}
-      >
+      <StepperProgress currentIndex={currentIndex} orientation={orientation} className={className} style={style} {...props}>
         <StepperCollectionContext.Provider value={collection}>
-          {children}
+          <StepperActionContext.Provider value={setValue}>
+            {children}
+          </StepperActionContext.Provider>
         </StepperCollectionContext.Provider>
-      </div>
+      </StepperProgress>
     </StepperContext.Provider>
+  );
+}
+
+// A render-phase cursor adjustment should only retry this host, not the root
+// navigation provider or all of its context calculations.
+function StepperProgress({
+  currentIndex,
+  orientation,
+  className,
+  style,
+  ...props
+}: React.ComponentPropsWithoutRef<"div"> & {
+  currentIndex: number;
+  orientation: StepperOrientation;
+}) {
+  const { progress, duration } = useConnectorProgress(currentIndex);
+  return (
+    <div
+      data-slot="stepper"
+      data-orientation={orientation}
+      className={cn("flex flex-col gap-6 transition-[--stepper-progress] ease-linear motion-reduce:transition-none", className)}
+      style={{ ...style, "--stepper-progress": progress, transitionDuration: duration + "ms" } as React.CSSProperties}
+      {...props}
+    />
   );
 }
 
@@ -470,7 +495,7 @@ function StepperItem<TValue extends StepperValue = StepperValue>({
   ...props
 }: StepperItemProps<TValue>) {
   const {
-    api: { value: currentValue, currentIndex, setValue, getStepIndex },
+    api: { value: currentValue, currentIndex, getStepIndex },
     collection: { id, orientation, steps, register },
   } = useStepperContext("StepperItem");
   const registrationId = React.useId();
@@ -522,7 +547,7 @@ function StepperItem<TValue extends StepperValue = StepperValue>({
     return () => window.clearTimeout(timeout);
   }, [index, isInsideStepperList, value]);
 
-  const itemContext = React.useMemo<StepperItemApi>(() => ({
+  const itemContext = React.useMemo<Omit<StepperItemApi, "setValue">>(() => ({
     value,
     index,
     disabled: isDisabled,
@@ -531,10 +556,9 @@ function StepperItem<TValue extends StepperValue = StepperValue>({
     stepState,
     stepPosition,
     orientation,
-    setValue,
     triggerId: getStepId(id, "trigger", value),
     contentId: getStepId(id, "content", value),
-  }), [value, index, isDisabled, completed, isActive, stepState, stepPosition, orientation, setValue, id]);
+  }), [value, index, isDisabled, completed, isActive, stepState, stepPosition, orientation, id]);
 
   const trigger = React.useMemo(() => defaultTrigger ? (
     <StepperTrigger>
@@ -628,10 +652,10 @@ function StepperTrigger({
     isActive,
     stepState,
     orientation,
-    setValue,
     triggerId,
     contentId,
   } = useStepperItemContext("StepperTrigger");
+  const setValue = useStepperAction("StepperTrigger");
   const { id, steps } = useStepperCollection("StepperTrigger");
   const isDisabled = itemDisabled || disabled;
 
