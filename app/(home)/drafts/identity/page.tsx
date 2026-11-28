@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import type { CSSProperties } from "react";
-import Image from "next/image";
+import { ArrowRight, ArrowUpRight, BookOpen, Code2, FlaskConical, Layers, ListChecks, ShoppingBag, UserRoundPlus } from "lucide-react";
+import { CopyButton } from "@/components/copy-button";
+import { registryInstallSnippet } from "@/lib/docs";
 import Link from "next/link";
 import {
   Stepper, StepperContent, StepperItem, StepperList,
@@ -13,7 +15,6 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-const ink = "#bd171c";
 const paper = "#f2efeb";
 const neutral = {
   "--background": "#fff", "--foreground": "#222", "--primary": "#272727",
@@ -22,10 +23,9 @@ const neutral = {
   "--ring": "#555", "--input": "#d4d4d4",
   "--destructive": "#b91c1c", colorScheme: "light",
 } as CSSProperties;
-const figure = "font-mono text-[10px] font-medium uppercase tracking-[.13em] text-[#bd171c]";
 const serif = "[font-family:Georgia,'Times_New_Roman',serif] font-normal tracking-[-.055em]";
 const rule = "border-[#bd171c]/35";
-const field = "h-10 w-full min-w-0 rounded-md border border-border bg-background px-3 text-base text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring sm:text-sm";
+const field = "h-10 w-full min-w-0 rounded-md border border-border bg-background px-3 text-base text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring ";
 const stages = [{value:"account"}, {value:"details"}, {value:"confirm"}] as const;
 const parts = [
   ["Indicator", "The visible state of each step."],
@@ -55,16 +55,16 @@ function Demo() {
         <StepperContent value="account" keepMounted className="space-y-3 border-0 bg-transparent p-0 shadow-none">
           <h3 className="text-lg font-medium">Start with the essentials.</h3>
           <label className="grid gap-1.5 text-sm">Workspace name<input className={field} placeholder="Studio" autoComplete="organization"/></label>
-          <p className="text-xs text-muted-foreground">A place for your next idea.</p>
+          
         </StepperContent>
         <StepperContent value="details" keepMounted className="space-y-3 border-0 bg-transparent p-0 shadow-none">
           <h3 className="text-lg font-medium">Make it yours.</h3>
           <label className="grid gap-1.5 text-sm">Email address<input type="email" className={field} placeholder="you@example.com" autoComplete="email"/></label>
-          <p className="text-xs text-muted-foreground">Your input stays here as you navigate.</p>
+          
         </StepperContent>
         <StepperContent value="confirm" keepMounted className="space-y-3 border-0 bg-transparent p-0 shadow-none">
           <h3 className="text-lg font-medium">Everything in place.</h3>
-          <p className="text-sm text-muted-foreground">Go back to revisit your details. This demo does not submit or store any data.</p>
+          <p className="text-sm text-muted-foreground">Go back to edit your details. Nothing is submitted.</p>
         </StepperContent>
       </div>
       <div className="flex justify-between gap-3 border-t border-border pt-4">
@@ -78,7 +78,7 @@ function Demo() {
 function Anatomy() {
   return <div className="relative">
     <input id="show-anatomy" type="checkbox" defaultChecked className="peer sr-only"/>
-    <label htmlFor="show-anatomy" className="mb-5 inline-flex cursor-pointer rounded-full border border-[#bd171c]/50 px-3 py-1.5 font-mono text-[11px] text-[#bd171c] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-checked:bg-[#bd171c] peer-checked:text-white">Anatomy overlay</label>
+    <label htmlFor="show-anatomy" className="mb-5 inline-flex h-9 cursor-pointer items-center gap-2 rounded-full border border-[#bd171c]/50 px-3 text-sm text-[#bd171c] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-checked:bg-[#bd171c] peer-checked:text-white"><Layers aria-hidden="true" className="size-4 shrink-0"/> Show anatomy</label>
     <div style={neutral} className="relative rounded-xl border border-border bg-background px-3 pt-16 pb-14 text-foreground sm:px-6">
       <Stepper steps={stages} defaultValue="details" className="gap-4">
         <StepperList>
@@ -110,55 +110,65 @@ export default function IdentityStudy() {
       <header className={`flex flex-wrap items-center justify-between gap-4 border-b py-5 ${rule}`}>
         <Link href="/drafts/identity" className="flex items-center gap-2.5">
           <Mark className="size-10 text-[#bd171c]"/>
-          <span className="grid"><span className="text-xl leading-none font-semibold tracking-tight">Stepper</span><span className="mt-1 font-mono text-[9px] uppercase tracking-[.2em]">by francozeta</span></span>
+          <span className="text-xl leading-none font-semibold tracking-tight">Stepper</span>
         </Link>
-        <nav aria-label="Stepper" className="flex flex-wrap items-center gap-x-5 gap-y-3 font-mono text-xs">
+        <nav aria-label="Stepper" className="flex flex-wrap items-center gap-x-5 gap-y-3 text-sm">
           <Link href="/docs" className="hover:text-[#bd171c]">Docs</Link>
           <Link href="/drafts/interactions" className="hover:text-[#bd171c]">Research</Link>
-          <Link href="/drafts/onboarding" className="hover:text-[#bd171c]">Onboarding</Link>
-          <a href="https://github.com/francozeta/stepper" className="rounded-full border border-[#242424]/30 px-3 py-1.5 hover:border-[#bd171c]">GitHub ↗</a>
+          <a href="https://github.com/francozeta/stepper" className="inline-flex items-center justify-center gap-1.5 rounded-full border border-[#242424]/30 px-3 py-1.5 hover:border-[#bd171c]">GitHub <ArrowUpRight aria-hidden="true" className="size-4 shrink-0"/></a>
         </nav>
       </header>
       <section className={`grid gap-10 border-b py-10 lg:grid-cols-[1.12fr_1fr] lg:items-center lg:gap-12 lg:py-16 ${rule}`}>
         <div className="relative isolate">
           <div aria-hidden="true" className="pointer-events-none absolute right-0 top-8 -z-10 h-[75%] w-[55%] opacity-10" style={{background:"repeating-linear-gradient(135deg,#bd171c 0 1px,transparent 1px 5px)",clipPath:"polygon(0 100%,0 70%,33% 70%,33% 38%,66% 38%,66% 0,100% 0,100% 100%)"}}/>
-          <p className={figure}>Fig. 01 / Identity study</p>
-          <h1 className={`${serif} mt-5 text-[clamp(3.4rem,7.5vw,7.7rem)] leading-[.86] text-[#bd171c]`}>Make progress<br/>feel <em className="font-normal">natural.</em></h1>
-          <p className={`${serif} mt-7 text-2xl italic tracking-[-.035em] sm:text-3xl`}>Expressive by identity.<br className="sm:hidden"/> Neutral by design.</p>
-          <p className="mt-5 max-w-lg text-sm leading-relaxed sm:text-base">A composable progress and navigation primitive for multi-step flows. Your application owns the workflow. Stepper makes it visible.</p>
+          <h1 className={`${serif} text-[clamp(3.15rem,7vw,7.25rem)] leading-[.86] text-[#bd171c]`}>Make progress<br/>feel <em className="font-normal">natural.</em></h1>
+          <p className="mt-7 max-w-[37ch] text-base leading-relaxed sm:text-lg">Build multi-step experiences for React, from onboarding to checkout. Stepper handles progress and navigation. You own the workflow.</p>
           <div className="mt-7 flex flex-wrap gap-2.5">
-            <Link href="/docs" className="rounded-full bg-[#bd171c] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#a20e14]">Read the docs ↗</Link>
-            <a href="https://github.com/francozeta/stepper" className="rounded-full border border-[#242424]/30 px-5 py-2.5 text-sm hover:border-[#bd171c]">View source ↗</a>
+            <Link href="/docs" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#bd171c] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#a20e14]">Get started <ArrowRight aria-hidden="true" className="size-4 shrink-0"/></Link>
+            <a href="https://github.com/francozeta/stepper" className="inline-flex items-center justify-center gap-2 rounded-full border border-[#242424]/30 px-5 py-2.5 text-sm hover:border-[#bd171c]">View source <ArrowUpRight aria-hidden="true" className="size-4 shrink-0"/></a>
+          </div>
+          <div style={neutral} className="mt-5 flex max-w-lg items-center gap-2 rounded-lg border border-[#242424]/15 bg-white/65 py-1.5 pr-1.5 pl-3 text-foreground">
+            <Code2 aria-hidden="true" className="size-4 shrink-0 text-muted-foreground"/>
+            <code className="min-w-0 flex-1 overflow-x-auto whitespace-nowrap font-mono text-xs sm:text-sm">{registryInstallSnippet}</code>
+            <CopyButton value={registryInstallSnippet} label="Copy install command" iconOnly className="size-9 shrink-0"/>
           </div>
         </div>
         <div className="min-w-0">
-          <div className={`mb-3 flex justify-between ${figure}`}><span>Live component / Neutral</span><span>01</span></div>
           <Demo/>
-          <p className="mt-3 font-mono text-[10px] text-[#626262]">Actual Stepper primitive. No brand tokens inherited.</p>
         </div>
       </section>
       <section className={`grid gap-8 border-b py-10 lg:grid-cols-2 lg:gap-12 ${rule}`}>
-        <div className="min-w-0"><p className={`${figure} mb-4`}>Fig. 02 / Anatomy</p><Anatomy/></div>
+        <div className="min-w-0"><Anatomy/></div>
         <div className="lg:border-l lg:border-[#bd171c]/35 lg:pl-12">
-          <p className={figure}>Structure is a language.</p>
           <h2 className={`${serif} mt-2 text-6xl text-[#bd171c]`}>Anatomy.</h2>
-          <p className="mt-4 max-w-md text-sm leading-relaxed">A modular structure that separates progress, navigation and content. Reveal the construction without changing the component.</p>
-          <dl className="mt-5 grid gap-2.5 text-sm">{parts.map(([name,desc],i)=><div key={name} className="grid grid-cols-[2ch_7ch_1fr] gap-3"><span aria-hidden="true" className="font-mono text-xs text-[#bd171c]">{String(i+1).padStart(2,"0")}</span><dt className="font-medium text-[#bd171c]">{name}</dt><dd>{desc}</dd></div>)}</dl>
+          <p className="mt-4 max-w-md text-sm leading-relaxed">Compose each part independently. Change the appearance without changing how your flow works.</p>
+          <dl className="mt-5 grid gap-2.5 text-sm">{parts.map(([name,desc],i)=><div key={name} className="grid grid-cols-[2ch_9ch_1fr] gap-3"><span aria-hidden="true" className="font-mono text-xs text-[#bd171c]">{String(i+1).padStart(2,"0")}</span><dt className="font-medium text-[#bd171c]">{name}</dt><dd>{desc}</dd></div>)}</dl>
         </div>
       </section>
-      <section className={`grid gap-8 border-b py-9 md:grid-cols-[1fr_1fr] ${rule}`}>
-        <div><p className={figure}>Fig. 03 / Mark exploration</p><h2 className={`${serif} mt-3 text-4xl`}>A mark for progress.</h2><p className="mt-3 max-w-md text-sm leading-relaxed">The original mark remains intact. This geometric candidate translates steps into a simpler construction for editorial surfaces and small sizes.</p></div>
-        <div className="grid grid-cols-2 gap-3">
-          <div className={`grid place-items-center gap-3 border p-5 ${rule}`}><Image src="/stepper-logo.svg" alt="Current Stepper logo" width={64} height={64}/><span className="font-mono text-[10px] uppercase">Current</span></div>
-          <div className={`grid place-items-center gap-3 border p-5 ${rule}`}><Mark className="size-16 text-[#bd171c]"/><span className={figure}>Candidate 01</span></div>
+      <section className={`border-b py-10 lg:py-14 ${rule}`}>
+        <h2 className={`${serif} text-5xl text-[#bd171c] sm:text-6xl`}>Your flow. Your rules.</h2>
+        <p className="mt-4 max-w-[62ch] text-base leading-relaxed">Install the source with shadcn, compose it in JSX, and style it to fit your product. Form state, validation and submission stay in your application.</p>
+        <div className="mt-8 grid gap-6 sm:grid-cols-3">
+          {([
+            {Icon:UserRoundPlus,title:"Onboarding",description:"Guide people through setup.",href:"/drafts/onboarding"},
+            {Icon:ShoppingBag,title:"Checkout",description:"Show progress from details to confirmation.",href:"/docs"},
+            {Icon:ListChecks,title:"Multi-step forms",description:"Break complex tasks into manageable steps.",href:"/drafts/interactions"},
+          ]).map(({Icon,title,description,href})=><Link key={title} href={href} className="group flex items-start gap-3 border-t border-[#bd171c]/35 pt-4">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-md border border-[#bd171c]/30 text-[#bd171c]"><Icon aria-hidden="true" className="size-5"/></span>
+            <span className="min-w-0 flex-1"><span className="flex items-center justify-between gap-2 font-medium">{title}<ArrowUpRight aria-hidden="true" className="size-4 shrink-0 text-[#bd171c]"/></span><span className="mt-1 block text-sm leading-relaxed text-[#555]">{description}</span></span>
+          </Link>)}
         </div>
       </section>
-      <section className={`grid grid-cols-2 gap-px border-b py-8 sm:grid-cols-4 ${rule}`} aria-label="Explore Stepper">
-        {([["Docs","API and usage","/docs"],["Research","Interaction studies","/drafts/interactions"],["Handoff","Shared intent","/drafts/handoff"],["Onboarding","Agent experiment","/drafts/onboarding"]] as const).map(([title,desc,href])=><Link key={href} href={href} className="group border border-[#bd171c]/30 p-4 hover:bg-[#bd171c]/5"><div className="flex justify-between gap-1 font-medium">{title}<span aria-hidden="true" className="text-[#bd171c]">↗</span></div><p className="mt-2 text-xs text-[#626262]">{desc}</p></Link>)}
+      <section className={`flex flex-wrap gap-x-8 gap-y-4 border-b py-6 ${rule}`} aria-label="Explore Stepper">
+        {([
+          {Icon:BookOpen,title:"Documentation",href:"/docs"},
+          {Icon:FlaskConical,title:"Research",href:"/drafts/interactions"},
+          {Icon:Layers,title:"Handoff",href:"/drafts/handoff"},
+        ]).map(({Icon,title,href})=><Link key={href} href={href} className="inline-flex items-center gap-2 text-sm font-medium hover:text-[#bd171c]"><Icon aria-hidden="true" className="size-4 shrink-0 text-[#bd171c]"/>{title}<ArrowUpRight aria-hidden="true" className="size-3.5 shrink-0"/></Link>)}
       </section>
-      <footer className="grid gap-5 py-9 md:grid-cols-2 md:items-end">
-        <div><p className={figure}>Identity / Core</p><p className={`${serif} mt-3 text-3xl italic text-[#bd171c] sm:text-4xl`}>Identity for the project.<br/>Neutral for your product.</p></div>
-        <div className="space-y-3 text-sm"><p className="max-w-md leading-relaxed">The visual language belongs to the website and documentation. The distributed component remains independently customizable.</p><p className="font-mono text-[10px] uppercase tracking-wider text-[#626262]">Stepper / Research / 001 — separate identity study</p></div>
+      <footer className="flex flex-wrap items-end justify-between gap-5 py-8">
+        <p className={`${serif} text-3xl italic text-[#bd171c] sm:text-4xl`}>Expressive by identity.<br/>Neutral by design.</p>
+        <a href="https://github.com/francozeta" className="text-sm hover:text-[#bd171c]">By francozeta</a>
       </footer>
     </div>
   </main>;
