@@ -8,7 +8,7 @@ import { createAgent } from "@ui-sdk/react/agent";
 import { Input } from "@ui-sdk/react/input";
 import { Switch, SwitchThumb } from "@ui-sdk/react/switch";
 import { Stepper, StepperContent, StepperItem, StepperList, StepperNext, StepperPrevious } from "@/components/ui/stepper";
-import { exampleSteps, labels, navigationError, stages, type Stage } from "@/lib/stepper-onboarding";
+import { assistancePlan, labels, navigationIssue, stages, type Stage, type ValidationIssue } from "@/lib/stepper-onboarding";
 
 type ProgressOptions = {
   value?: string;
@@ -43,7 +43,7 @@ function getBridge() {
   });
 }
 
-const fieldClass = "h-11 w-full rounded-lg border border-border bg-background px-3 text-sm outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring";
+const fieldClass = "h-11 w-full rounded-lg border border-border bg-background px-3 text-base sm:text-sm outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring aria-invalid:border-destructive";
 const steps = stages.map((value) => ({ value }));
 
 export function StepperAgentOnboarding() {
@@ -61,6 +61,8 @@ export function StepperAgentOnboarding() {
   }
   const [busy, setBusy] = React.useState(false);
   const [message, setMessage] = React.useState("");
+  const [issue, setIssue] = React.useState<ValidationIssue>();
+  const statusId = React.useId();
   const [confirmed, setConfirmed] = React.useState(false);
   const running = React.useRef<AbortController | null>(null);
 
@@ -68,12 +70,14 @@ export function StepperAgentOnboarding() {
 
   function requestStage(target: string) {
     const current = latest.current;
-    const error = navigationError(current.stage, target, current.name, current.currency);
+    const error = navigationIssue(current.stage, target, current.name, current.currency);
     if (error) {
-      setMessage(error);
+      setIssue(error);
+      setMessage(error.message);
       return false;
     }
     updateDraft({ stage: target as Stage });
+    setIssue(undefined);
     setMessage("");
     setConfirmed(false);
     return true;
@@ -101,13 +105,19 @@ export function StepperAgentOnboarding() {
     running.current = controller;
     setBusy(true);
     setMessage("");
+    setIssue(undefined);
     try {
-      const agent = getBridge();
-      const result = await agent.act({ steps: exampleSteps(current.stage, current.name, current.currency, current.qrTouched, {
+      const plan = assistancePlan(current.stage, current.name, current.currency, current.qrTouched, {
         name: current.nameTouched, currency: current.currencyTouched,
-      }) }, { signal: controller.signal });
+      });
+      const result = plan.steps.length
+        ? await getBridge().act({ steps: plan.steps }, { signal: controller.signal })
+        : { ok: true };
       if (controller.signal.aborted) setMessage("Paused. Continue by hand or resume.");
-      else if (result.ok) setMessage("Draft prepared. Review before confirming.");
+      else if (result.ok && plan.issue) {
+        setIssue(plan.issue);
+        setMessage(plan.issue.message);
+      } else if (result.ok) setMessage("Draft prepared. Review before confirming.");
       else setMessage((message) => message || "A change was blocked. Check the fields before continuing.");
     } catch {
       setMessage(controller.signal.aborted ? "Paused." : "The assistant could not finish. You can continue manually.");
@@ -150,16 +160,20 @@ export function StepperAgentOnboarding() {
               <StepperContent {...panel("business")}>
                 <h2 className="text-lg font-medium">Make it yours.</h2>
                 <label className="grid gap-2 text-sm">Business name
-                  <Input aria-label="Business name" name="business" value={name} onValueChange={(value, details) => {
-                    if (acceptChange(details)) updateDraft({ name: value, ...(details.source !== "agent" ? { nameTouched: true } : {}) });
+                  <Input aria-label="Business name" aria-required="true" aria-invalid={issue?.field === "name" || undefined} aria-describedby={issue?.field === "name" ? statusId : undefined} name="business" value={name} onValueChange={(value, details) => {
+                    if (!acceptChange(details)) return;
+                    updateDraft({ name: value, ...(details.source !== "agent" ? { nameTouched: true } : {}) });
+                    if (issue?.field === "name" && value.trim()) { setIssue(undefined); setMessage(""); }
                   }} placeholder="Your café" className={fieldClass} />
                 </label>
               </StepperContent>
               <StepperContent {...panel("preferences")}>
                 <h2 className="text-lg font-medium">Set your preferences.</h2>
                 <label className="grid gap-2 text-sm">Currency
-                  <Input aria-label="Currency" name="currency" value={currency} onValueChange={(value, details) => {
-                    if (acceptChange(details)) updateDraft({ currency: value, ...(details.source !== "agent" ? { currencyTouched: true } : {}) });
+                  <Input aria-label="Currency" aria-required="true" aria-invalid={issue?.field === "currency" || undefined} aria-describedby={issue?.field === "currency" ? statusId : undefined} name="currency" value={currency} onValueChange={(value, details) => {
+                    if (!acceptChange(details)) return;
+                    updateDraft({ currency: value, ...(details.source !== "agent" ? { currencyTouched: true } : {}) });
+                    if (issue?.field === "currency" && /^(PEN|USD)$/i.test(value.trim())) { setIssue(undefined); setMessage(""); }
                   }} placeholder="PEN or USD" className={fieldClass} />
                 </label>
                 <label className="flex items-center justify-between gap-3 text-sm">
@@ -190,7 +204,7 @@ export function StepperAgentOnboarding() {
               ) : <StepperNext className="rounded-full">Continue</StepperNext>}
               </div>
             </div>
-            <p role="status" className="min-h-10 text-sm text-muted-foreground">{message || (busy ? "Preparing your setup. You can still edit." : stage === "review" ? "Review your choices before confirming." : "Assist uses sample details and keeps your choices.")}</p>
+            <p id={statusId} role="status" className={`min-h-10 text-sm ${issue ? "text-destructive" : "text-muted-foreground"}`}>{message || (busy ? "Preparing your setup. You can still edit." : stage === "review" ? "Review your choices before confirming." : "Assist uses sample details and keeps your choices.")}</p>
           </Stepper>
         </AgentProgress>
       </section>
