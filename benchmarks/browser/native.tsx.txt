@@ -1,0 +1,7 @@
+import * as React from "react";
+const names = ["Business", "Preferences", "Review"];
+export function Adapter({step, panels, guardedRequest}) {
+  return <div><ol aria-label="Progress steps">{names.map((name,index)=><li key={name}><button type="button" aria-current={index===step?"step":undefined} onClick={()=>void guardedRequest(index)}>{name}</button></li>)}</ol>
+    <section aria-label={names[step]}>{panels[step]}</section><footer><button disabled={step===0} onClick={()=>void guardedRequest(step-1)}>Back</button><button disabled={step===2} onClick={()=>void guardedRequest(step+1)}>Continue</button></footer>
+  </div>;
+}

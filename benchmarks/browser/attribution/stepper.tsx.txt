@@ -1,0 +1,37 @@
+import * as React from "react";
+import {
+  Stepper, StepperContent, StepperIndicator, StepperItem, StepperLabel,
+  StepperList, StepperNext, StepperPrevious, StepperTrigger,
+} from "./core";
+
+const composed = window.__benchConfig.host === "render";
+const button = composed ? <button /> : undefined;
+
+function renderChildren(steps, field) {
+  return <>
+    <StepperList>
+      {steps.map(({ value }, index) => <StepperItem key={value} value={value} defaultTrigger={false}>
+        <StepperTrigger data-bench-trigger={value} render={button}>
+          <StepperIndicator>{index + 1}</StepperIndicator>
+          <StepperLabel>Stage {index + 1}</StepperLabel>
+        </StepperTrigger>
+      </StepperItem>)}
+    </StepperList>
+    {steps.map(({ value }, index) => <StepperContent key={value} value={value} keepMounted={index === 0}
+      data-bench-panel={value} className="min-h-32">
+      <h2 className="mb-2 font-semibold">{index === 0 ? "Business details" : "Regional preferences"}</h2>
+      {index === 0 ? field : <p>Review your settings.</p>}
+    </StepperContent>)}
+    <footer className="flex gap-2">
+      <StepperPrevious data-bench-control="back">Back</StepperPrevious>
+      <StepperNext data-bench-control="forward">Continue</StepperNext>
+    </footer>
+  </>;
+}
+
+export function Flow({ steps, step, field, changeStep, childrenMode }) {
+  const children = React.useMemo(() => renderChildren(steps, field), [steps, field]);
+  return <Stepper steps={steps} value={step} onValueChange={changeStep}>
+    {childrenMode === "rebuilt" ? renderChildren(steps, field) : children}
+  </Stepper>;
+}

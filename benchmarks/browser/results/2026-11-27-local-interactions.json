@@ -1,0 +1,2650 @@
+{
+  "revision": "1e3133639fc89e0a2fe24a15f98367fddead9b64",
+  "node": "v22.23.5",
+  "browser": "156.0.8078.4",
+  "baselineRevision": "5cd44a9512fa92c979dddaa30beefdd74fcd218c",
+  "versions": {
+    "node_modules/@ark-ui/react": "5.40.0",
+    "node_modules/@base-ui/react": "1.9.0",
+    "node_modules/@stepperize/react": "8.0.0",
+    "node_modules/cn": "0.5.2",
+    "node_modules/esbuild": "0.28.1",
+    "node_modules/playwright": "1.65.1",
+    "node_modules/react": "19.2.5",
+    "node_modules/react-dom": "19.2.5"
+  },
+  "mode": "interactions",
+  "results": [
+    {
+      "name": "native",
+      "bytesByPackage": {
+        "react": 8056,
+        "scheduler": 3689,
+        "react-dom": 180070,
+        "app/adapter": 2757
+      },
+      "bundle": {
+        "minifiedBytes": 196690,
+        "gzipBytes": 61338,
+        "adapterLines": 7,
+        "buildMs": 571.7224000000001
+      },
+      "profiles": [
+        {
+          "name": "native",
+          "mobile": false,
+          "round": 0,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 2.5,
+                "twoFrameProxyMs": 15.5
+              },
+              "back": {
+                "domMs": 1.5999999940395355,
+                "twoFrameProxyMs": 23.799999982118607
+              }
+            },
+            {
+              "forward": {
+                "domMs": 3,
+                "twoFrameProxyMs": 23.599999994039536
+              },
+              "back": {
+                "domMs": 1.5,
+                "twoFrameProxyMs": 25.30000001192093
+              }
+            },
+            {
+              "forward": {
+                "domMs": 2.5,
+                "twoFrameProxyMs": 15.799999982118607
+              },
+              "back": {
+                "domMs": 2.2999999821186066,
+                "twoFrameProxyMs": 7.5999999940395355
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 20.418999999999993,
+            "LayoutDuration": 2.9770000000000003,
+            "RecalcStyleDuration": 2.739000000000005,
+            "TaskDuration": 143.262
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "native",
+          "mobile": false,
+          "round": 1,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 1.5999999940395355,
+                "twoFrameProxyMs": 26.30000001192093
+              },
+              "back": {
+                "domMs": 1.5999999940395355,
+                "twoFrameProxyMs": 25.5
+              }
+            },
+            {
+              "forward": {
+                "domMs": 2.199999988079071,
+                "twoFrameProxyMs": 23
+              },
+              "back": {
+                "domMs": 1.2999999821186066,
+                "twoFrameProxyMs": 23.299999982118607
+              }
+            },
+            {
+              "forward": {
+                "domMs": 1.699999988079071,
+                "twoFrameProxyMs": 21.900000005960464
+              },
+              "back": {
+                "domMs": 1.199999988079071,
+                "twoFrameProxyMs": 26
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 16.43399999999999,
+            "LayoutDuration": 1.797,
+            "RecalcStyleDuration": 2.2889999999999993,
+            "TaskDuration": 119.54800000000002
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "native",
+          "mobile": false,
+          "round": 2,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 1.800000011920929,
+                "twoFrameProxyMs": 27.80000001192093
+              },
+              "back": {
+                "domMs": 1.2999999821186066,
+                "twoFrameProxyMs": 25.899999976158142
+              }
+            },
+            {
+              "forward": {
+                "domMs": 2.5,
+                "twoFrameProxyMs": 25.5
+              },
+              "back": {
+                "domMs": 2.800000011920929,
+                "twoFrameProxyMs": 24.599999994039536
+              }
+            },
+            {
+              "forward": {
+                "domMs": 1.5,
+                "twoFrameProxyMs": 27.400000005960464
+              },
+              "back": {
+                "domMs": 1.300000011920929,
+                "twoFrameProxyMs": 25.400000005960464
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 16.555,
+            "LayoutDuration": 2.221000000000001,
+            "RecalcStyleDuration": 2.363999999999998,
+            "TaskDuration": 115.49600000000004
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "native",
+          "mobile": false,
+          "round": 3,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 1.7999999821186066,
+                "twoFrameProxyMs": 22.69999998807907
+              },
+              "back": {
+                "domMs": 1.300000011920929,
+                "twoFrameProxyMs": 27
+              }
+            },
+            {
+              "forward": {
+                "domMs": 3,
+                "twoFrameProxyMs": 27.599999994039536
+              },
+              "back": {
+                "domMs": 1.5999999940395355,
+                "twoFrameProxyMs": 25
+              }
+            },
+            {
+              "forward": {
+                "domMs": 2.4000000059604645,
+                "twoFrameProxyMs": 26.69999998807907
+              },
+              "back": {
+                "domMs": 1.899999976158142,
+                "twoFrameProxyMs": 24.599999994039536
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 20.01499999999999,
+            "LayoutDuration": 2.391000000000001,
+            "RecalcStyleDuration": 2.782999999999999,
+            "TaskDuration": 118.58900000000003
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "native",
+          "mobile": false,
+          "round": 4,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 2.7999999821186066,
+                "twoFrameProxyMs": 15.5
+              },
+              "back": {
+                "domMs": 2,
+                "twoFrameProxyMs": 20.80000001192093
+              }
+            },
+            {
+              "forward": {
+                "domMs": 3.2999999821186066,
+                "twoFrameProxyMs": 13.799999982118607
+              },
+              "back": {
+                "domMs": 2.5999999940395355,
+                "twoFrameProxyMs": 18.099999994039536
+              }
+            },
+            {
+              "forward": {
+                "domMs": 2.7999999821186066,
+                "twoFrameProxyMs": 14.699999988079071
+              },
+              "back": {
+                "domMs": 1.7000000178813934,
+                "twoFrameProxyMs": 22.200000017881393
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 22.814,
+            "LayoutDuration": 2.9660000000000033,
+            "RecalcStyleDuration": 3.1580000000000013,
+            "TaskDuration": 173.96699999999998
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "native",
+          "mobile": true,
+          "round": 0,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 9.700000017881393,
+                "twoFrameProxyMs": 15.800000011920929
+              },
+              "back": {
+                "domMs": 7.299999982118607,
+                "twoFrameProxyMs": 17.5
+              }
+            },
+            {
+              "forward": {
+                "domMs": 13.699999988079071,
+                "twoFrameProxyMs": 29.099999994039536
+              },
+              "back": {
+                "domMs": 8.099999994039536,
+                "twoFrameProxyMs": 19.400000005960464
+              }
+            },
+            {
+              "forward": {
+                "domMs": 10.599999994039536,
+                "twoFrameProxyMs": 18.400000005960464
+              },
+              "back": {
+                "domMs": 7.0999999940395355,
+                "twoFrameProxyMs": 16.19999998807907
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 85.76300000000003,
+            "LayoutDuration": 10.31499999999999,
+            "RecalcStyleDuration": 11.287000000000006,
+            "TaskDuration": 607.7660000000001
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "native",
+          "mobile": true,
+          "round": 1,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 21.099999994039536,
+                "twoFrameProxyMs": 35
+              },
+              "back": {
+                "domMs": 2,
+                "twoFrameProxyMs": 4.4000000059604645
+              }
+            },
+            {
+              "forward": {
+                "domMs": 9.599999994039536,
+                "twoFrameProxyMs": 25.599999994039536
+              },
+              "back": {
+                "domMs": 21.400000005960464,
+                "twoFrameProxyMs": 40.599999994039536
+              }
+            },
+            {
+              "forward": {
+                "domMs": 16.5,
+                "twoFrameProxyMs": 32
+              },
+              "back": {
+                "domMs": 11.800000011920929,
+                "twoFrameProxyMs": 30.100000023841858
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 143.659,
+            "LayoutDuration": 12.656,
+            "RecalcStyleDuration": 13.47799999999999,
+            "TaskDuration": 1038.2980000000002
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "native",
+          "mobile": true,
+          "round": 2,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 15.900000005960464,
+                "twoFrameProxyMs": 33.099999994039536
+              },
+              "back": {
+                "domMs": 15.5,
+                "twoFrameProxyMs": 36.39999997615814
+              }
+            },
+            {
+              "forward": {
+                "domMs": 19.400000005960464,
+                "twoFrameProxyMs": 32.900000005960464
+              },
+              "back": {
+                "domMs": 11.199999988079071,
+                "twoFrameProxyMs": 27.799999982118607
+              }
+            },
+            {
+              "forward": {
+                "domMs": 11.599999994039536,
+                "twoFrameProxyMs": 30.200000017881393
+              },
+              "back": {
+                "domMs": 15.5,
+                "twoFrameProxyMs": 29.30000001192093
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 149.0880000000001,
+            "LayoutDuration": 16.626999999999974,
+            "RecalcStyleDuration": 16.581,
+            "TaskDuration": 946.1880000000002
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "native",
+          "mobile": true,
+          "round": 3,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 10.300000011920929,
+                "twoFrameProxyMs": 18.700000017881393
+              },
+              "back": {
+                "domMs": 9,
+                "twoFrameProxyMs": 17.700000017881393
+              }
+            },
+            {
+              "forward": {
+                "domMs": 9.699999988079071,
+                "twoFrameProxyMs": 35.19999998807907
+              },
+              "back": {
+                "domMs": 7.5,
+                "twoFrameProxyMs": 16.19999998807907
+              }
+            },
+            {
+              "forward": {
+                "domMs": 8.599999994039536,
+                "twoFrameProxyMs": 32.79999998211861
+              },
+              "back": {
+                "domMs": 6.700000017881393,
+                "twoFrameProxyMs": 15.5
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 80.63200000000003,
+            "LayoutDuration": 9.204000000000004,
+            "RecalcStyleDuration": 10.923000000000002,
+            "TaskDuration": 575.731
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "native",
+          "mobile": true,
+          "round": 4,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 12.300000011920929,
+                "twoFrameProxyMs": 19.30000001192093
+              },
+              "back": {
+                "domMs": 11.300000011920929,
+                "twoFrameProxyMs": 22.400000005960464
+              }
+            },
+            {
+              "forward": {
+                "domMs": 13.099999994039536,
+                "twoFrameProxyMs": 30.80000001192093
+              },
+              "back": {
+                "domMs": 13.099999994039536,
+                "twoFrameProxyMs": 28.099999994039536
+              }
+            },
+            {
+              "forward": {
+                "domMs": 13.400000005960464,
+                "twoFrameProxyMs": 37.599999994039536
+              },
+              "back": {
+                "domMs": 7.899999976158142,
+                "twoFrameProxyMs": 17.799999982118607
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 109.76300000000006,
+            "LayoutDuration": 13.152999999999999,
+            "RecalcStyleDuration": 13.198000000000002,
+            "TaskDuration": 714.8789999999998
+          },
+          "pageErrors": []
+        }
+      ],
+      "interactions": [
+        {
+          "mobile": false,
+          "rounds": 5,
+          "forwardDom": {
+            "count": 15,
+            "median": 2.5,
+            "p90": 3,
+            "min": 1.5,
+            "max": 3.2999999821186066
+          },
+          "backDom": {
+            "count": 15,
+            "median": 1.5999999940395355,
+            "p90": 2.5999999940395355,
+            "min": 1.199999988079071,
+            "max": 2.800000011920929
+          },
+          "forwardFrameProxy": {
+            "count": 15,
+            "median": 23,
+            "p90": 27.599999994039536,
+            "min": 13.799999982118607,
+            "max": 27.80000001192093
+          },
+          "backFrameProxy": {
+            "count": 15,
+            "median": 24.599999994039536,
+            "p90": 26,
+            "min": 7.5999999940395355,
+            "max": 27
+          }
+        },
+        {
+          "mobile": true,
+          "rounds": 5,
+          "forwardDom": {
+            "count": 15,
+            "median": 12.300000011920929,
+            "p90": 19.400000005960464,
+            "min": 8.599999994039536,
+            "max": 21.099999994039536
+          },
+          "backDom": {
+            "count": 15,
+            "median": 9,
+            "p90": 15.5,
+            "min": 2,
+            "max": 21.400000005960464
+          },
+          "forwardFrameProxy": {
+            "count": 15,
+            "median": 30.80000001192093,
+            "p90": 35.19999998807907,
+            "min": 15.800000011920929,
+            "max": 37.599999994039536
+          },
+          "backFrameProxy": {
+            "count": 15,
+            "median": 19.400000005960464,
+            "p90": 36.39999997615814,
+            "min": 4.4000000059604645,
+            "max": 40.599999994039536
+          }
+        }
+      ]
+    },
+    {
+      "name": "stepper-before",
+      "bytesByPackage": {
+        "react": 8082,
+        "scheduler": 3713,
+        "react-dom": 180365,
+        "app/adapter": 16741,
+        "@base-ui/react": 2787,
+        "@base-ui/utils": 1355,
+        "cn": 26840
+      },
+      "bundle": {
+        "minifiedBytes": 242001,
+        "gzipBytes": 78540,
+        "adapterLines": 12,
+        "buildMs": 122.77840000000015
+      },
+      "profiles": [
+        {
+          "name": "stepper-before",
+          "mobile": false,
+          "round": 0,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 3.800000011920929,
+                "twoFrameProxyMs": 24.5
+              },
+              "back": {
+                "domMs": 5.700000017881393,
+                "twoFrameProxyMs": 23.5
+              }
+            },
+            {
+              "forward": {
+                "domMs": 3.9000000059604645,
+                "twoFrameProxyMs": 24.400000005960464
+              },
+              "back": {
+                "domMs": 3.199999988079071,
+                "twoFrameProxyMs": 25.5
+              }
+            },
+            {
+              "forward": {
+                "domMs": 3.4000000059604645,
+                "twoFrameProxyMs": 23.5
+              },
+              "back": {
+                "domMs": 2.699999988079071,
+                "twoFrameProxyMs": 25.099999994039536
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 31.057000000000002,
+            "LayoutDuration": 2.3459999999999974,
+            "RecalcStyleDuration": 4.4030000000000005,
+            "TaskDuration": 143.00500000000005
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "stepper-before",
+          "mobile": false,
+          "round": 1,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 3.0999999940395355,
+                "twoFrameProxyMs": 28.299999982118607
+              },
+              "back": {
+                "domMs": 2.7000000178813934,
+                "twoFrameProxyMs": 26.200000017881393
+              }
+            },
+            {
+              "forward": {
+                "domMs": 3.699999988079071,
+                "twoFrameProxyMs": 26
+              },
+              "back": {
+                "domMs": 2.9000000059604645,
+                "twoFrameProxyMs": 24.099999994039536
+              }
+            },
+            {
+              "forward": {
+                "domMs": 3.399999976158142,
+                "twoFrameProxyMs": 23.599999994039536
+              },
+              "back": {
+                "domMs": 2.7000000178813934,
+                "twoFrameProxyMs": 26.30000001192093
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 25.664999999999992,
+            "LayoutDuration": 2.1159999999999997,
+            "RecalcStyleDuration": 3.8040000000000003,
+            "TaskDuration": 129.913
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "stepper-before",
+          "mobile": false,
+          "round": 2,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 3.4000000059604645,
+                "twoFrameProxyMs": 27.900000005960464
+              },
+              "back": {
+                "domMs": 3.699999988079071,
+                "twoFrameProxyMs": 24.69999998807907
+              }
+            },
+            {
+              "forward": {
+                "domMs": 2.800000011920929,
+                "twoFrameProxyMs": 25
+              },
+              "back": {
+                "domMs": 2.600000023841858,
+                "twoFrameProxyMs": 26.80000001192093
+              }
+            },
+            {
+              "forward": {
+                "domMs": 3.4000000059604645,
+                "twoFrameProxyMs": 30
+              },
+              "back": {
+                "domMs": 2.5999999940395355,
+                "twoFrameProxyMs": 26.400000005960464
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 26.247999999999994,
+            "LayoutDuration": 1.8869999999999998,
+            "RecalcStyleDuration": 3.819999999999999,
+            "TaskDuration": 131.125
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "stepper-before",
+          "mobile": false,
+          "round": 3,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 3.2000000178813934,
+                "twoFrameProxyMs": 26.80000001192093
+              },
+              "back": {
+                "domMs": 4.200000017881393,
+                "twoFrameProxyMs": 21.900000005960464
+              }
+            },
+            {
+              "forward": {
+                "domMs": 4.300000011920929,
+                "twoFrameProxyMs": 28.5
+              },
+              "back": {
+                "domMs": 3.7000000178813934,
+                "twoFrameProxyMs": 19.5
+              }
+            },
+            {
+              "forward": {
+                "domMs": 4.4000000059604645,
+                "twoFrameProxyMs": 19.5
+              },
+              "back": {
+                "domMs": 3.0999999940395355,
+                "twoFrameProxyMs": 19.5
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 33.50500000000001,
+            "LayoutDuration": 2.508,
+            "RecalcStyleDuration": 4.809000000000001,
+            "TaskDuration": 175.607
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "stepper-before",
+          "mobile": false,
+          "round": 4,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 6.300000011920929,
+                "twoFrameProxyMs": 34.099999994039536
+              },
+              "back": {
+                "domMs": 5.200000017881393,
+                "twoFrameProxyMs": 18.200000017881393
+              }
+            },
+            {
+              "forward": {
+                "domMs": 4.800000011920929,
+                "twoFrameProxyMs": 12
+              },
+              "back": {
+                "domMs": 4,
+                "twoFrameProxyMs": 22.099999994039536
+              }
+            },
+            {
+              "forward": {
+                "domMs": 4.0999999940395355,
+                "twoFrameProxyMs": 29.19999998807907
+              },
+              "back": {
+                "domMs": 3.5999999940395355,
+                "twoFrameProxyMs": 19.19999998807907
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 37.828,
+            "LayoutDuration": 2.7959999999999963,
+            "RecalcStyleDuration": 5.250000000000001,
+            "TaskDuration": 199.45200000000003
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "stepper-before",
+          "mobile": true,
+          "round": 0,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 29.299999982118607,
+                "twoFrameProxyMs": 45.099999994039536
+              },
+              "back": {
+                "domMs": 25.799999982118607,
+                "twoFrameProxyMs": 39.39999997615814
+              }
+            },
+            {
+              "forward": {
+                "domMs": 21.600000023841858,
+                "twoFrameProxyMs": 37
+              },
+              "back": {
+                "domMs": 19.5,
+                "twoFrameProxyMs": 28.900000005960464
+              }
+            },
+            {
+              "forward": {
+                "domMs": 21.700000017881393,
+                "twoFrameProxyMs": 40.599999994039536
+              },
+              "back": {
+                "domMs": 12.599999994039536,
+                "twoFrameProxyMs": 24.80000001192093
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 186.60100000000003,
+            "LayoutDuration": 14.260999999999996,
+            "RecalcStyleDuration": 24.116,
+            "TaskDuration": 925.9969999999997
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "stepper-before",
+          "mobile": true,
+          "round": 1,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 34.5,
+                "twoFrameProxyMs": 42.5
+              },
+              "back": {
+                "domMs": 21.700000017881393,
+                "twoFrameProxyMs": 32.10000002384186
+              }
+            },
+            {
+              "forward": {
+                "domMs": 30,
+                "twoFrameProxyMs": 44.19999998807907
+              },
+              "back": {
+                "domMs": 20,
+                "twoFrameProxyMs": 32.19999998807907
+              }
+            },
+            {
+              "forward": {
+                "domMs": 24.299999982118607,
+                "twoFrameProxyMs": 45.79999998211861
+              },
+              "back": {
+                "domMs": 28.099999994039536,
+                "twoFrameProxyMs": 43.5
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 200.523,
+            "LayoutDuration": 15.886999999999984,
+            "RecalcStyleDuration": 28.560000000000002,
+            "TaskDuration": 1029.1929999999998
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "stepper-before",
+          "mobile": true,
+          "round": 2,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 50.400000005960464,
+                "twoFrameProxyMs": 89.59999999403954
+              },
+              "back": {
+                "domMs": 23,
+                "twoFrameProxyMs": 47
+              }
+            },
+            {
+              "forward": {
+                "domMs": 26.599999994039536,
+                "twoFrameProxyMs": 47
+              },
+              "back": {
+                "domMs": 12.099999994039536,
+                "twoFrameProxyMs": 28.599999994039536
+              }
+            },
+            {
+              "forward": {
+                "domMs": 5.199999988079071,
+                "twoFrameProxyMs": 9.699999988079071
+              },
+              "back": {
+                "domMs": 4.300000011920929,
+                "twoFrameProxyMs": 8.599999994039536
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 165.68300000000002,
+            "LayoutDuration": 21.54499999999998,
+            "RecalcStyleDuration": 21.723000000000006,
+            "TaskDuration": 1011.9659999999997
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "stepper-before",
+          "mobile": true,
+          "round": 3,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 20.200000017881393,
+                "twoFrameProxyMs": 32
+              },
+              "back": {
+                "domMs": 15,
+                "twoFrameProxyMs": 26.200000017881393
+              }
+            },
+            {
+              "forward": {
+                "domMs": 21.599999994039536,
+                "twoFrameProxyMs": 45.80000001192093
+              },
+              "back": {
+                "domMs": 16.900000005960464,
+                "twoFrameProxyMs": 28.600000023841858
+              }
+            },
+            {
+              "forward": {
+                "domMs": 18.19999998807907,
+                "twoFrameProxyMs": 31.30000001192093
+              },
+              "back": {
+                "domMs": 16.5,
+                "twoFrameProxyMs": 29.799999982118607
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 151.478,
+            "LayoutDuration": 13.217999999999993,
+            "RecalcStyleDuration": 18.877,
+            "TaskDuration": 770.3399999999998
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "stepper-before",
+          "mobile": true,
+          "round": 4,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 16.69999998807907,
+                "twoFrameProxyMs": 26
+              },
+              "back": {
+                "domMs": 21.5,
+                "twoFrameProxyMs": 31.5
+              }
+            },
+            {
+              "forward": {
+                "domMs": 19,
+                "twoFrameProxyMs": 30.19999998807907
+              },
+              "back": {
+                "domMs": 12.5,
+                "twoFrameProxyMs": 20
+              }
+            },
+            {
+              "forward": {
+                "domMs": 14.400000005960464,
+                "twoFrameProxyMs": 24.69999998807907
+              },
+              "back": {
+                "domMs": 13.399999976158142,
+                "twoFrameProxyMs": 25.19999998807907
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 136.80700000000002,
+            "LayoutDuration": 10.913999999999993,
+            "RecalcStyleDuration": 18.450000000000003,
+            "TaskDuration": 707.1700000000001
+          },
+          "pageErrors": []
+        }
+      ],
+      "interactions": [
+        {
+          "mobile": false,
+          "rounds": 5,
+          "forwardDom": {
+            "count": 15,
+            "median": 3.699999988079071,
+            "p90": 4.800000011920929,
+            "min": 2.800000011920929,
+            "max": 6.300000011920929
+          },
+          "backDom": {
+            "count": 15,
+            "median": 3.199999988079071,
+            "p90": 5.200000017881393,
+            "min": 2.5999999940395355,
+            "max": 5.700000017881393
+          },
+          "forwardFrameProxy": {
+            "count": 15,
+            "median": 26,
+            "p90": 30,
+            "min": 12,
+            "max": 34.099999994039536
+          },
+          "backFrameProxy": {
+            "count": 15,
+            "median": 24.099999994039536,
+            "p90": 26.400000005960464,
+            "min": 18.200000017881393,
+            "max": 26.80000001192093
+          }
+        },
+        {
+          "mobile": true,
+          "rounds": 5,
+          "forwardDom": {
+            "count": 15,
+            "median": 21.600000023841858,
+            "p90": 34.5,
+            "min": 5.199999988079071,
+            "max": 50.400000005960464
+          },
+          "backDom": {
+            "count": 15,
+            "median": 16.900000005960464,
+            "p90": 25.799999982118607,
+            "min": 4.300000011920929,
+            "max": 28.099999994039536
+          },
+          "forwardFrameProxy": {
+            "count": 15,
+            "median": 40.599999994039536,
+            "p90": 47,
+            "min": 9.699999988079071,
+            "max": 89.59999999403954
+          },
+          "backFrameProxy": {
+            "count": 15,
+            "median": 28.900000005960464,
+            "p90": 43.5,
+            "min": 8.599999994039536,
+            "max": 47
+          }
+        }
+      ]
+    },
+    {
+      "name": "stepper",
+      "bytesByPackage": {
+        "react": 8082,
+        "scheduler": 3713,
+        "react-dom": 180365,
+        "app/adapter": 16826,
+        "@base-ui/react": 2787,
+        "@base-ui/utils": 1355,
+        "cn": 26840
+      },
+      "bundle": {
+        "minifiedBytes": 242086,
+        "gzipBytes": 78575,
+        "adapterLines": 12,
+        "buildMs": 138.5908999999997
+      },
+      "profiles": [
+        {
+          "name": "stepper",
+          "mobile": false,
+          "round": 0,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 4,
+                "twoFrameProxyMs": 19.400000005960464
+              },
+              "back": {
+                "domMs": 3.5,
+                "twoFrameProxyMs": 21.900000005960464
+              }
+            },
+            {
+              "forward": {
+                "domMs": 3.4000000059604645,
+                "twoFrameProxyMs": 21.900000005960464
+              },
+              "back": {
+                "domMs": 3.199999988079071,
+                "twoFrameProxyMs": 22.899999976158142
+              }
+            },
+            {
+              "forward": {
+                "domMs": 3.4000000059604645,
+                "twoFrameProxyMs": 30.400000005960464
+              },
+              "back": {
+                "domMs": 3.600000023841858,
+                "twoFrameProxyMs": 23.700000017881393
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 31.833,
+            "LayoutDuration": 2.339000000000001,
+            "RecalcStyleDuration": 4.898999999999999,
+            "TaskDuration": 160.73700000000002
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "stepper",
+          "mobile": false,
+          "round": 1,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 5.399999976158142,
+                "twoFrameProxyMs": 30.099999994039536
+              },
+              "back": {
+                "domMs": 3.0999999940395355,
+                "twoFrameProxyMs": 21.69999998807907
+              }
+            },
+            {
+              "forward": {
+                "domMs": 5.300000011920929,
+                "twoFrameProxyMs": 32.30000001192093
+              },
+              "back": {
+                "domMs": 3.2999999821186066,
+                "twoFrameProxyMs": 22.19999998807907
+              }
+            },
+            {
+              "forward": {
+                "domMs": 5.4000000059604645,
+                "twoFrameProxyMs": 35
+              },
+              "back": {
+                "domMs": 5,
+                "twoFrameProxyMs": 17.400000005960464
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 35.30499999999998,
+            "LayoutDuration": 2.607999999999999,
+            "RecalcStyleDuration": 5.373999999999999,
+            "TaskDuration": 179.668
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "stepper",
+          "mobile": false,
+          "round": 2,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 3.0999999940395355,
+                "twoFrameProxyMs": 23.700000017881393
+              },
+              "back": {
+                "domMs": 2.5,
+                "twoFrameProxyMs": 25.19999998807907
+              }
+            },
+            {
+              "forward": {
+                "domMs": 3.800000011920929,
+                "twoFrameProxyMs": 21
+              },
+              "back": {
+                "domMs": 2.5999999940395355,
+                "twoFrameProxyMs": 25.400000005960464
+              }
+            },
+            {
+              "forward": {
+                "domMs": 3.5,
+                "twoFrameProxyMs": 22.5
+              },
+              "back": {
+                "domMs": 2.9000000059604645,
+                "twoFrameProxyMs": 23.099999994039536
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 26.423000000000002,
+            "LayoutDuration": 2.1880000000000024,
+            "RecalcStyleDuration": 4.167000000000001,
+            "TaskDuration": 141.98100000000002
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "stepper",
+          "mobile": false,
+          "round": 3,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 5,
+                "twoFrameProxyMs": 29.399999976158142
+              },
+              "back": {
+                "domMs": 4.4000000059604645,
+                "twoFrameProxyMs": 20.5
+              }
+            },
+            {
+              "forward": {
+                "domMs": 5.5,
+                "twoFrameProxyMs": 29.599999994039536
+              },
+              "back": {
+                "domMs": 3.5999999940395355,
+                "twoFrameProxyMs": 19.900000005960464
+              }
+            },
+            {
+              "forward": {
+                "domMs": 4.799999982118607,
+                "twoFrameProxyMs": 28.299999982118607
+              },
+              "back": {
+                "domMs": 3.300000011920929,
+                "twoFrameProxyMs": 19.700000017881393
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 37.047,
+            "LayoutDuration": 2.8129999999999997,
+            "RecalcStyleDuration": 5.327000000000002,
+            "TaskDuration": 197.96699999999996
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "stepper",
+          "mobile": false,
+          "round": 4,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 4.4000000059604645,
+                "twoFrameProxyMs": 21.30000001192093
+              },
+              "back": {
+                "domMs": 3.699999988079071,
+                "twoFrameProxyMs": 23.30000001192093
+              }
+            },
+            {
+              "forward": {
+                "domMs": 5,
+                "twoFrameProxyMs": 17.30000001192093
+              },
+              "back": {
+                "domMs": 3.5999999940395355,
+                "twoFrameProxyMs": 21.099999994039536
+              }
+            },
+            {
+              "forward": {
+                "domMs": 3.9000000059604645,
+                "twoFrameProxyMs": 21
+              },
+              "back": {
+                "domMs": 2.5,
+                "twoFrameProxyMs": 25
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 33.108,
+            "LayoutDuration": 2.5839999999999996,
+            "RecalcStyleDuration": 4.790000000000003,
+            "TaskDuration": 168.96000000000006
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "stepper",
+          "mobile": true,
+          "round": 0,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 36,
+                "twoFrameProxyMs": 55.5
+              },
+              "back": {
+                "domMs": 26.799999982118607,
+                "twoFrameProxyMs": 44.599999994039536
+              }
+            },
+            {
+              "forward": {
+                "domMs": 31.5,
+                "twoFrameProxyMs": 51
+              },
+              "back": {
+                "domMs": 28.599999994039536,
+                "twoFrameProxyMs": 44.80000001192093
+              }
+            },
+            {
+              "forward": {
+                "domMs": 29.600000023841858,
+                "twoFrameProxyMs": 51.5
+              },
+              "back": {
+                "domMs": 22.900000005960464,
+                "twoFrameProxyMs": 35.30000001192093
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 245.81900000000002,
+            "LayoutDuration": 17.94599999999999,
+            "RecalcStyleDuration": 35.231,
+            "TaskDuration": 1238.5300000000004
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "stepper",
+          "mobile": true,
+          "round": 1,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 30.5,
+                "twoFrameProxyMs": 46.89999997615814
+              },
+              "back": {
+                "domMs": 28,
+                "twoFrameProxyMs": 40.20000001788139
+              }
+            },
+            {
+              "forward": {
+                "domMs": 26.799999982118607,
+                "twoFrameProxyMs": 45.900000005960464
+              },
+              "back": {
+                "domMs": 20.799999982118607,
+                "twoFrameProxyMs": 39.89999997615814
+              }
+            },
+            {
+              "forward": {
+                "domMs": 22.69999998807907,
+                "twoFrameProxyMs": 32.5
+              },
+              "back": {
+                "domMs": 14.5,
+                "twoFrameProxyMs": 28.80000001192093
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 199.4149999999999,
+            "LayoutDuration": 15.044000000000002,
+            "RecalcStyleDuration": 23.938000000000002,
+            "TaskDuration": 985.6940000000001
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "stepper",
+          "mobile": true,
+          "round": 2,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 26.799999982118607,
+                "twoFrameProxyMs": 50.79999998211861
+              },
+              "back": {
+                "domMs": 32.70000001788139,
+                "twoFrameProxyMs": 48.80000001192093
+              }
+            },
+            {
+              "forward": {
+                "domMs": 35.5,
+                "twoFrameProxyMs": 56.70000001788139
+              },
+              "back": {
+                "domMs": 34.30000001192093,
+                "twoFrameProxyMs": 49.099999994039536
+              }
+            },
+            {
+              "forward": {
+                "domMs": 26.299999982118607,
+                "twoFrameProxyMs": 45.89999997615814
+              },
+              "back": {
+                "domMs": 51.599999994039536,
+                "twoFrameProxyMs": 77.39999997615814
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 272.66000000000014,
+            "LayoutDuration": 19.912000000000013,
+            "RecalcStyleDuration": 33.767,
+            "TaskDuration": 1268.0920000000003
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "stepper",
+          "mobile": true,
+          "round": 3,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 31.19999998807907,
+                "twoFrameProxyMs": 44.69999998807907
+              },
+              "back": {
+                "domMs": 14.199999988079071,
+                "twoFrameProxyMs": 22.900000005960464
+              }
+            },
+            {
+              "forward": {
+                "domMs": 15.900000005960464,
+                "twoFrameProxyMs": 29.299999982118607
+              },
+              "back": {
+                "domMs": 17,
+                "twoFrameProxyMs": 27.5
+              }
+            },
+            {
+              "forward": {
+                "domMs": 16.69999998807907,
+                "twoFrameProxyMs": 26.899999976158142
+              },
+              "back": {
+                "domMs": 9.900000005960464,
+                "twoFrameProxyMs": 17.400000005960464
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 152.27,
+            "LayoutDuration": 10.97300000000001,
+            "RecalcStyleDuration": 19.274000000000008,
+            "TaskDuration": 765.422
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "stepper",
+          "mobile": true,
+          "round": 4,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 17.19999998807907,
+                "twoFrameProxyMs": 28.099999994039536
+              },
+              "back": {
+                "domMs": 15.400000005960464,
+                "twoFrameProxyMs": 22.69999998807907
+              }
+            },
+            {
+              "forward": {
+                "domMs": 15.400000005960464,
+                "twoFrameProxyMs": 22.5
+              },
+              "back": {
+                "domMs": 14.5,
+                "twoFrameProxyMs": 22.5
+              }
+            },
+            {
+              "forward": {
+                "domMs": 17.5,
+                "twoFrameProxyMs": 27
+              },
+              "back": {
+                "domMs": 11.900000005960464,
+                "twoFrameProxyMs": 19.5
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 132.29999999999998,
+            "LayoutDuration": 9.979000000000001,
+            "RecalcStyleDuration": 19.608999999999995,
+            "TaskDuration": 678.5670000000001
+          },
+          "pageErrors": []
+        }
+      ],
+      "interactions": [
+        {
+          "mobile": false,
+          "rounds": 5,
+          "forwardDom": {
+            "count": 15,
+            "median": 4.4000000059604645,
+            "p90": 5.4000000059604645,
+            "min": 3.0999999940395355,
+            "max": 5.5
+          },
+          "backDom": {
+            "count": 15,
+            "median": 3.300000011920929,
+            "p90": 4.4000000059604645,
+            "min": 2.5,
+            "max": 5
+          },
+          "forwardFrameProxy": {
+            "count": 15,
+            "median": 23.700000017881393,
+            "p90": 32.30000001192093,
+            "min": 17.30000001192093,
+            "max": 35
+          },
+          "backFrameProxy": {
+            "count": 15,
+            "median": 22.19999998807907,
+            "p90": 25.19999998807907,
+            "min": 17.400000005960464,
+            "max": 25.400000005960464
+          }
+        },
+        {
+          "mobile": true,
+          "rounds": 5,
+          "forwardDom": {
+            "count": 15,
+            "median": 26.799999982118607,
+            "p90": 35.5,
+            "min": 15.400000005960464,
+            "max": 36
+          },
+          "backDom": {
+            "count": 15,
+            "median": 20.799999982118607,
+            "p90": 34.30000001192093,
+            "min": 9.900000005960464,
+            "max": 51.599999994039536
+          },
+          "forwardFrameProxy": {
+            "count": 15,
+            "median": 45.89999997615814,
+            "p90": 55.5,
+            "min": 22.5,
+            "max": 56.70000001788139
+          },
+          "backFrameProxy": {
+            "count": 15,
+            "median": 35.30000001192093,
+            "p90": 49.099999994039536,
+            "min": 17.400000005960464,
+            "max": 77.39999997615814
+          }
+        }
+      ]
+    },
+    {
+      "name": "ark",
+      "bytesByPackage": {
+        "react": 8055,
+        "scheduler": 3689,
+        "react-dom": 180183,
+        "app/adapter": 2775,
+        "@zag-js/anatomy": 656,
+        "@zag-js/steps": 5269,
+        "@zag-js/dom-query": 395,
+        "@zag-js/utils": 2005,
+        "@zag-js/core": 4098,
+        "@zag-js/types": 91,
+        "@ark-ui/react": 5755,
+        "@zag-js/react": 5149
+      },
+      "bundle": {
+        "minifiedBytes": 220237,
+        "gzipBytes": 69324,
+        "adapterLines": 10,
+        "buildMs": 196.42529999999988
+      },
+      "profiles": [
+        {
+          "name": "ark",
+          "mobile": false,
+          "round": 0,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 4.299999982118607,
+                "twoFrameProxyMs": 22.19999998807907
+              },
+              "back": {
+                "domMs": 4.5,
+                "twoFrameProxyMs": 21.599999994039536
+              }
+            },
+            {
+              "forward": {
+                "domMs": 4.800000011920929,
+                "twoFrameProxyMs": 18.400000005960464
+              },
+              "back": {
+                "domMs": 3,
+                "twoFrameProxyMs": 23
+              }
+            },
+            {
+              "forward": {
+                "domMs": 3.9000000059604645,
+                "twoFrameProxyMs": 19.599999994039536
+              },
+              "back": {
+                "domMs": 3.100000023841858,
+                "twoFrameProxyMs": 20.900000005960464
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 33.967999999999996,
+            "LayoutDuration": 2.524000000000002,
+            "RecalcStyleDuration": 5.056000000000002,
+            "TaskDuration": 160.653
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "ark",
+          "mobile": false,
+          "round": 1,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 5.700000017881393,
+                "twoFrameProxyMs": 17.900000005960464
+              },
+              "back": {
+                "domMs": 3.7999999821186066,
+                "twoFrameProxyMs": 24.5
+              }
+            },
+            {
+              "forward": {
+                "domMs": 6.600000023841858,
+                "twoFrameProxyMs": 16.700000017881393
+              },
+              "back": {
+                "domMs": 3.600000023841858,
+                "twoFrameProxyMs": 19.700000017881393
+              }
+            },
+            {
+              "forward": {
+                "domMs": 3.4000000059604645,
+                "twoFrameProxyMs": 21.80000001192093
+              },
+              "back": {
+                "domMs": 3.0999999940395355,
+                "twoFrameProxyMs": 22.80000001192093
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 36.634,
+            "LayoutDuration": 2.6359999999999992,
+            "RecalcStyleDuration": 4.952999999999999,
+            "TaskDuration": 167.77999999999997
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "ark",
+          "mobile": false,
+          "round": 2,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 4.299999982118607,
+                "twoFrameProxyMs": 23.69999998807907
+              },
+              "back": {
+                "domMs": 3.699999988079071,
+                "twoFrameProxyMs": 23.19999998807907
+              }
+            },
+            {
+              "forward": {
+                "domMs": 4.800000011920929,
+                "twoFrameProxyMs": 21.200000017881393
+              },
+              "back": {
+                "domMs": 3.4000000059604645,
+                "twoFrameProxyMs": 22.599999994039536
+              }
+            },
+            {
+              "forward": {
+                "domMs": 4.0999999940395355,
+                "twoFrameProxyMs": 12.599999994039536
+              },
+              "back": {
+                "domMs": 4.200000017881393,
+                "twoFrameProxyMs": 24
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 33.468000000000025,
+            "LayoutDuration": 2.5179999999999993,
+            "RecalcStyleDuration": 4.946000000000001,
+            "TaskDuration": 158.236
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "ark",
+          "mobile": false,
+          "round": 3,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 3,
+                "twoFrameProxyMs": 30.900000005960464
+              },
+              "back": {
+                "domMs": 2.800000011920929,
+                "twoFrameProxyMs": 27.599999994039536
+              }
+            },
+            {
+              "forward": {
+                "domMs": 3.0999999940395355,
+                "twoFrameProxyMs": 29.5
+              },
+              "back": {
+                "domMs": 1.800000011920929,
+                "twoFrameProxyMs": 27.900000005960464
+              }
+            },
+            {
+              "forward": {
+                "domMs": 2.5,
+                "twoFrameProxyMs": 33
+              },
+              "back": {
+                "domMs": 2.0999999940395355,
+                "twoFrameProxyMs": 27.399999976158142
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 21.083000000000006,
+            "LayoutDuration": 1.5520000000000014,
+            "RecalcStyleDuration": 3.2399999999999998,
+            "TaskDuration": 100.631
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "ark",
+          "mobile": false,
+          "round": 4,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 5.0999999940395355,
+                "twoFrameProxyMs": 15.899999976158142
+              },
+              "back": {
+                "domMs": 4.300000011920929,
+                "twoFrameProxyMs": 22.5
+              }
+            },
+            {
+              "forward": {
+                "domMs": 5.5,
+                "twoFrameProxyMs": 20.19999998807907
+              },
+              "back": {
+                "domMs": 4,
+                "twoFrameProxyMs": 24.19999998807907
+              }
+            },
+            {
+              "forward": {
+                "domMs": 3.800000011920929,
+                "twoFrameProxyMs": 20
+              },
+              "back": {
+                "domMs": 3.5999999940395355,
+                "twoFrameProxyMs": 23.900000005960464
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 35.95599999999999,
+            "LayoutDuration": 2.616,
+            "RecalcStyleDuration": 4.939999999999999,
+            "TaskDuration": 164.98000000000002
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "ark",
+          "mobile": true,
+          "round": 0,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 39.69999998807907,
+                "twoFrameProxyMs": 59.400000005960464
+              },
+              "back": {
+                "domMs": 32,
+                "twoFrameProxyMs": 48.19999998807907
+              }
+            },
+            {
+              "forward": {
+                "domMs": 35.79999998211861,
+                "twoFrameProxyMs": 60.099999994039536
+              },
+              "back": {
+                "domMs": 7.199999988079071,
+                "twoFrameProxyMs": 15.400000005960464
+              }
+            },
+            {
+              "forward": {
+                "domMs": 32.099999994039536,
+                "twoFrameProxyMs": 54.5
+              },
+              "back": {
+                "domMs": 24.80000001192093,
+                "twoFrameProxyMs": 42.80000001192093
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 257.9850000000001,
+            "LayoutDuration": 16.173999999999992,
+            "RecalcStyleDuration": 33.520999999999994,
+            "TaskDuration": 1131.1739999999998
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "ark",
+          "mobile": true,
+          "round": 1,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 25.400000005960464,
+                "twoFrameProxyMs": 43.099999994039536
+              },
+              "back": {
+                "domMs": 29.80000001192093,
+                "twoFrameProxyMs": 46.69999998807907
+              }
+            },
+            {
+              "forward": {
+                "domMs": 34.30000001192093,
+                "twoFrameProxyMs": 48
+              },
+              "back": {
+                "domMs": 19.700000017881393,
+                "twoFrameProxyMs": 30.80000001192093
+              }
+            },
+            {
+              "forward": {
+                "domMs": 20.30000001192093,
+                "twoFrameProxyMs": 41.099999994039536
+              },
+              "back": {
+                "domMs": 31.19999998807907,
+                "twoFrameProxyMs": 45
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 238.68899999999994,
+            "LayoutDuration": 13.365000000000016,
+            "RecalcStyleDuration": 22.513999999999992,
+            "TaskDuration": 931.6610000000001
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "ark",
+          "mobile": true,
+          "round": 2,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 21.099999994039536,
+                "twoFrameProxyMs": 32.5
+              },
+              "back": {
+                "domMs": 17.5,
+                "twoFrameProxyMs": 26.599999994039536
+              }
+            },
+            {
+              "forward": {
+                "domMs": 18.299999982118607,
+                "twoFrameProxyMs": 41
+              },
+              "back": {
+                "domMs": 13.900000005960464,
+                "twoFrameProxyMs": 23.599999994039536
+              }
+            },
+            {
+              "forward": {
+                "domMs": 13.200000017881393,
+                "twoFrameProxyMs": 19.400000005960464
+              },
+              "back": {
+                "domMs": 20.400000005960464,
+                "twoFrameProxyMs": 30.19999998807907
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 149.872,
+            "LayoutDuration": 10.56399999999999,
+            "RecalcStyleDuration": 18.797000000000008,
+            "TaskDuration": 668.0949999999997
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "ark",
+          "mobile": true,
+          "round": 3,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 28.799999982118607,
+                "twoFrameProxyMs": 38
+              },
+              "back": {
+                "domMs": 26,
+                "twoFrameProxyMs": 38.70000001788139
+              }
+            },
+            {
+              "forward": {
+                "domMs": 29.099999994039536,
+                "twoFrameProxyMs": 38.19999998807907
+              },
+              "back": {
+                "domMs": 35.599999994039536,
+                "twoFrameProxyMs": 52.30000001192093
+              }
+            },
+            {
+              "forward": {
+                "domMs": 36.89999997615814,
+                "twoFrameProxyMs": 58
+              },
+              "back": {
+                "domMs": 33,
+                "twoFrameProxyMs": 55.599999994039536
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 261.938,
+            "LayoutDuration": 18.134999999999998,
+            "RecalcStyleDuration": 31.574999999999992,
+            "TaskDuration": 1084.403
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "ark",
+          "mobile": true,
+          "round": 4,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 21.5,
+                "twoFrameProxyMs": 40.5
+              },
+              "back": {
+                "domMs": 13.5,
+                "twoFrameProxyMs": 21.900000005960464
+              }
+            },
+            {
+              "forward": {
+                "domMs": 24.200000017881393,
+                "twoFrameProxyMs": 39.400000005960464
+              },
+              "back": {
+                "domMs": 15.199999988079071,
+                "twoFrameProxyMs": 26.19999998807907
+              }
+            },
+            {
+              "forward": {
+                "domMs": 21.700000017881393,
+                "twoFrameProxyMs": 34
+              },
+              "back": {
+                "domMs": 23.400000005960464,
+                "twoFrameProxyMs": 35.400000005960464
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 168.64600000000007,
+            "LayoutDuration": 12.663999999999994,
+            "RecalcStyleDuration": 21.47500000000001,
+            "TaskDuration": 770.2420000000001
+          },
+          "pageErrors": []
+        }
+      ],
+      "interactions": [
+        {
+          "mobile": false,
+          "rounds": 5,
+          "forwardDom": {
+            "count": 15,
+            "median": 4.299999982118607,
+            "p90": 5.700000017881393,
+            "min": 2.5,
+            "max": 6.600000023841858
+          },
+          "backDom": {
+            "count": 15,
+            "median": 3.5999999940395355,
+            "p90": 4.300000011920929,
+            "min": 1.800000011920929,
+            "max": 4.5
+          },
+          "forwardFrameProxy": {
+            "count": 15,
+            "median": 20.19999998807907,
+            "p90": 30.900000005960464,
+            "min": 12.599999994039536,
+            "max": 33
+          },
+          "backFrameProxy": {
+            "count": 15,
+            "median": 23.19999998807907,
+            "p90": 27.599999994039536,
+            "min": 19.700000017881393,
+            "max": 27.900000005960464
+          }
+        },
+        {
+          "mobile": true,
+          "rounds": 5,
+          "forwardDom": {
+            "count": 15,
+            "median": 25.400000005960464,
+            "p90": 36.89999997615814,
+            "min": 13.200000017881393,
+            "max": 39.69999998807907
+          },
+          "backDom": {
+            "count": 15,
+            "median": 23.400000005960464,
+            "p90": 33,
+            "min": 7.199999988079071,
+            "max": 35.599999994039536
+          },
+          "forwardFrameProxy": {
+            "count": 15,
+            "median": 41,
+            "p90": 59.400000005960464,
+            "min": 19.400000005960464,
+            "max": 60.099999994039536
+          },
+          "backFrameProxy": {
+            "count": 15,
+            "median": 35.400000005960464,
+            "p90": 52.30000001192093,
+            "min": 15.400000005960464,
+            "max": 55.599999994039536
+          }
+        }
+      ]
+    },
+    {
+      "name": "stepperize",
+      "bytesByPackage": {
+        "react": 8056,
+        "scheduler": 3689,
+        "react-dom": 180114,
+        "app/adapter": 2909,
+        "@stepperize/core": 1254,
+        "@stepperize/react": 12948
+      },
+      "bundle": {
+        "minifiedBytes": 211088,
+        "gzipBytes": 66707,
+        "adapterLines": 12,
+        "buildMs": 120.76569999999992
+      },
+      "profiles": [
+        {
+          "name": "stepperize",
+          "mobile": false,
+          "round": 0,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 4.4000000059604645,
+                "twoFrameProxyMs": 30.700000017881393
+              },
+              "back": {
+                "domMs": 3.7000000178813934,
+                "twoFrameProxyMs": 22.30000001192093
+              }
+            },
+            {
+              "forward": {
+                "domMs": 2.699999988079071,
+                "twoFrameProxyMs": 21.099999994039536
+              },
+              "back": {
+                "domMs": 3.5,
+                "twoFrameProxyMs": 24.900000005960464
+              }
+            },
+            {
+              "forward": {
+                "domMs": 2.800000011920929,
+                "twoFrameProxyMs": 24.900000005960464
+              },
+              "back": {
+                "domMs": 3.2000000178813934,
+                "twoFrameProxyMs": 26.200000017881393
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 29.37100000000001,
+            "LayoutDuration": 2.359,
+            "RecalcStyleDuration": 3.7969999999999984,
+            "TaskDuration": 141.07000000000002
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "stepperize",
+          "mobile": false,
+          "round": 1,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 3.2999999821186066,
+                "twoFrameProxyMs": 25
+              },
+              "back": {
+                "domMs": 2.699999988079071,
+                "twoFrameProxyMs": 24.799999982118607
+              }
+            },
+            {
+              "forward": {
+                "domMs": 2.800000011920929,
+                "twoFrameProxyMs": 20.5
+              },
+              "back": {
+                "domMs": 3.199999988079071,
+                "twoFrameProxyMs": 26.599999994039536
+              }
+            },
+            {
+              "forward": {
+                "domMs": 2.0999999940395355,
+                "twoFrameProxyMs": 25.900000005960464
+              },
+              "back": {
+                "domMs": 2.699999988079071,
+                "twoFrameProxyMs": 25.599999994039536
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 25.606000000000005,
+            "LayoutDuration": 1.688000000000002,
+            "RecalcStyleDuration": 3.033000000000001,
+            "TaskDuration": 125.307
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "stepperize",
+          "mobile": false,
+          "round": 2,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 3.0999999940395355,
+                "twoFrameProxyMs": 27.099999994039536
+              },
+              "back": {
+                "domMs": 5.0999999940395355,
+                "twoFrameProxyMs": 21.099999994039536
+              }
+            },
+            {
+              "forward": {
+                "domMs": 4.0999999940395355,
+                "twoFrameProxyMs": 30.19999998807907
+              },
+              "back": {
+                "domMs": 4.5999999940395355,
+                "twoFrameProxyMs": 22.69999998807907
+              }
+            },
+            {
+              "forward": {
+                "domMs": 2.300000011920929,
+                "twoFrameProxyMs": 23.700000017881393
+              },
+              "back": {
+                "domMs": 3.2999999821186066,
+                "twoFrameProxyMs": 24.599999994039536
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 32.45000000000001,
+            "LayoutDuration": 2.6489999999999987,
+            "RecalcStyleDuration": 3.7789999999999995,
+            "TaskDuration": 154.90899999999996
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "stepperize",
+          "mobile": false,
+          "round": 3,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 2.399999976158142,
+                "twoFrameProxyMs": 30.299999982118607
+              },
+              "back": {
+                "domMs": 3.5999999940395355,
+                "twoFrameProxyMs": 21.69999998807907
+              }
+            },
+            {
+              "forward": {
+                "domMs": 2.2999999821186066,
+                "twoFrameProxyMs": 31.599999994039536
+              },
+              "back": {
+                "domMs": 3.7999999821186066,
+                "twoFrameProxyMs": 26.899999976158142
+              }
+            },
+            {
+              "forward": {
+                "domMs": 1.7999999821186066,
+                "twoFrameProxyMs": 31.299999982118607
+              },
+              "back": {
+                "domMs": 2.199999988079071,
+                "twoFrameProxyMs": 28.19999998807907
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 22.769,
+            "LayoutDuration": 1.6600000000000017,
+            "RecalcStyleDuration": 2.706,
+            "TaskDuration": 104.855
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "stepperize",
+          "mobile": false,
+          "round": 4,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 5.199999988079071,
+                "twoFrameProxyMs": 26.5
+              },
+              "back": {
+                "domMs": 5.800000011920929,
+                "twoFrameProxyMs": 16.600000023841858
+              }
+            },
+            {
+              "forward": {
+                "domMs": 4.200000017881393,
+                "twoFrameProxyMs": 26.5
+              },
+              "back": {
+                "domMs": 5.4000000059604645,
+                "twoFrameProxyMs": 19.599999994039536
+              }
+            },
+            {
+              "forward": {
+                "domMs": 3.5999999940395355,
+                "twoFrameProxyMs": 21.80000001192093
+              },
+              "back": {
+                "domMs": 4.799999982118607,
+                "twoFrameProxyMs": 20
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 41.47600000000001,
+            "LayoutDuration": 2.939999999999998,
+            "RecalcStyleDuration": 4.964999999999997,
+            "TaskDuration": 214.501
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "stepperize",
+          "mobile": true,
+          "round": 0,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 36.400000005960464,
+                "twoFrameProxyMs": 64
+              },
+              "back": {
+                "domMs": 39.099999994039536,
+                "twoFrameProxyMs": 58.79999998211861
+              }
+            },
+            {
+              "forward": {
+                "domMs": 28.80000001192093,
+                "twoFrameProxyMs": 38
+              },
+              "back": {
+                "domMs": 43.39999997615814,
+                "twoFrameProxyMs": 63.89999997615814
+              }
+            },
+            {
+              "forward": {
+                "domMs": 28.299999982118607,
+                "twoFrameProxyMs": 56
+              },
+              "back": {
+                "domMs": 35.900000005960464,
+                "twoFrameProxyMs": 55.599999994039536
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 304.2499999999999,
+            "LayoutDuration": 21.287,
+            "RecalcStyleDuration": 29.896000000000004,
+            "TaskDuration": 1328.7179999999998
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "stepperize",
+          "mobile": true,
+          "round": 1,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 25.900000005960464,
+                "twoFrameProxyMs": 28.69999998807907
+              },
+              "back": {
+                "domMs": 34,
+                "twoFrameProxyMs": 52.79999998211861
+              }
+            },
+            {
+              "forward": {
+                "domMs": 33.900000005960464,
+                "twoFrameProxyMs": 60.10000002384186
+              },
+              "back": {
+                "domMs": 34.60000002384186,
+                "twoFrameProxyMs": 42.5
+              }
+            },
+            {
+              "forward": {
+                "domMs": 24.200000017881393,
+                "twoFrameProxyMs": 30
+              },
+              "back": {
+                "domMs": 13.199999988079071,
+                "twoFrameProxyMs": 31.19999998807907
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 221.16399999999993,
+            "LayoutDuration": 15.023000000000009,
+            "RecalcStyleDuration": 21.424000000000014,
+            "TaskDuration": 979.4130000000001
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "stepperize",
+          "mobile": true,
+          "round": 2,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 37.5,
+                "twoFrameProxyMs": 58.5
+              },
+              "back": {
+                "domMs": 31.799999982118607,
+                "twoFrameProxyMs": 46.79999998211861
+              }
+            },
+            {
+              "forward": {
+                "domMs": 21.599999994039536,
+                "twoFrameProxyMs": 45.400000005960464
+              },
+              "back": {
+                "domMs": 28.69999998807907,
+                "twoFrameProxyMs": 45.29999998211861
+              }
+            },
+            {
+              "forward": {
+                "domMs": 21.5,
+                "twoFrameProxyMs": 39.5
+              },
+              "back": {
+                "domMs": 27.900000005960464,
+                "twoFrameProxyMs": 42.099999994039536
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 254.8490000000001,
+            "LayoutDuration": 16.397999999999996,
+            "RecalcStyleDuration": 25.461000000000013,
+            "TaskDuration": 1127.0569999999998
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "stepperize",
+          "mobile": true,
+          "round": 3,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 27.399999976158142,
+                "twoFrameProxyMs": 49.599999994039536
+              },
+              "back": {
+                "domMs": 38,
+                "twoFrameProxyMs": 53.599999994039536
+              }
+            },
+            {
+              "forward": {
+                "domMs": 27.80000001192093,
+                "twoFrameProxyMs": 52.20000001788139
+              },
+              "back": {
+                "domMs": 23.399999976158142,
+                "twoFrameProxyMs": 35.79999998211861
+              }
+            },
+            {
+              "forward": {
+                "domMs": 23.30000001192093,
+                "twoFrameProxyMs": 46
+              },
+              "back": {
+                "domMs": 28.200000017881393,
+                "twoFrameProxyMs": 44.599999994039536
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 231.595,
+            "LayoutDuration": 15.918000000000001,
+            "RecalcStyleDuration": 23.283000000000005,
+            "TaskDuration": 1031.245
+          },
+          "pageErrors": []
+        },
+        {
+          "name": "stepperize",
+          "mobile": true,
+          "round": 4,
+          "samples": [
+            {
+              "forward": {
+                "domMs": 20.599999994039536,
+                "twoFrameProxyMs": 37.19999998807907
+              },
+              "back": {
+                "domMs": 22.599999994039536,
+                "twoFrameProxyMs": 33.900000005960464
+              }
+            },
+            {
+              "forward": {
+                "domMs": 18.700000017881393,
+                "twoFrameProxyMs": 29.5
+              },
+              "back": {
+                "domMs": 20.799999982118607,
+                "twoFrameProxyMs": 29.599999994039536
+              }
+            },
+            {
+              "forward": {
+                "domMs": 14.699999988079071,
+                "twoFrameProxyMs": 25.5
+              },
+              "back": {
+                "domMs": 15.300000011920929,
+                "twoFrameProxyMs": 27.80000001192093
+              }
+            }
+          ],
+          "cdpDeltaMs": {
+            "ScriptDuration": 161.42599999999996,
+            "LayoutDuration": 11.815000000000007,
+            "RecalcStyleDuration": 17.986,
+            "TaskDuration": 757.8980000000001
+          },
+          "pageErrors": []
+        }
+      ],
+      "interactions": [
+        {
+          "mobile": false,
+          "rounds": 5,
+          "forwardDom": {
+            "count": 15,
+            "median": 2.800000011920929,
+            "p90": 4.4000000059604645,
+            "min": 1.7999999821186066,
+            "max": 5.199999988079071
+          },
+          "backDom": {
+            "count": 15,
+            "median": 3.5999999940395355,
+            "p90": 5.4000000059604645,
+            "min": 2.199999988079071,
+            "max": 5.800000011920929
+          },
+          "forwardFrameProxy": {
+            "count": 15,
+            "median": 26.5,
+            "p90": 31.299999982118607,
+            "min": 20.5,
+            "max": 31.599999994039536
+          },
+          "backFrameProxy": {
+            "count": 15,
+            "median": 24.599999994039536,
+            "p90": 26.899999976158142,
+            "min": 16.600000023841858,
+            "max": 28.19999998807907
+          }
+        },
+        {
+          "mobile": true,
+          "rounds": 5,
+          "forwardDom": {
+            "count": 15,
+            "median": 25.900000005960464,
+            "p90": 36.400000005960464,
+            "min": 14.699999988079071,
+            "max": 37.5
+          },
+          "backDom": {
+            "count": 15,
+            "median": 28.69999998807907,
+            "p90": 39.099999994039536,
+            "min": 13.199999988079071,
+            "max": 43.39999997615814
+          },
+          "forwardFrameProxy": {
+            "count": 15,
+            "median": 45.400000005960464,
+            "p90": 60.10000002384186,
+            "min": 25.5,
+            "max": 64
+          },
+          "backFrameProxy": {
+            "count": 15,
+            "median": 44.599999994039536,
+            "p90": 58.79999998211861,
+            "min": 27.80000001192093,
+            "max": 63.89999997615814
+          }
+        }
+      ]
+    }
+  ]
+}

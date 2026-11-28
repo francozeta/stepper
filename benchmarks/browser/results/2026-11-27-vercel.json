@@ -1,0 +1,183 @@
+{
+  "revision": "5cd44a9512fa92c979dddaa30beefdd74fcd218c",
+  "date": "2026-11-27 (Lima)",
+  "environment": {
+    "provider": "Vercel Sandbox",
+    "os": "Ubuntu 26.04.1 LTS",
+    "node": "24.22.3",
+    "browser": "159.0.8154.6",
+    "vcpus": 1,
+    "memoryMb": 2048,
+    "react": "19.2.5",
+    "playwright": "1.65.1",
+    "esbuild": "0.28.1",
+    "baseUi": "1.9.0",
+    "cn": "0.5.2",
+    "arkUi": "5.40.0",
+    "stepperize": "8.0.0",
+    "durationMs": 123976,
+    "activeCpuMs": 73497
+  },
+  "method": "Production React; 80 synchronous controlled updates per sample; 7 samples after 2 warmups; fixed library order; desktop 1280x900 and touch emulation 390x844 CPU slowdown 4x; same form and minimal shared CSS. Server guard simulated. Samples rounded to 0.1ms. Playwright upgraded only in disposable environment; resolved full transitive lock not retained. This is a single exploratory run, not a release gate or actual device test.",
+  "checks": [
+    "invalid_required_field",
+    "onboarding_back_and_confirm",
+    "external_owner_change_during_guard",
+    "keyboard_current_step",
+    "controlled_update_sampling"
+  ],
+  "results": [
+    {
+      "name": "native",
+      "gzipBytes": 61325,
+      "minifiedBytes": 196643,
+      "adapterLines": 7,
+      "desktop": {
+        "medianMs": 7,
+        "samplesMs": [
+          7,
+          6.6,
+          7.6,
+          7,
+          14.8,
+          5.4,
+          7.9
+        ],
+        "checksPassed": 5,
+        "pageErrors": [],
+        "selectionAfterArrow": 0,
+        "focusAfterArrow": "Business"
+      },
+      "mobile": {
+        "medianMs": 31.4,
+        "samplesMs": [
+          36.7,
+          31.4,
+          30.6,
+          29.8,
+          45.5,
+          24.9,
+          34.1
+        ],
+        "checksPassed": 5,
+        "pageErrors": [],
+        "selectionAfterArrow": 0,
+        "focusAfterArrow": "Business"
+      }
+    },
+    {
+      "name": "stepper",
+      "gzipBytes": 78528,
+      "minifiedBytes": 241954,
+      "adapterLines": 12,
+      "desktop": {
+        "medianMs": 26.7,
+        "samplesMs": [
+          36.9,
+          38.7,
+          42.3,
+          26.7,
+          26.6,
+          22.2,
+          14
+        ],
+        "checksPassed": 5,
+        "pageErrors": [],
+        "selectionAfterArrow": 0,
+        "focusAfterArrow": "Step 2:2Preferences"
+      },
+      "mobile": {
+        "medianMs": 130.3,
+        "samplesMs": [
+          147.4,
+          135.3,
+          143.6,
+          106.3,
+          130.3,
+          76.8,
+          54.5
+        ],
+        "checksPassed": 5,
+        "pageErrors": [],
+        "selectionAfterArrow": 0,
+        "focusAfterArrow": "Step 2:2Preferences"
+      }
+    },
+    {
+      "name": "ark",
+      "gzipBytes": 69311,
+      "minifiedBytes": 220190,
+      "adapterLines": 10,
+      "desktop": {
+        "medianMs": 52.6,
+        "samplesMs": [
+          52.8,
+          62.6,
+          54.1,
+          32.8,
+          52.6,
+          29.7,
+          25.5
+        ],
+        "checksPassed": 5,
+        "pageErrors": [],
+        "selectionAfterArrow": 0,
+        "focusAfterArrow": "1Business"
+      },
+      "mobile": {
+        "medianMs": 173.4,
+        "samplesMs": [
+          186.7,
+          185.8,
+          173.4,
+          139.4,
+          173.6,
+          128.2,
+          125.4
+        ],
+        "checksPassed": 5,
+        "pageErrors": [],
+        "selectionAfterArrow": 0,
+        "focusAfterArrow": "1Business"
+      }
+    },
+    {
+      "name": "stepperize",
+      "gzipBytes": 66695,
+      "minifiedBytes": 211041,
+      "adapterLines": 12,
+      "desktop": {
+        "medianMs": 27.6,
+        "samplesMs": [
+          24,
+          32.1,
+          24.2,
+          30.3,
+          27.6,
+          22,
+          29.5
+        ],
+        "checksPassed": 5,
+        "pageErrors": [],
+        "selectionAfterArrow": 0,
+        "focusAfterArrow": "Business"
+      },
+      "mobile": {
+        "medianMs": 90,
+        "samplesMs": [
+          95.1,
+          114.4,
+          90,
+          92.8,
+          82.7,
+          72.7,
+          67.9
+        ],
+        "checksPassed": 5,
+        "pageErrors": [],
+        "selectionAfterArrow": 0,
+        "focusAfterArrow": "Business"
+      }
+    }
+  ]
+}

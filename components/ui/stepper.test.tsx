@@ -114,6 +114,31 @@ describe("Stepper", () => {
     ).toHaveTextContent("3");
   });
 
+  it("keeps item actions current when the controlled owner replaces its callback", () => {
+    const steps = [{ value: "account" }, { value: "profile" }];
+    const first = vi.fn();
+    const latest = vi.fn();
+    function Action() {
+      const { setValue } = useStepperItem();
+      return <button onClick={() => setValue("profile")}>Custom action</button>;
+    }
+    const children = (
+      <StepperList>
+        <StepperItem value="account" defaultTrigger={false}><StepperTrigger>Account</StepperTrigger><Action /></StepperItem>
+        <StepperItem value="profile">Profile</StepperItem>
+      </StepperList>
+    );
+    const view = (onValueChange: (value: string) => void) => (
+      <Stepper steps={steps} value="account" onValueChange={onValueChange}>{children}</Stepper>
+    );
+    const { rerender } = render(view(first));
+    rerender(view(latest));
+    fireEvent.click(screen.getByRole("button", { name: "Custom action" }));
+    fireEvent.click(screen.getByRole("button", { name: /Profile/ }));
+    expect(first).not.toHaveBeenCalled();
+    expect(latest.mock.calls).toEqual([["profile"], ["profile"]]);
+  });
+
   it("exposes item state for custom composed indicators", async () => {
     function ItemState() {
       const { completed, index, isActive, stepPosition, stepState, value } =
@@ -518,6 +543,34 @@ describe("Stepper", () => {
     warn.mockRestore();
   });
 
+  it("indexes the first occurrence and warns once per duplicate explicit value", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    function IndexProbe() {
+      const { getStepIndex, steps } = useStepper();
+      return <output data-testid="step-indices">{getStepIndex("a")},{getStepIndex("b")},{getStepIndex("missing")},{steps.length}</output>;
+    }
+
+    try {
+      render(
+        <Stepper steps={[{ value: "a" }, { value: "b" }, { value: "a" }, { value: "a" }, { value: "b" }]}>
+          <IndexProbe />
+        </Stepper>
+      );
+
+      expect(screen.getByTestId("step-indices")).toHaveTextContent("0,1,-1,5");
+      const duplicateWarnings = warn.mock.calls
+        .map(([message]) => String(message))
+        .filter((message) => message.includes("is duplicated"));
+      expect(duplicateWarnings).toEqual([
+        expect.stringContaining('StepperItem value "a" is duplicated'),
+        expect.stringContaining('StepperItem value "b" is duplicated'),
+      ]);
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
   it("warns in development when content references a missing step value", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
 
@@ -635,6 +688,33 @@ describe("Stepper", () => {
     );
 
     expect(screen.getAllByRole("button", { name: /Account/ })).toHaveLength(1);
+  });
+
+  it("keeps the native trigger and focus when switching to equivalent composition", () => {
+    const steps = [{ value: "account" }, { value: "profile" }];
+    const view = (composed: boolean) => (
+      <Stepper steps={steps} value="account">
+        <StepperList>
+          <StepperItem value="account" defaultTrigger={false}>
+            <StepperTrigger render={composed ? <button /> : undefined}>
+              <StepperLabel>Account</StepperLabel>
+            </StepperTrigger>
+          </StepperItem>
+          <StepperItem value="profile">Profile</StepperItem>
+        </StepperList>
+        <StepperContent value="account">Account content</StepperContent>
+      </Stepper>
+    );
+    const { rerender } = render(view(false));
+    const trigger = screen.getByRole("button", { name: "Account" });
+    trigger.focus();
+    expect(trigger).toHaveAttribute("type", "button");
+    rerender(view(true));
+    expect(screen.getByRole("button", { name: "Account" })).toBe(trigger);
+    expect(trigger).toHaveFocus();
+    rerender(view(false));
+    expect(screen.getByRole("button", { name: "Account" })).toBe(trigger);
+    expect(trigger).toHaveFocus();
   });
 
   it("composes Base UI render buttons and preserves native semantics", async () => {
@@ -1149,6 +1229,55 @@ describe("Stepper", () => {
     await waitForSettledEffects();
     expect(screen.getByText("Review content")).toBeVisible();
     expect(screen.queryByText("Profile content")).not.toBeInTheDocument();
+  });
+
+  it("keeps the latest guarded navigation intent across different controls", async () => {
+    let resolveNext: ((allowed: boolean) => void) | undefined;
+    let resolvePrevious: ((allowed: boolean) => void) | undefined;
+    const onValueChange = vi.fn();
+
+    render(
+      <Stepper value="profile" steps={[{ value: "account" }, { value: "profile" }, { value: "review" }]} onValueChange={onValueChange}>
+        <StepperPrevious onBeforePrevious={() => new Promise<boolean>((resolve) => { resolvePrevious = resolve; })}>Back</StepperPrevious>
+        <StepperNext onBeforeNext={() => new Promise<boolean>((resolve) => { resolveNext = resolve; })}>Continue</StepperNext>
+      </Stepper>
+    );
+
+    const next = screen.getByRole("button", { name: "Continue" });
+    const back = screen.getByRole("button", { name: "Back" });
+    fireEvent.click(next);
+    expect(next).toHaveAttribute("aria-busy", "true");
+    expect(next).toHaveAttribute("data-pending");
+    fireEvent.click(back);
+    resolveNext?.(true);
+    await waitFor(() => expect(next).toBeEnabled());
+    expect(next).not.toHaveAttribute("aria-busy");
+    expect(onValueChange).not.toHaveBeenCalled();
+    resolvePrevious?.(true);
+    await waitFor(() => expect(back).toBeEnabled());
+    expect(onValueChange.mock.calls).toEqual([["account"]]);
+  });
+
+  it("invalidates a pending guard on a newer direct request even before a controlled commit", async () => {
+    let resolveGuard: ((allowed: boolean) => void) | undefined;
+    const onValueChange = vi.fn();
+    function DirectRequest() {
+      const { setValue } = useStepper();
+      return <button type="button" onClick={() => setValue("review")}>Review directly</button>;
+    }
+
+    render(
+      <Stepper value="account" steps={[{ value: "account" }, { value: "profile" }, { value: "review" }]} onValueChange={onValueChange}>
+        <StepperNext onBeforeNext={() => new Promise<boolean>((resolve) => { resolveGuard = resolve; })}>Continue</StepperNext>
+        <DirectRequest />
+      </Stepper>
+    );
+    const next = screen.getByRole("button", { name: "Continue" });
+    fireEvent.click(next);
+    fireEvent.click(screen.getByRole("button", { name: "Review directly" }));
+    resolveGuard?.(true);
+    await waitFor(() => expect(next).toBeEnabled());
+    expect(onValueChange.mock.calls).toEqual([["review"]]);
   });
 
   it("ignores a guard when its destination is replaced", async () => {

@@ -1,0 +1,53 @@
+name: Browser comparison
+on:
+  workflow_dispatch:
+    inputs:
+      interactions:
+        description: "Also measure counterbalanced individual interactions"
+        required: false
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: browser-comparison-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.15.0
+      - name: Isolate benchmark dependencies
+        run: |
+          mkdir -p "$RUNNER_TEMP/stepper-comparison"
+          cp -R benchmarks/browser/. "$RUNNER_TEMP/stepper-comparison/"
+          cd "$RUNNER_TEMP/stepper-comparison"
+          npm install --ignore-scripts --no-audit --no-fund
+          npx --no-install playwright install --with-deps --only-shell chromium
+      - name: Run production React in Chromium
+        env:
+          STEPPER_REPO: ${{ github.workspace }}
+        run: node "$RUNNER_TEMP/stepper-comparison/run.mjs"
+      - name: Run counterbalanced individual interactions
+        if: ${{ inputs.interactions }}
+        env:
+          STEPPER_REPO: ${{ github.workspace }}
+        run: node "$RUNNER_TEMP/stepper-comparison/run.mjs" --interactions
+      - name: Preserve measurements and resolved dependency graph
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-comparison
+          retention-days: 7
+          path: |
+            ${{ runner.temp }}/stepper-comparison/results/report.json
+            ${{ runner.temp }}/stepper-comparison/results/interaction-report.json
+            ${{ runner.temp }}/stepper-comparison/results/*.metafile.json
+            ${{ runner.temp }}/stepper-comparison/package-lock.json

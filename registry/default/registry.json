@@ -47,6 +47,7 @@
       "description": "An intent-driven onboarding block with hidden Stepper state, intent routing, profile validation, interests, async setup, and a signed-in completion state.",
       "dependencies": [
         "@base-ui/react@^1.4.1",
+        "class-variance-authority@^0.7.1",
         "cn@^0.5.2",
         "lucide-react",
         "react-icons",

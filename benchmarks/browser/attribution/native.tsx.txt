@@ -1,0 +1,64 @@
+import * as React from "react";
+
+// A minimum React/HTML control with the same form, step count, overflow and
+// persistent navigation. It carries its own keyboard and accessible markup.
+function NativeProgress({ steps, step, changeStep }) {
+  function moveFocus(event) {
+    const current = event.target.dataset.benchTrigger;
+    if (current === undefined) return;
+    const index = Number(current);
+    const target = { ArrowRight: index + 1, ArrowLeft: index - 1, Home: 0, End: steps.length - 1 }[event.key];
+    const button = Number.isInteger(target) && event.currentTarget.querySelector(`[data-bench-trigger="${target}"]`);
+    if (button) {
+      event.preventDefault();
+      button.focus();
+    }
+  }
+
+  return <ol aria-label="Progress steps" onKeyDown={moveFocus} data-slot="stepper-list"
+    className="flex min-w-0 w-full overflow-x-auto pb-2">
+    {steps.map(({ value }, index) => {
+      const active = step === value;
+      return <li key={value} className="relative flex min-w-16 flex-1 flex-col items-center sm:min-w-28">
+        <button type="button" data-bench-trigger={value} id={"native-trigger-" + value}
+          aria-current={active ? "step" : undefined} aria-controls={active ? "native-panel-" + value : undefined}
+          className="flex min-h-10 w-full flex-col items-center gap-2 rounded-lg text-sm"
+          onClick={() => changeStep(value)}>
+          <span className="sr-only">Step {index + 1}:</span>
+          <span aria-hidden="true" className={(active ? "bg-primary text-primary-foreground " : "bg-background ") +
+            "flex size-7 shrink-0 items-center justify-center rounded-full border border-border text-xs shadow-sm sm:size-9"}>{index + 1}</span>
+          <span className="text-xs leading-tight font-medium sm:text-sm">Stage {index + 1}</span>
+        </button>
+        {index < steps.length - 1 && <span aria-hidden="true"
+          className="pointer-events-none absolute start-[calc(50%_+_0.875rem)] end-[calc(-50%_+_0.875rem)] top-3.5 h-px bg-muted-foreground/25 sm:start-[calc(50%_+_1.125rem)] sm:end-[calc(-50%_+_1.125rem)] sm:top-4.5" />}
+      </li>;
+    })}
+  </ol>;
+}
+
+const Progress = React.memo(NativeProgress);
+
+export function Flow({ steps, step, field, changeStep }) {
+  const index = Number(step);
+  const panel = "min-h-32 rounded-lg border border-border/70 bg-muted/25 p-4 text-sm text-foreground shadow-sm";
+  const control = "inline-flex h-9 min-w-24 items-center justify-center border px-3 text-sm font-medium disabled:pointer-events-none disabled:opacity-50";
+  return <div className="flex flex-col gap-6">
+    <Progress steps={steps} step={step} changeStep={changeStep} />
+    <section aria-labelledby="native-trigger-0" role="region" id="native-panel-0" data-bench-panel="0" hidden={index !== 0}
+      className={panel}>
+      <h2 className="mb-2 font-semibold">Business details</h2>
+      {field}
+    </section>
+    {index > 0 && <section aria-labelledby={"native-trigger-" + step} role="region" id={"native-panel-" + step}
+      data-bench-panel={step} className={panel}>
+      <h2 className="mb-2 font-semibold">Regional preferences</h2>
+      <p>Review your settings.</p>
+    </section>}
+    <footer className="flex gap-2">
+      <button type="button" className={control + " border-border bg-background text-foreground"} data-bench-control="back"
+        disabled={index === 0} onClick={() => changeStep(String(index - 1))}>Back</button>
+      <button type="button" className={control + " border-primary bg-primary text-primary-foreground"} data-bench-control="forward"
+        disabled={index === steps.length - 1} onClick={() => changeStep(String(index + 1))}>Continue</button>
+    </footer>
+  </div>;
+}

@@ -1,6 +1,6 @@
 ---
 title: "Installation"
-description: "Install Stepper through the shadcn registry and copy the component source into your app."
+description: "Install Stepper, run a two-step flow, and choose who owns navigation."
 eyebrow: "basics"
 navTitle: "Installation"
 navIcon: "book-open"
@@ -9,31 +9,42 @@ copyLabel: "Copy import"
 copyCopiedLabel: "Import copied"
 ---
 
+import { CodeBlockCommand } from "@/components/code-block-command";
 import { CodeBlock, Section } from "@/components/docs-content";
 import { File, Files, Folder } from "@/components/files";
 import {
   controlledSnippet,
   gettingStartedSnippet,
-  registryInstallSnippet,
-  usageSnippet,
+  registryInstallCommands,
+  registryNamespaceConfig,
 } from "@/lib/docs";
 
 <Section
   title="Install"
-  description="Stepper is installed through the shadcn registry. The CLI copies the component source into your project, so you can customize it directly."
+  description="Start in an existing TypeScript React project configured with shadcn/ui and Tailwind CSS v4. Use Node.js 22 or newer. The CLI copies the source into your app."
 >
-  <CodeBlock
-    code={registryInstallSnippet}
-    filename="terminal"
-    lang="bash"
-    showLineNumbers={false}
-    compact
-  />
+  <CodeBlockCommand {...registryInstallCommands} />
+  <p className="text-sm leading-relaxed text-muted-foreground">
+    Keep your existing shadcn preset. Stepper uses Base UI internally for composition, but Base Nova is not required. The installed source uses your theme tokens and UI alias. Base Nova and Radix Nova have passed local registry install, TypeScript and markup checks; other presets have not yet been verified.
+  </p>
+  <p className="text-sm text-muted-foreground">
+    If the namespace cannot be resolved, merge this entry into the registries object in your components.json.
+  </p>
+  <CodeBlock code={registryNamespaceConfig} filename="components.json" lang="json" />
+  <p className="text-sm text-muted-foreground">You can also install from the direct registry URL.</p>
+  <CodeBlock code="npx shadcn@latest add https://francozeta-stepper.vercel.app/r/stepper.json" filename="terminal" lang="bash" showLineNumbers={false} compact />
+</Section>
+
+<Section
+  title="Your first flow"
+  description="Copy this complete client component, then render SetupStepper in your page. Explicit step IDs infer the allowed values in TypeScript. This is a navigation example, not a form-validation policy."
+>
+  <CodeBlock code={controlledSnippet} filename="setup-stepper.tsx" />
 </Section>
 
 <Section
   title="What gets added"
-  description="Stepper does not install as a runtime package. After installation, the source belongs to your project."
+  description="One editable Stepper file, plus Base UI and cn if your app needs them. No mandatory Motion, form library, or agent SDK."
 >
   <Files>
     <Folder name="components" defaultOpen>
@@ -42,23 +53,26 @@ import {
       </Folder>
     </Folder>
   </Files>
-  <CodeBlock
-    code={usageSnippet}
-    filename="app/page.tsx"
-    lang="tsx"
-  />
+  <p className="text-sm leading-relaxed text-muted-foreground">
+    This is the default location. The CLI uses your components.json ui alias, so adjust the import if your app uses a different path. The source uses shadcn theme tokens and Tailwind v4 utilities. A missing theme or incorrect content scanning can leave the component unstyled.
+  </p>
 </Section>
 
 <Section
-  title="Use it uncontrolled"
-  description="Use defaultValue when the Stepper can own its active step."
+  title="Choose who owns the active step"
+  description="Use defaultValue for a local, self-contained flow. Use steps, value and onValueChange for forms, conditional steps, routes or server-backed workflows."
 >
   <CodeBlock code={gettingStartedSnippet} filename="checkout-stepper.tsx" />
+  <p className="text-sm leading-relaxed text-muted-foreground">
+    In controlled mode, a missing or disabled value displays the first enabled step without calling onValueChange. Keep field state, validation, permissions and final submission in your application. A guard on Continue alone does not validate every possible navigation path.
+  </p>
 </Section>
 
-<Section
-  title="Use it controlled"
-  description="Pass value and onValueChange when app state, validation, or routing decides the current step."
->
-  <CodeBlock code={controlledSnippet} filename="controlled-usage.tsx" />
+<Section title="Where to go next" description="Keep your first flow small, then add only the behavior you need.">
+  <div className="grid gap-2 text-sm">
+    <a className="underline underline-offset-4" href="/docs/stepper">Composition and examples</a>
+    <a className="underline underline-offset-4" href="/docs/adapters/react-hook-form">Form validation with React Hook Form</a>
+    <a className="underline underline-offset-4" href="/docs/styling">Theme tokens and custom styling</a>
+    <a className="underline underline-offset-4" href="/docs/api">API and controlled fallback</a>
+  </div>
 </Section>

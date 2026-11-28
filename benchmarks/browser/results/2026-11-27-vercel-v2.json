@@ -1,0 +1,275 @@
+{
+  "revision": "4cc8f9e1ec0c0302a841af5d842e7a2b43a3ebf8",
+  "baselineRevision": "5cd44a9512fa92c979dddaa30beefdd74fcd218c",
+  "date": "2026-11-27 (Lima)",
+  "environment": {
+    "provider": "Vercel Sandbox",
+    "os": "Ubuntu 26.04.1 LTS (same universal image as first run)",
+    "node": "24.22.3",
+    "browser": "159.0.8154.6",
+    "vcpus": 1,
+    "memoryMb": 2048,
+    "react": "19.2.5",
+    "playwright": "1.65.1",
+    "esbuild": "0.28.1",
+    "baseUi": "1.9.0",
+    "cn": "0.5.2",
+    "arkUi": "5.40.0",
+    "stepperize": "8.0.0",
+    "durationMs": 90347,
+    "activeCpuMs": 49230,
+    "ingressBytes": 306590342
+  },
+  "lockSha256": "7f59b95b9e4cc9d5576a0540e386e17c847b20de4c61378d6e375fc55e2bdf27",
+  "method": "Production React. Seven samples after two warmups, 80 synchronous controlled updates per sample. All builds first, desktop forward library order, mobile reversed. Same machine and direct dependency versions for both Stepper revisions. Samples rounded to 0.1 ms. Package attribution is minified bytes, not additive gzip. Captured summary, not full report/metafiles or resolved lock. One exploratory run, no physical-device, live server or real-agent validation.",
+  "checks": [
+    "invalid_required_field",
+    "onboarding_back_and_confirm",
+    "external_owner_change_during_guard",
+    "keyboard_current_step",
+    "controlled_update_sampling"
+  ],
+  "results": [
+    {
+      "name": "native",
+      "gzipBytes": 61325,
+      "minifiedBytes": 196643,
+      "adapterLines": 7,
+      "buildMs": 75.169768,
+      "bytesByPackage": {
+        "react": 8056,
+        "scheduler": 3689,
+        "react-dom": 180070,
+        "app/adapter": 2697
+      },
+      "desktop": {
+        "medianMs": 4.8,
+        "samplesMs": [
+          3.5,
+          4.1,
+          5.6,
+          4.6,
+          12.1,
+          5.5,
+          4.8
+        ],
+        "checksPassed": 5,
+        "pageErrors": [],
+        "selectionAfterArrow": 0,
+        "focusAfterArrow": "Business"
+      },
+      "mobile": {
+        "medianMs": 23.1,
+        "samplesMs": [
+          25.2,
+          22.2,
+          23.3,
+          19.9,
+          30.7,
+          23.1,
+          16.3
+        ],
+        "checksPassed": 5,
+        "pageErrors": [],
+        "selectionAfterArrow": 0,
+        "focusAfterArrow": "Business"
+      }
+    },
+    {
+      "name": "stepper-before",
+      "gzipBytes": 78528,
+      "minifiedBytes": 241954,
+      "adapterLines": 12,
+      "buildMs": 87.764399,
+      "bytesByPackage": {
+        "react": 8082,
+        "scheduler": 3713,
+        "react-dom": 180365,
+        "app/adapter": 16681,
+        "@base-ui/react": 2787,
+        "@base-ui/utils": 1355,
+        "cn": 26840
+      },
+      "desktop": {
+        "medianMs": 21.7,
+        "samplesMs": [
+          24.5,
+          29.6,
+          25.5,
+          21.7,
+          21.5,
+          11.2,
+          9.3
+        ],
+        "checksPassed": 5,
+        "pageErrors": [],
+        "selectionAfterArrow": 0,
+        "focusAfterArrow": "Step 2:2Preferences"
+      },
+      "mobile": {
+        "medianMs": 89.6,
+        "samplesMs": [
+          95.3,
+          80.2,
+          89.6,
+          60.6,
+          90.4,
+          125.9,
+          57.6
+        ],
+        "checksPassed": 5,
+        "pageErrors": [],
+        "selectionAfterArrow": 0,
+        "focusAfterArrow": "Step 2:2Preferences"
+      }
+    },
+    {
+      "name": "stepper",
+      "gzipBytes": 78554,
+      "minifiedBytes": 242015,
+      "adapterLines": 12,
+      "buildMs": 98.405152,
+      "bytesByPackage": {
+        "react": 8082,
+        "scheduler": 3713,
+        "react-dom": 180365,
+        "app/adapter": 16742,
+        "@base-ui/react": 2787,
+        "@base-ui/utils": 1355,
+        "cn": 26840
+      },
+      "desktop": {
+        "medianMs": 19,
+        "samplesMs": [
+          23.1,
+          26,
+          19,
+          17.1,
+          31.6,
+          11.9,
+          9.7
+        ],
+        "checksPassed": 5,
+        "pageErrors": [],
+        "selectionAfterArrow": 0,
+        "focusAfterArrow": "Step 2:2Preferences"
+      },
+      "mobile": {
+        "medianMs": 81.9,
+        "samplesMs": [
+          88.4,
+          81.9,
+          89.5,
+          56.5,
+          89.8,
+          34.2,
+          39.4
+        ],
+        "checksPassed": 5,
+        "pageErrors": [],
+        "selectionAfterArrow": 0,
+        "focusAfterArrow": "Step 2:2Preferences"
+      }
+    },
+    {
+      "name": "ark",
+      "gzipBytes": 69311,
+      "minifiedBytes": 220190,
+      "adapterLines": 10,
+      "buildMs": 93.164074,
+      "bytesByPackage": {
+        "react": 8055,
+        "scheduler": 3689,
+        "react-dom": 180183,
+        "app/adapter": 2715,
+        "@zag-js/anatomy": 656,
+        "@zag-js/steps": 5269,
+        "@zag-js/dom-query": 395,
+        "@zag-js/utils": 2005,
+        "@zag-js/core": 4098,
+        "@zag-js/types": 91,
+        "@ark-ui/react": 5755,
+        "@zag-js/react": 5149
+      },
+      "desktop": {
+        "medianMs": 32.1,
+        "samplesMs": [
+          38.3,
+          45.4,
+          34.9,
+          21.3,
+          32.1,
+          21.3,
+          16.8
+        ],
+        "checksPassed": 5,
+        "pageErrors": [],
+        "selectionAfterArrow": 0,
+        "focusAfterArrow": "1Business"
+      },
+      "mobile": {
+        "medianMs": 104.7,
+        "samplesMs": [
+          124.5,
+          144.8,
+          122.3,
+          96.3,
+          104.7,
+          83.6,
+          79.8
+        ],
+        "checksPassed": 5,
+        "pageErrors": [],
+        "selectionAfterArrow": 0,
+        "focusAfterArrow": "1Business"
+      }
+    },
+    {
+      "name": "stepperize",
+      "gzipBytes": 66695,
+      "minifiedBytes": 211041,
+      "adapterLines": 12,
+      "buildMs": 66.501654,
+      "bytesByPackage": {
+        "react": 8056,
+        "scheduler": 3689,
+        "react-dom": 180114,
+        "app/adapter": 2849,
+        "@stepperize/core": 1254,
+        "@stepperize/react": 12948
+      },
+      "desktop": {
+        "medianMs": 18,
+        "samplesMs": [
+          17,
+          20.2,
+          18.2,
+          18,
+          21.6,
+          12,
+          16.4
+        ],
+        "checksPassed": 5,
+        "pageErrors": [],
+        "selectionAfterArrow": 0,
+        "focusAfterArrow": "Business"
+      },
+      "mobile": {
+        "medianMs": 61.2,
+        "samplesMs": [
+          61.2,
+          87.6,
+          66.1,
+          66.5,
+          55.3,
+          47.8,
+          57
+        ],
+        "checksPassed": 5,
+        "pageErrors": [],
+        "selectionAfterArrow": 0,
+        "focusAfterArrow": "Business"
+      }
+    }
+  ]
+}

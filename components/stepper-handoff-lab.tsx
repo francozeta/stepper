@@ -9,10 +9,35 @@ const labels: Record<Stage, string> = { account: "Account", preferences: "Prefer
 
 export function StepperHandoffLab() {
   const [state, dispatch] = React.useReducer(handoffReducer, initialState);
-  const [target, setTarget] = React.useState<Stage>("preferences");
-  const [snapshot, setSnapshot] = React.useState<Stage | undefined>();
+  const [pending, setPending] = React.useState(false);
+  const timer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const index = stages.indexOf(state.stage);
   const last = state.history.at(-1);
+
+  React.useEffect(() => () => {
+    if (timer.current !== null) clearTimeout(timer.current);
+  }, []);
+
+  function requestHelp() {
+    if (timer.current !== null) {
+      clearTimeout(timer.current);
+      timer.current = null;
+      setPending(false);
+      return;
+    }
+
+    const target = stages[index + 1];
+    if (!target) return;
+    const expectedStage = state.stage;
+    const expectedRevision = state.revision;
+    setPending(true);
+    // Deliberate local delay: a person can change the form while the request is pending.
+    timer.current = setTimeout(() => {
+      timer.current = null;
+      dispatch({ type: "navigate", source: "agent", target, expectedStage, expectedRevision });
+      setPending(false);
+    }, 1200);
+  }
 
   function panel(value: Stage) {
     const inactive = value !== state.stage;
@@ -32,7 +57,7 @@ export function StepperHandoffLab() {
           <Link href="/drafts/onboarding" className="text-xs text-muted-foreground hover:text-foreground">Next: Agent-ready →</Link>
         </div>
         <h1 className="text-2xl font-medium tracking-tight">One interface. Shared intent.</h1>
-        <p className="text-sm text-muted-foreground">A human and a simulated agent can request navigation. Neither owns the workflow.</p>
+        <p className="text-sm text-muted-foreground">Move forward yourself or ask the assistant. You can change your mind at any point.</p>
       </header>
       <section className="rounded-2xl border border-border p-4 sm:p-6">
         <Stepper steps={stages.map((value) => ({ value }))} value={state.stage} onValueChange={(value) => dispatch({ type: "navigate", source: "human", target: value })}>
@@ -54,7 +79,7 @@ export function StepperHandoffLab() {
                 <input type="checkbox" checked={state.updates} onChange={(event) => dispatch({ type: "updates", value: event.target.checked })} />
                 Receive product updates
               </label>
-              <p className="text-xs text-muted-foreground">Your choices stay here when the agent takes over.</p>
+              <p className="text-xs text-muted-foreground">Your choices are kept when you move between steps.</p>
             </StepperContent>
             <StepperContent {...panel("review")}>
               <h2 className="text-lg font-medium">Everything in place.</h2>
@@ -62,39 +87,21 @@ export function StepperHandoffLab() {
               <p className="text-sm">Updates: {state.updates ? "Enabled" : "Disabled"}</p>
             </StepperContent>
           </div>
-          <div className="flex justify-between gap-3 border-t pt-4">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-t pt-4">
             <StepperPrevious className="rounded-full">Back</StepperPrevious>
-            <StepperNext className="rounded-full">Continue</StepperNext>
+            <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+              <button type="button" aria-label={pending ? "Stop assistant" : "Continue with assistant"} onClick={requestHelp} disabled={!pending && index === stages.length - 1} className="h-9 rounded-full border border-border px-3 text-sm font-medium hover:bg-muted disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">{pending ? "Stop" : "Assist"}</button>
+              <StepperNext className="rounded-full">Continue</StepperNext>
+            </div>
           </div>
-          <p role="status" className="min-h-8 text-xs text-muted-foreground">{last?.message ?? "Ready."}</p>
+          <p role="status" className="min-h-10 text-sm text-muted-foreground">
+            {pending ? "Preparing the next step. You can still edit." : last?.result === "blocked" ? last.message : last?.source === "agent" ? "Assistant moved you to the next step." : "Assist follows the same rules as you."}
+          </p>
         </Stepper>
       </section>
 
-      <section className="grid gap-4 border-t pt-5">
-        <div className="flex items-center justify-between gap-2">
-          <h2 className="text-sm font-medium">Agent simulator</h2>
-          <span className="rounded-full border px-2 py-1 text-[10px] text-muted-foreground">Local only</span>
-        </div>
-        <p className="text-xs text-muted-foreground">Read the current stage, then ask to move. Try changing the step manually between reading and executing the request.</p>
-        <div className="flex flex-wrap items-center gap-2 text-sm">
-          <button type="button" onClick={() => setSnapshot(state.stage)} className="rounded-full border px-3 py-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Read state</button>
-          <output className="font-mono text-xs text-muted-foreground">snapshot: {snapshot ?? "—"}</output>
-        </div>
-        <div className="flex flex-wrap items-end gap-2">
-          <label className="grid flex-1 gap-1 text-xs text-muted-foreground">Target stage
-            <select value={target} onChange={(event) => setTarget(event.target.value as Stage)} className="h-10 rounded-lg border bg-background px-3 text-sm text-foreground">
-              {stages.map((value) => <option key={value} value={value}>{labels[value]}</option>)}
-            </select>
-          </label>
-          <button type="button" disabled={!snapshot} onClick={() => dispatch({ type: "navigate", source: "agent", target, expectedStage: snapshot })} className="h-10 rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Request change</button>
-        </div>
-        <div className="flex justify-between gap-3 text-xs text-muted-foreground">
-          <span>Current stage</span><span className="font-mono">{index + 1}/3 · {state.stage}</span>
-        </div>
-      </section>
-
       <section className="grid gap-2 border-t pt-5">
-        <h2 className="text-sm font-medium">Action trace</h2>
+        <h2 className="text-sm font-medium">Interaction history</h2>
         {state.history.length === 0 ? <p className="text-xs text-muted-foreground">No requests yet.</p> : (
           <ol className="grid gap-2">
             {state.history.map((entry, i) => <li key={i} className="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-xs">
@@ -106,7 +113,7 @@ export function StepperHandoffLab() {
           </ol>
         )}
       </section>
-      <p className="text-xs text-muted-foreground">No model, network request, or browser tool registration. This is a controlled baseline for a future UI SDK bridge.</p>
+      <p className="text-xs text-muted-foreground">Local simulation. Try moving or editing while the assistant prepares the next step.</p>
     </main>
   );
 }

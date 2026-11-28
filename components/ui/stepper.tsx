@@ -74,6 +74,8 @@ type StepperContextValue = {
   collection: StepperCollection;
   previousValue: StepperValue | undefined;
   nextValue: StepperValue | undefined;
+  readIntent: () => number;
+  advanceIntent: () => number;
 };
 
 type StepperProps<TValue extends StepperValue = StepperValue> =
@@ -274,22 +276,6 @@ function useConnectorProgress(currentIndex: number) {
   return { progress: Math.max(0, cursor.index), duration: cursor.duration };
 }
 
-function useDuplicateStepWarning(steps: StepperStep[]) {
-  React.useEffect(() => {
-    if (!isDevelopment) return;
-
-    const seen = new Set<StepperValue>();
-    const duplicates = new Set<StepperValue>();
-    for (const { value } of steps) {
-      if (seen.has(value)) duplicates.add(value);
-      seen.add(value);
-    }
-    for (const value of duplicates) {
-      warnDev(`StepperItem value "${value}" is duplicated. Step values must be unique within a Stepper.`);
-    }
-  }, [steps]);
-}
-
 function useStepper<
   TValue extends StepperValue = StepperValue,
 >(): StepperApi<TValue> {
@@ -339,14 +325,26 @@ function Stepper({
   }, []);
   const registration = stepsProp === undefined ? register : undefined;
 
-  const { steps, getStepIndex } = React.useMemo(() => {
-    const steps = (stepsProp ?? [...registrations.values()]).map(({ value, disabled }) => ({ value, disabled: !!disabled }));
+  const { steps, getStepIndex, duplicates } = React.useMemo(() => {
     const indices = new Map<StepperValue, number>();
-    steps.forEach(({ value }, index) => {
-      if (!indices.has(value)) indices.set(value, index);
-    });
-    return { steps, getStepIndex: (value: StepperValue) => indices.get(value) ?? -1 };
+    const duplicates = isDevelopment ? new Set<StepperValue>() : undefined;
+    const steps = Array.from<StepperStepInput, StepperStep>(
+      stepsProp ?? registrations.values(),
+      ({ value, disabled }, index) => {
+        if (indices.has(value)) duplicates?.add(value);
+        else indices.set(value, index);
+        return { value, disabled: !!disabled };
+      }
+    );
+    return { steps, getStepIndex: (value: StepperValue) => indices.get(value) ?? -1, duplicates };
   }, [registrations, stepsProp]);
+
+  React.useEffect(() => {
+    if (!duplicates) return;
+    for (const value of duplicates) {
+      warnDev(`StepperItem value "${value}" is duplicated. Step values must be unique within a Stepper.`);
+    }
+  }, [duplicates]);
   const collection = React.useMemo<StepperCollection>(
     () => ({ id, orientation, steps, register: registration }),
     [id, orientation, registration, steps]
@@ -363,11 +361,18 @@ function Stepper({
   const previousValue = currentIndex < 0 ? undefined : steps[findEnabledIndex(steps, currentIndex, -1)]?.value;
   const nextValue = currentIndex < 0 ? undefined : steps[findEnabledIndex(steps, currentIndex, 1)]?.value;
 
+  // One root-scoped intent clock covers direct requests and both guarded directions.
+  const navigationEpochRef = React.useRef(0);
+  const readIntent = React.useCallback(() => navigationEpochRef.current, []);
+  const advanceIntent = React.useCallback(() => ++navigationEpochRef.current, []);
+  React.useLayoutEffect(() => () => { advanceIntent(); }, [currentValue, advanceIntent]);
+
   const setValue = React.useCallback((nextValue: StepperValue) => {
     if (steps[getStepIndex(nextValue)]?.disabled !== false) return;
+    advanceIntent();
     if (!controlled) setUncontrolledValue(nextValue);
     onValueChange?.(nextValue);
-  }, [controlled, getStepIndex, onValueChange, steps]);
+  }, [advanceIntent, controlled, getStepIndex, onValueChange, steps]);
   const goPrevious = React.useCallback(() => {
     if (previousValue !== undefined) setValue(previousValue);
   }, [previousValue, setValue]);
@@ -376,7 +381,6 @@ function Stepper({
   }, [nextValue, setValue]);
 
   const { progress, duration } = useConnectorProgress(currentIndex);
-  useDuplicateStepWarning(steps);
 
   const context = React.useMemo<StepperContextValue>(() => ({
     api: {
@@ -395,7 +399,9 @@ function Stepper({
     collection,
     previousValue,
     nextValue,
-  }), [collection, currentIndex, currentValue, getStepIndex, goNext, goPrevious, nextValue, orientation, previousValue, setValue, steps]);
+    readIntent,
+    advanceIntent,
+  }), [advanceIntent, collection, currentIndex, currentValue, getStepIndex, goNext, goPrevious, nextValue, orientation, previousValue, readIntent, setValue, steps]);
 
   return (
     <StepperContext.Provider value={context}>
@@ -573,10 +579,11 @@ function StepperItem<TValue extends StepperValue = StepperValue>({
 function StepperElement({
   defaultTagName,
   render,
-  asChild,
+  legacyAsChild: asChild,
   children,
   ...props
-}: React.HTMLAttributes<HTMLElement> & StepperCompositionProps & {
+}: React.HTMLAttributes<HTMLElement> & Omit<StepperCompositionProps, "asChild"> & {
+  legacyAsChild?: boolean;
   defaultTagName: "button" | "div";
   type?: React.ComponentPropsWithoutRef<"button">["type"];
   disabled?: boolean;
@@ -585,14 +592,22 @@ function StepperElement({
     ? React.Children.only(children) as React.ReactElement
     : undefined;
 
-  return useRender({
+  const customRender = render ?? legacyRender;
+  const element = useRender({
     defaultTagName,
-    render: render ?? legacyRender,
+    enabled: customRender !== undefined,
+    render: customRender,
     props: {
       ...props,
       ...(!asChild && children !== undefined ? { children } : {}),
     },
   });
+
+  // Keep the hook order and host element identity when composition changes.
+  // Base UI only needs to merge props/events/refs for custom composition.
+  return customRender !== undefined
+    ? element
+    : React.createElement(defaultTagName, props, children);
 }
 
 function StepperTrigger({
@@ -625,7 +640,7 @@ function StepperTrigger({
     <StepperElement
       defaultTagName="button"
       render={render}
-      asChild={asChild}
+      legacyAsChild={asChild}
       id={triggerId}
       type={nativeButton ? "button" : undefined}
       aria-current={isActive ? "step" : undefined}
@@ -831,7 +846,7 @@ function StepperContent<TValue extends StepperValue = StepperValue>({
     <StepperElement
       defaultTagName="div"
       render={render}
-      asChild={asChild}
+      legacyAsChild={asChild}
       id={getStepId(id, "content", value)}
       role="region"
       aria-labelledby={getStepId(id, "trigger", value)}
@@ -878,7 +893,7 @@ function StepperNavigationButton({
   onBeforeNavigate?: StepperNavigationGuard;
 }) {
   const previous = direction === "previous";
-  const { api: { value, goPrevious, goNext }, previousValue, nextValue } =
+  const { api: { value, goPrevious, goNext }, previousValue, nextValue, readIntent, advanceIntent } =
     useStepperContext(previous ? "StepperPrevious" : "StepperNext");
   const target = previous ? previousValue : nextValue;
   const navigate = previous ? goPrevious : goNext;
@@ -894,8 +909,9 @@ function StepperNavigationButton({
 
   async function handleClick(event: React.MouseEvent<HTMLButtonElement>) {
     const request = epoch.current;
+    const beforeClick = readIntent();
     onClick?.(event);
-    if (isDisabled || pendingRef.current || request !== epoch.current) {
+    if (isDisabled || pendingRef.current || request !== epoch.current || beforeClick !== readIntent()) {
       event.preventDefault();
       return;
     }
@@ -905,10 +921,11 @@ function StepperNavigationButton({
       return;
     }
 
+    const intent = advanceIntent();
     pendingRef.current = true;
     setPending(true);
     try {
-      if ((await onBeforeNavigate()) !== false && request === epoch.current) {
+      if ((await onBeforeNavigate()) !== false && request === epoch.current && intent === readIntent()) {
         navigate();
       }
     } finally {
@@ -921,12 +938,14 @@ function StepperNavigationButton({
     <StepperElement
       defaultTagName="button"
       render={render}
-      asChild={asChild}
+      legacyAsChild={asChild}
       type={nativeButton ? "button" : undefined}
       disabled={nativeButton ? isDisabled : undefined}
       aria-disabled={isDisabled ? true : undefined}
       tabIndex={!nativeButton && isDisabled ? -1 : tabIndex}
+      aria-busy={pending || undefined}
       data-slot={previous ? "stepper-previous" : "stepper-next"}
+      data-pending={pending ? "" : undefined}
       data-disabled={isDisabled ? "" : undefined}
       className={isComposed ? className : cn(
         "inline-flex h-9 min-w-24 items-center justify-center gap-2 rounded-none border px-3 text-sm font-medium",

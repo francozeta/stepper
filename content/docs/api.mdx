@@ -1,6 +1,6 @@
 ---
 title: "Stepper API"
-description: "The V1 API keeps the surface small: one root, one ordered list, item primitives, content panels, and previous/next helpers."
+description: "One root, an ordered list, item primitives, content panels, and previous/next helpers."
 eyebrow: "api"
 navTitle: "API"
 navIcon: "code"
@@ -18,12 +18,17 @@ import {
 import {
   apiComponents,
   accessibilityNotes,
+  anatomyParts,
   asChildRequirements,
   compositionCode,
+  compositionMigrationCode,
+  compositionMigrationNotes,
   contentProps,
   controlledBehaviorNotes,
+  itemHookNotes,
   itemProps,
   listProps,
+  navigationGuardNotes,
   navigationProps,
   rootProps,
   triggerProps,
@@ -42,19 +47,12 @@ import {
   <InfoGrid items={controlledBehaviorNotes} />
 </Section>
 
-<Section title="Base UI composition" description="Prefer render={<CustomButton />} over asChild for new code. Set nativeButton={false} when rendering a link. The render prop also accepts a Base UI render callback.">
-  <InfoGrid items={asChildRequirements} />
+<Section title="Base UI composition" description={compositionMigrationNotes}>
+  <CodeBlock code={compositionMigrationCode} filename="custom-trigger.tsx" />
 </Section>
 
 <Section title="Anatomy" description="Use these names when discussing visuals or behavior. Connector refers to StepperSeparator: the Track is the unfilled line and the Fill is the progress overlay. The Trigger is the interactive hit area; the Focus outline marks keyboard focus, not the active step.">
-  <InfoGrid items={[
-    { label: "Indicator", value: "StepperIndicator", help: "Number or status symbol." },
-    { label: "Connector", value: "StepperSeparator", help: "Track and Fill between adjacent steps." },
-    { label: "Trigger", value: "StepperTrigger", help: "Interactive target, distinct from its focus outline." },
-    { label: "Label / Description", value: "StepperLabel / StepperDescription", help: "Visible step name and supporting text." },
-    { label: "Panel", value: "StepperContent", help: "Content associated with the active step." },
-    { label: "Navigation", value: "StepperPrevious / StepperNext", help: "Persistent previous and next controls." },
-  ]} />
+  <InfoGrid items={anatomyParts} />
 </Section>
 
 <Section title="List props">
@@ -70,8 +68,7 @@ import {
 </Section>
 
 <Section
-  title="asChild requirements"
-  description="Stepper uses Base UI render composition. Existing asChild usage is supported as a compatibility alias. Custom elements must forward props and refs."
+  title="render and asChild requirements"
 >
   <InfoGrid items={asChildRequirements} />
 </Section>
@@ -80,7 +77,7 @@ import {
   <PropsTable rows={contentProps} />
 </Section>
 
-<Section title="Navigation props">
+<Section title="Navigation props" description={navigationGuardNotes}>
   <PropsTable rows={navigationProps} />
 </Section>
 
@@ -101,9 +98,11 @@ import {
   </div>
 </Section>
 
+<Section title="useStepperItem hook" description={itemHookNotes} />
+
 <Section
   title="Primitive parts"
-  description="Each part exposes data-slot and data-state attributes for predictable styling."
+  description="Rendered parts expose data-slot. Items, triggers and panels also expose data-state."
 >
   <div className="grid gap-3 md:grid-cols-2">
     {apiComponents.map((component) => (

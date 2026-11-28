@@ -1,0 +1,82 @@
+import * as React from "react";
+import { createRoot } from "react-dom/client";
+import { cn } from "cn";
+import { Adapter } from "./adapter";
+
+const appClass = SHARED_CN ? cn("onboarding-flow px-2", "px-4") : "onboarding-flow px-4";
+const timing = window.__timing;
+
+function App() {
+  const [flow, setFlow] = React.useState({ step: 0, status: "ready" });
+  const [name, setName] = React.useState("");
+  const [currency, setCurrency] = React.useState("");
+  const [qr, setQr] = React.useState(false);
+  const current = React.useRef(0);
+  const intent = React.useRef(0);
+  const pending = React.useRef(null);
+  const { step, status } = flow;
+
+  function commit(target, message) {
+    current.current = target;
+    setFlow({ step: target, status: message });
+  }
+
+  function accept(target) {
+    const from = current.current;
+    if (target === from || target < 0 || target > 2) return;
+    intent.current++;
+    commit(target, pending.current ? "interrupted" : "ready");
+  }
+
+  function validate(target) {
+    const from = current.current;
+    if (target <= from) return true;
+    if (pending.current) return false;
+    if (target !== from + 1 || (from === 0 ? !name.trim() : !/^(PEN|USD)$/i.test(currency.trim()))) {
+      commit(from, "invalid");
+      return false;
+    }
+    const token = ++intent.current;
+    commit(from, "checking");
+    return new Promise(resolve => {
+      pending.current = () => {
+        pending.current = null;
+        const allowed = token === intent.current;
+        if (!allowed) commit(current.current, "discarded");
+        resolve(allowed);
+      };
+    });
+  }
+
+  async function request(target) {
+    if (target <= current.current || await validate(target)) accept(target);
+  }
+
+  function edit(set, value) {
+    intent.current++;
+    set(value);
+  }
+
+  React.useLayoutEffect(() => {
+    timing.mounted ??= performance.now();
+    timing.commit(step, status);
+  });
+  timing.release = () => pending.current?.();
+
+  const panels = [
+    <section key="business" data-bench-panel={0}><h2>Business details</h2><label>Business name<input data-bench-field="business" value={name} onChange={e => edit(setName, e.target.value)} /></label></section>,
+    <section key="preferences" data-bench-panel={1}><h2>Regional preferences</h2><label>Currency<input data-bench-field="currency" value={currency} onChange={e => edit(setCurrency, e.target.value)} /></label><label><input type="checkbox" checked={qr} onChange={e => edit(setQr, e.target.checked)} />QR payments</label></section>,
+    <section key="review" data-bench-panel={2}><h2>Review workspace</h2><p>{name} · {currency} · QR {qr ? "enabled" : "disabled"}</p><button type="button" onClick={() => commit(2, "confirmed")}>Confirm setup</button></section>,
+  ];
+  const messages = { ready: "", checking: "Checking details", invalid: "Check the required field", interrupted: "Validation interrupted", discarded: "Stale result discarded", confirmed: "Confirmed locally" };
+  return <main className={appClass} data-bench-state={status} data-bench-current={step}>
+    <h1>Set up your business</h1>
+    <Adapter step={step} panels={panels} request={request} validate={validate} accept={accept} busy={status === "checking"} />
+    <p role="status">{messages[status]}</p>
+  </main>;
+}
+
+const root = createRoot(document.getElementById("root"));
+root.render(PROFILE_REACT
+  ? <React.Profiler id="onboarding" onRender={(_id, phase, actualDuration) => timing.react.push({ phase, actualDuration })}><App /></React.Profiler>
+  : <App />);

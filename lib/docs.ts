@@ -1,4 +1,5 @@
 import packageJson from "@/package.json";
+import { absoluteUrl } from "@/lib/site";
 
 const registryVersion = packageJson.version;
 
@@ -16,10 +17,12 @@ const releaseItems = [
   "The registry output is generated from components/ui/stepper.tsx.",
   "GitHub Actions verifies the registry, docs, tests, and production build.",
   "The public install command copies @stepper/stepper from the official shadcn registry namespace.",
-  "The component is copied into the user's app instead of installed as a runtime dependency.",
+  "The Stepper source is copied into the app. Its Base UI and cn runtime dependencies are installed or reused.",
 ];
 
-const gettingStartedSnippet = `import {
+const gettingStartedSnippet = `"use client";
+
+import {
   Stepper,
   StepperContent,
   StepperItem,
@@ -32,11 +35,11 @@ export function CheckoutStepper() {
   return (
     <Stepper defaultValue="account">
       <StepperList>
-        <StepperItem value="account" completed>
+        <StepperItem value="account">
           Account
         </StepperItem>
         <StepperItem value="profile">Profile</StepperItem>
-        <StepperItem value="payment" disabled>
+        <StepperItem value="payment">
           Payment
         </StepperItem>
       </StepperList>
@@ -53,19 +56,34 @@ export function CheckoutStepper() {
   );
 }`;
 
-const controlledSnippet = `const [step, setStep] = React.useState("details");
+const controlledSnippet = `"use client";
 
-<Stepper value={step} onValueChange={setStep}>
-  <StepperList>
-    <StepperItem value="details">Details</StepperItem>
-    <StepperItem value="review">Review</StepperItem>
-    <StepperItem value="confirm">Confirm</StepperItem>
-  </StepperList>
+import { useState } from "react";
+import {
+  Stepper, StepperContent, StepperItem, StepperList,
+  StepperNext, StepperPrevious, type StepperStepsValue,
+} from "@/components/ui/stepper";
 
-  <StepperContent value="details">Collect details.</StepperContent>
-  <StepperContent value="review">Review the request.</StepperContent>
-  <StepperContent value="confirm">Confirm the flow.</StepperContent>
-</Stepper>;`;
+const steps = [{ value: "details" }, { value: "review" }] as const;
+type Step = StepperStepsValue<typeof steps>;
+
+export function SetupStepper() {
+  const [step, setStep] = useState<Step>("details");
+  return (
+    <Stepper steps={steps} value={step} onValueChange={setStep}>
+      <StepperList>
+        <StepperItem value="details">Details</StepperItem>
+        <StepperItem value="review">Review</StepperItem>
+      </StepperList>
+      <StepperContent value="details">Enter your details.</StepperContent>
+      <StepperContent value="review">Review your details.</StepperContent>
+      <div className="flex justify-between">
+        <StepperPrevious />
+        <StepperNext />
+      </div>
+    </Stepper>
+  );
+}`;
 
 const usageSnippet = `import {
   Stepper,
@@ -82,6 +100,9 @@ const usageSnippet = `import {
 } from "@/components/ui/stepper";`;
 
 const registryInstallSnippet = `pnpm dlx shadcn@latest add @stepper/stepper`;
+const registryNamespaceConfig = JSON.stringify({
+  registries: { "@stepper": absoluteUrl("/r/{name}.json") },
+}, null, 2);
 
 const registryInstallCommands = {
   pnpm: registryInstallSnippet,
@@ -208,12 +229,12 @@ const controlledBehaviorNotes = [
   {
     label: "Missing value",
     value: "First enabled step",
-    help: "When value points to a step that does not exist, Stepper renders the first enabled step and calls onValueChange with that fallback.",
+    help: "When value points to a step that does not exist, Stepper renders the first enabled step without emitting onValueChange. The controlled owner can explicitly reconcile its value.",
   },
   {
     label: "Disabled value",
     value: "Skipped",
-    help: "When the selected step becomes disabled, Stepper moves to the first enabled step so controls and content stay coherent.",
+    help: "When the selected step becomes disabled, Stepper displays the first enabled step; if all are disabled, there is no active step. The controlled owner keeps its value.",
   },
   {
     label: "Real flows",
@@ -226,7 +247,7 @@ const asChildRequirements = [
   {
     label: "Focusable child",
     value: "button or link",
-    help: "StepperTrigger asChild should render a focusable element that can receive keyboard focus.",
+    help: "Use a focusable host for custom triggers and controls. Set nativeButton={false} for a link.",
   },
   {
     label: "Prop forwarding",
@@ -235,10 +256,30 @@ const asChildRequirements = [
   },
   {
     label: "Refs and events",
-    value: "forwardRef",
-    help: "Forward refs for custom components and avoid preventDefault unless you intentionally block navigation.",
+    value: "props and ref to the host",
+    help: "Forward the ref to the DOM element. An event handler can call preventDefault to block Stepper navigation.",
   },
 ];
+
+const anatomyParts = [
+  { label: "Indicator", value: "StepperIndicator", help: "Number or status symbol." },
+  { label: "Connector", value: "StepperSeparator", help: "Track and Fill between adjacent steps." },
+  { label: "Trigger", value: "StepperTrigger", help: "Interactive target. Its focus outline identifies keyboard focus." },
+  { label: "Label / Description", value: "StepperLabel / StepperDescription", help: "Visible step name and supporting text." },
+  { label: "Panel", value: "StepperContent", help: "Content associated with the active step." },
+  { label: "Navigation", value: "StepperPrevious / StepperNext", help: "Persistent previous and next controls." },
+];
+
+const compositionMigrationCode = `<StepperTrigger
+  nativeButton={false}
+  render={<a href="/setup/preferences" />}
+>
+  Preferences
+</StepperTrigger>`;
+
+const compositionMigrationNotes = "When updating an existing copy, review the installed source diff before replacing local customizations. Existing asChild composition is supported. Prefer render for new composition. Custom hosts receive the supplied props, handlers, and ref.";
+const navigationGuardNotes = "Guards run only on their own navigation controls. A pending guard sets aria-busy and data-pending on that control. A newer eligible request supersedes pending navigation even if its guard later returns false. The app owns shared workflow validation, external cancellation, and submission.";
+const itemHookNotes = "Call useStepperItem inside a StepperItem to read its value, index, orientation, state, position and trigger/panel IDs. Use setValue for enabled-step requests.";
 
 const themeTokensSnippet = `:root {
   --background: oklch(1 0 0);
@@ -1235,7 +1276,7 @@ const rootProps = [
   {
     name: "onValueChange",
     type: "(value: string) => void",
-    description: "Called when the selected step changes, including controlled fallbacks to the first enabled step.",
+    description: "Called for valid navigation requests. Rendering a fallback does not emit onValueChange.",
   },
   {
     name: "orientation",
@@ -1339,7 +1380,25 @@ const contentProps = [
     defaultValue: "false",
     description: "Render the content props onto a child element with Base UI composition (legacy API).",
   },
+  {
+    name: "render",
+    type: "ReactElement or Base UI render callback",
+    description: "Renders a custom content host with the panel's attributes.",
+  },
 ];
+
+const renderButtonProp = {
+  name: "render",
+  type: "ReactElement or Base UI render callback",
+  description: "Renders a custom interactive host with Stepper's props and handlers.",
+};
+
+const nativeButtonProp = {
+  name: "nativeButton",
+  type: "boolean",
+  defaultValue: "!asChild",
+  description: "Set false for a link or other non-button host. Disabled non-button hosts use aria-disabled and leave the tab order.",
+};
 
 const triggerProps = [
   {
@@ -1352,8 +1411,10 @@ const triggerProps = [
     name: "disabled",
     type: "boolean",
     defaultValue: "false",
-    description: "Disables the trigger in addition to the parent StepperItem disabled state. With asChild, aria-disabled and tabIndex are applied instead of a native disabled attribute.",
+    description: "Disables the trigger in addition to the parent StepperItem disabled state.",
   },
+  renderButtonProp,
+  nativeButtonProp,
 ];
 
 const navigationProps = [
@@ -1379,6 +1440,8 @@ const navigationProps = [
     type: "() => boolean | Promise<boolean>",
     description: "Runs before StepperNext changes the value. Return false to cancel navigation.",
   },
+  renderButtonProp,
+  nativeButtonProp,
 ];
 
 const useStepperRows = [
@@ -1391,6 +1454,11 @@ const useStepperRows = [
     name: "steps",
     type: "{ value: string; disabled: boolean }[]",
     description: "Registered step order used by navigation helpers.",
+  },
+  {
+    name: "orientation",
+    type: '"horizontal" | "vertical"',
+    description: "The configured direction of the list and connectors.",
   },
   {
     name: "currentIndex",
@@ -1406,6 +1474,11 @@ const useStepperRows = [
     name: "setValue",
     type: "(value: string) => void",
     description: "Selects an enabled step by value.",
+  },
+  {
+    name: "getStepIndex",
+    type: "(value: string) => number",
+    description: "Looks up a step's zero-based index. Returns -1 for unknown values.",
   },
   {
     name: "canGoPrevious / canGoNext",
@@ -1535,11 +1608,14 @@ const v2Roadmap = [
 
 export {
   accessibilityNotes,
+  anatomyParts,
   apiComponents,
   asChildRequirements,
   checkoutExampleCode,
   circleProgressRecipeSnippet,
   compositionCode,
+  compositionMigrationCode,
+  compositionMigrationNotes,
   contentProps,
   controlledBehaviorNotes,
   controlledExampleCode,
@@ -1550,12 +1626,15 @@ export {
   gettingStartedSnippet,
   indicatorCode,
   itemProps,
+  itemHookNotes,
   listProps,
   mobileDrawerPatternSnippet,
   navigationProps,
+  navigationGuardNotes,
   registryVersion,
   registryInstallCommands,
   registryInstallSnippet,
+  registryNamespaceConfig,
   registryNotes,
   quickFacts,
   reactHookFormAdapterPreviewCode,

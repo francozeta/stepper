@@ -14,7 +14,7 @@ type BlockPreviewCardProps = {
   demoHref: string;
   codePath: string;
   filename: string;
-  installCommands: BlockInstallCommands;
+  installCommands?: BlockInstallCommands;
   className?: string;
 };
 

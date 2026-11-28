@@ -47,6 +47,10 @@ export const tokens = [
   </div>
 </Section>
 
+<Section title="Keep your design system" description="No preset migration is required. Use your existing theme tokens, className overrides and local component source. The Stepper core uses Base UI for composition regardless of the surrounding component preset.">
+  <p className="text-sm leading-relaxed text-muted-foreground">The default registry uses cn for class conflict resolution. If your project already uses cn, share that dependency. An application-owned compiled helper is optional; include installed Stepper classes in the scan. Do not silently replace the merge engine in a legacy project: logical inset overrides differed in our tests. Preserve visible keyboard focus, disabled states and reduced motion when restyling.</p>
+</Section>
+
 <Section
   title="Theme token overrides"
   description="Stepper reads the same semantic tokens as the rest of your shadcn/ui project."

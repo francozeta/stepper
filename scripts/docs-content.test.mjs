@@ -53,6 +53,32 @@ describe("MDX docs content", () => {
     expect(sidebar).toContain("DocsSearchTrigger");
   });
 
+  it("documents a complete first flow and the silent controlled fallback", async () => {
+    const install = await readText("content/docs/installation.mdx");
+    const docsData = await readText("lib/docs.ts");
+    expect(install).toContain("Node.js 22");
+    expect(install).toContain("Tailwind CSS v4");
+    expect(install).toContain("components.json");
+    expect(install).toContain("without calling onValueChange");
+    expect(docsData).toContain('export function SetupStepper()');
+    expect(docsData).toContain("without emitting onValueChange");
+    expect(docsData).not.toContain("including controlled fallbacks");
+  });
+
+  it("only advertises registry items that exist", async () => {
+    const blocks = await readText("content/docs/blocks.mdx");
+    const markdown = await readText("lib/docs-markdown.ts");
+    const registry = JSON.parse(await readText("public/registry.json"));
+    for (const source of [blocks, markdown, await readText("README.md"), await readText("lib/docs.ts")]) {
+      for (const [, name] of source.matchAll(/add @stepper\/([a-z-]+)/g)) {
+        expect(registry.items.some((item) => item.name === name)).toBe(true);
+      }
+    }
+    expect(blocks).toContain("not a published registry item");
+    expect(markdown).toContain("without emitting onValueChange");
+    expect(markdown).toContain("Base Nova is not required");
+  });
+
   it("documents Stepper ownership, controlled fallback, and composition boundaries", async () => {
     const index = await readText("content/docs/index.mdx");
     const stepper = await readText("content/docs/stepper.mdx");

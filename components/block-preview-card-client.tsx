@@ -35,7 +35,7 @@ type BlockPreviewCardClientProps = {
   demoHref: string;
   preview: React.ReactNode;
   code: React.ReactNode;
-  installCommands: BlockInstallCommands;
+  installCommands?: BlockInstallCommands;
   className?: string;
 };
 
@@ -88,7 +88,7 @@ function BlockPreviewCardClient({
           </TabsList>
 
           <div className="flex min-w-0 flex-wrap items-center gap-2 lg:justify-end">
-            <CompactInstallCommand commands={installCommands} />
+            {installCommands ? <CompactInstallCommand commands={installCommands} /> : <span className="text-xs text-muted-foreground">Preview only</span>}
             <Button
               asChild
               variant="outline"

@@ -1,0 +1,55 @@
+import * as React from "react";
+import { createRoot, version } from "react-dom/client";
+import { cn } from "cn";
+import { Flow } from "bench-adapter";
+
+const bench = window.__bench;
+const { count, callbacks, fieldScope, childrenMode } = window.__benchConfig;
+const steps = Array.from({ length: count }, (_, index) => ({ value: String(index) }));
+const Draft = React.createContext(null);
+const heading = cn("mb-4 text-xl font-semibold", "text-foreground");
+
+function DraftField() {
+  const lifted = React.useContext(Draft);
+  const local = React.useState("");
+  const [draft, setDraft] = fieldScope === "field" ? local : lifted;
+
+  React.useLayoutEffect(() => {
+    bench.commitEdit(draft);
+  }, [draft]);
+
+  return <label className="block">
+    Business name
+    <input className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 text-base"
+      data-bench-field value={draft} onChange={event => setDraft(event.target.value)} />
+    <output data-bench-draft className="sr-only">{draft}</output>
+  </label>;
+}
+
+function App() {
+  const [step, setStep] = React.useState("0");
+  const [draft, setDraft] = React.useState("");
+  const lifted = React.useMemo(() => [draft, setDraft], [draft]);
+  const field = React.useMemo(() => <DraftField />, []);
+  const changeStep = callbacks === "stable" ? setStep : value => setStep(value);
+
+  React.useLayoutEffect(() => {
+    bench.commitStep(step);
+  }, [step]);
+
+  return <Draft.Provider value={lifted}>
+    <main className="mx-auto max-w-2xl p-4" data-bench-step={step}>
+      <h1 className={heading}>Set up your business</h1>
+      <Flow step={step} steps={steps} field={field} changeStep={changeStep} childrenMode={childrenMode} />
+    </main>
+  </Draft.Provider>;
+}
+
+bench.versions = { react: React.version, reactDom: version };
+const root = createRoot(document.getElementById("root"));
+const app = <App />;
+root.render(PROFILE_REACT
+  ? <React.Profiler id="App" onRender={(_id, phase, duration, _base, start, commit) => {
+      bench.commits.push({ phase, duration, start, commit });
+    }}>{app}</React.Profiler>
+  : app);

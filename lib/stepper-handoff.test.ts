@@ -29,6 +29,22 @@ describe("handoff navigation policy", () => {
     expect(state.updates).toBe(true);
   });
 
+  it("rejects pending assistance after editing the same stage or leaving and returning", () => {
+    const filled = handoffReducer(initialState, { type: "workspace", value: "Studio" });
+    const pending = { type: "navigate", source: "agent", target: "preferences", expectedStage: "account", expectedRevision: filled.revision } as const;
+    const edited = handoffReducer(filled, { type: "workspace", value: "My studio" });
+    const rejected = handoffReducer(edited, pending);
+    expect(rejected.stage).toBe("account");
+    expect(rejected.workspace).toBe("My studio");
+    expect(rejected.history.at(-1)?.result).toBe("blocked");
+
+    const forward = handoffReducer(filled, { type: "navigate", source: "human", target: "preferences" });
+    const back = handoffReducer(forward, { type: "navigate", source: "human", target: "account" });
+    expect(handoffReducer(back, pending).history.at(-1)?.result).toBe("blocked");
+    const retry = handoffReducer(back, { ...pending, expectedRevision: back.revision });
+    expect(retry.stage).toBe("preferences");
+  });
+
   it("rejects unknown targets", () => {
     const state = handoffReducer(initialState, { type: "navigate", source: "agent", target: "unknown" });
     expect(state.stage).toBe("account");

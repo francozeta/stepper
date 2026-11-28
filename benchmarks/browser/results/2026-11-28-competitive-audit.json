@@ -1,0 +1,94 @@
+{
+  "revision": "8de8d6c55fa60a3b44546c4569e844a9896845ee",
+  "currentCoreSha256": "7985ba7725227539d8c9839a08dba03d1e8435a28170567eb8aa4215baa6f6ae",
+  "mode": "audit",
+  "browser": "156.0.8078.4",
+  "node": "v22.23.5",
+  "lockSha256": "f3b3b023fed997933fdc8bd4ea520ea7e41bbefe9b942e2e9b170e9119b8b9ad",
+  "variants": {
+    "native": {
+      "initialNextEnabled": true,
+      "rejectsEmptyInput": true,
+      "violations": [],
+      "afterArrow": {
+        "focus": "1",
+        "current": "0",
+        "state": "invalid",
+        "focusOutline": "2px"
+      },
+      "afterEnter": "checking",
+      "listRole": "ol",
+      "customButtonHosts": 3
+    },
+    "stepper-before": {
+      "initialNextEnabled": true,
+      "rejectsEmptyInput": true,
+      "violations": [],
+      "afterArrow": {
+        "focus": "1",
+        "current": "0",
+        "state": "invalid",
+        "focusOutline": "2px"
+      },
+      "afterEnter": "checking",
+      "listRole": "ol",
+      "customButtonHosts": 3
+    },
+    "stepper": {
+      "initialNextEnabled": true,
+      "rejectsEmptyInput": true,
+      "violations": [],
+      "afterArrow": {
+        "focus": "1",
+        "current": "0",
+        "state": "invalid",
+        "focusOutline": "2px"
+      },
+      "afterEnter": "checking",
+      "listRole": "ol",
+      "customButtonHosts": 3
+    },
+    "ark": {
+      "initialNextEnabled": true,
+      "rejectsEmptyInput": true,
+      "violations": [],
+      "afterArrow": {
+        "focus": "1",
+        "current": "0",
+        "state": "invalid",
+        "focusOutline": "2px"
+      },
+      "afterEnter": "checking",
+      "listRole": "tablist",
+      "customButtonHosts": 3
+    },
+    "stepperize": {
+      "initialNextEnabled": true,
+      "rejectsEmptyInput": true,
+      "violations": [],
+      "afterArrow": {
+        "focus": "1",
+        "current": "0",
+        "state": "checking",
+        "focusOutline": "2px"
+      },
+      "afterEnter": "checking",
+      "listRole": "tablist",
+      "customButtonHosts": 3
+    },
+    "dice": {
+      "initialNextEnabled": false,
+      "rejectsEmptyInput": true,
+      "violations": [],
+      "afterArrow": {
+        "focus": "0",
+        "current": "0",
+        "state": "checking",
+        "focusOutline": "2px"
+      },
+      "afterEnter": "checking",
+      "listRole": "tablist",
+      "customButtonHosts": 3
+    }
+  }
+}
