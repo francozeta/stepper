@@ -12,14 +12,14 @@ export function navigationError(current: Stage, target: string, name: string, cu
 }
 
 export type DemoStep = { ref: string; action: string; args: unknown[] };
-export function exampleSteps(stage: Stage, name: string, currency: string, qrTouched: boolean): DemoStep[] {
+export function exampleSteps(stage: Stage, name: string, currency: string, qrTouched: boolean, touched: { name?: boolean; currency?: boolean } = {}): DemoStep[] {
   const result: DemoStep[] = [];
   if (stage === "business") {
-    if (!name.trim()) result.push({ ref: "Business name", action: "setValue", args: ["Café Studio"] });
+    if (!name.trim() && !touched.name) result.push({ ref: "Business name", action: "setValue", args: ["Café Studio"] });
     result.push({ ref: "Onboarding progress", action: "setValue", args: ["preferences"] });
   }
   if (stage !== "review") {
-    if (!currency.trim()) result.push({ ref: "Currency", action: "setValue", args: ["PEN"] });
+    if (!currency.trim() && !touched.currency) result.push({ ref: "Currency", action: "setValue", args: ["PEN"] });
     if (!qrTouched) result.push({ ref: "QR payments", action: "setChecked", args: [true] });
     result.push({ ref: "Onboarding progress", action: "setValue", args: ["review"] });
   }

@@ -47,11 +47,18 @@ const fieldClass = "h-11 w-full rounded-lg border border-border bg-background px
 const steps = stages.map((value) => ({ value }));
 
 export function StepperAgentOnboarding() {
-  const [stage, setStage] = React.useState<Stage>("business");
-  const [name, setName] = React.useState("");
-  const [currency, setCurrency] = React.useState("");
-  const [qr, setQr] = React.useState(false);
-  const [qrTouched, setQrTouched] = React.useState(false);
+  const [draft, setDraft] = React.useState({
+    stage: "business" as Stage, name: "", currency: "", qr: false,
+    qrTouched: false, nameTouched: false, currencyTouched: false,
+  });
+  const latest = React.useRef(draft);
+  const { stage, name, currency, qr } = draft;
+
+  // SDK calls may arrive before React commits. Read the last accepted intent.
+  function updateDraft(patch: Partial<typeof draft>) {
+    latest.current = { ...latest.current, ...patch };
+    setDraft(latest.current);
+  }
   const [busy, setBusy] = React.useState(false);
   const [message, setMessage] = React.useState("");
   const [confirmed, setConfirmed] = React.useState(false);
@@ -60,12 +67,13 @@ export function StepperAgentOnboarding() {
   React.useEffect(() => () => running.current?.abort(), []);
 
   function requestStage(target: string) {
-    const error = navigationError(stage, target, name, currency);
+    const current = latest.current;
+    const error = navigationError(current.stage, target, current.name, current.currency);
     if (error) {
       setMessage(error);
       return false;
     }
-    setStage(target as Stage);
+    updateDraft({ stage: target as Stage });
     setMessage("");
     setConfirmed(false);
     return true;
@@ -87,19 +95,22 @@ export function StepperAgentOnboarding() {
   }
 
   async function prepare() {
-    if (running.current || stage === "review") return;
+    const current = latest.current;
+    if (running.current || current.stage === "review") return;
     const controller = new AbortController();
     running.current = controller;
     setBusy(true);
     setMessage("");
     try {
       const agent = getBridge();
-      const result = await agent.act({ steps: exampleSteps(stage, name, currency, qrTouched) }, { signal: controller.signal });
+      const result = await agent.act({ steps: exampleSteps(current.stage, current.name, current.currency, current.qrTouched, {
+        name: current.nameTouched, currency: current.currencyTouched,
+      }) }, { signal: controller.signal });
       if (controller.signal.aborted) setMessage("Paused. Continue by hand or resume.");
       else if (result.ok) setMessage("Draft prepared. Review before confirming.");
-      else setMessage((message) => message || "A change was blocked. Check the fields or open the action details.");
+      else setMessage((message) => message || "A change was blocked. Check the fields before continuing.");
     } catch {
-      setMessage(controller.signal.aborted ? "Paused." : "The bridge could not finish. You can continue manually.");
+      setMessage(controller.signal.aborted ? "Paused." : "The assistant could not finish. You can continue manually.");
     } finally {
       running.current = null;
       setBusy(false);
@@ -122,7 +133,7 @@ export function StepperAgentOnboarding() {
       <header className="grid gap-3">
         <Link href="/drafts/handoff" className="w-fit text-xs text-muted-foreground hover:text-foreground">Stepper / Research / 006</Link>
         <h1 className="text-2xl font-medium tracking-tight">Set up your business.</h1>
-        <p className="text-sm text-muted-foreground">Fill it in yourself or let the assistant prepare a sample. Review it before confirming.</p>
+        <p className="text-sm text-muted-foreground">Complete it yourself or ask for help.</p>
       </header>
       <section onPointerDownCapture={(event) => { if (event.nativeEvent.isTrusted) stop(); }} onKeyDownCapture={(event) => { if (event.nativeEvent.isTrusted) stop(); }} className="rounded-2xl border border-border p-4 sm:p-6">
         <AgentProgress aria-label="Onboarding progress" value={stage} onValueChange={(value, details) => {
@@ -140,24 +151,22 @@ export function StepperAgentOnboarding() {
                 <h2 className="text-lg font-medium">Make it yours.</h2>
                 <label className="grid gap-2 text-sm">Business name
                   <Input aria-label="Business name" name="business" value={name} onValueChange={(value, details) => {
-                    if (acceptChange(details)) setName(value);
+                    if (acceptChange(details)) updateDraft({ name: value, ...(details.source !== "agent" ? { nameTouched: true } : {}) });
                   }} placeholder="Your café" className={fieldClass} />
                 </label>
-                <p className="text-xs text-muted-foreground">The name your customers will see.</p>
               </StepperContent>
               <StepperContent {...panel("preferences")}>
                 <h2 className="text-lg font-medium">Set your preferences.</h2>
                 <label className="grid gap-2 text-sm">Currency
                   <Input aria-label="Currency" name="currency" value={currency} onValueChange={(value, details) => {
-                    if (acceptChange(details)) setCurrency(value);
+                    if (acceptChange(details)) updateDraft({ currency: value, ...(details.source !== "agent" ? { currencyTouched: true } : {}) });
                   }} placeholder="PEN or USD" className={fieldClass} />
                 </label>
                 <label className="flex items-center justify-between gap-3 text-sm">
                   <span>QR payments</span>
                   <Switch aria-label="QR payments" checked={qr} onCheckedChange={(value, details) => {
                     if (!acceptChange(details)) return;
-                    setQr(value);
-                    setQrTouched(true);
+                    updateDraft({ qr: value, qrTouched: true });
                   }} className="group relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border bg-muted p-0.5 data-checked:bg-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
                     <SwitchThumb className="size-4 rounded-full bg-background shadow-sm transition-transform group-data-checked:translate-x-5 motion-reduce:transition-none" />
                   </Switch>
@@ -172,20 +181,19 @@ export function StepperAgentOnboarding() {
                 </dl>
               </StepperContent>
             </div>
-            <div className="flex justify-between gap-3 border-t pt-4">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-t pt-4">
               <StepperPrevious className="rounded-full">Back</StepperPrevious>
+              <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+                <button type="button" aria-label={busy ? "Stop assistant" : "Fill with assistant"} disabled={!busy && stage === "review"} onClick={busy ? stop : prepare} className="h-9 rounded-full border border-border px-3 text-sm font-medium hover:bg-muted disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">{busy ? "Stop" : message.startsWith("Paused") ? "Resume" : "Assist"}</button>
               {stage === "review" ? (
                 <button type="button" onClick={() => setConfirmed(true)} disabled={confirmed} className="inline-flex h-9 min-w-24 items-center justify-center rounded-full border border-primary bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring/50 focus-visible:ring-[3px] focus-visible:outline-none disabled:opacity-50">{confirmed ? "Confirmed locally" : "Confirm setup"}</button>
               ) : <StepperNext className="rounded-full">Continue</StepperNext>}
+              </div>
             </div>
+            <p role="status" className="min-h-10 text-sm text-muted-foreground">{message || (busy ? "Preparing your setup. You can still edit." : stage === "review" ? "Review your choices before confirming." : "Assist uses sample details and keeps your choices.")}</p>
           </Stepper>
         </AgentProgress>
       </section>
-      <div className="grid gap-2">
-        <button type="button" disabled={!busy && stage === "review"} onClick={busy ? stop : prepare} className="w-fit rounded-full border border-border px-4 py-2 text-sm font-medium disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">{busy ? "Stop assistant" : "Fill with assistant"}</button>
-        <p className="text-sm text-muted-foreground">Uses sample details and keeps your existing choices.</p>
-        <p role="status" className="min-h-10 text-sm text-muted-foreground">{message || (busy ? "Preparing your example…" : "")}</p>
-      </div>
       <p className="text-xs text-muted-foreground">Local demo using UI SDK actions. No external submissions.</p>
     </main>
   );

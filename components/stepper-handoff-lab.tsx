@@ -87,20 +87,17 @@ export function StepperHandoffLab() {
               <p className="text-sm">Updates: {state.updates ? "Enabled" : "Disabled"}</p>
             </StepperContent>
           </div>
-          <div className="flex justify-between gap-3 border-t pt-4">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-t pt-4">
             <StepperPrevious className="rounded-full">Back</StepperPrevious>
-            <StepperNext className="rounded-full">Continue</StepperNext>
+            <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+              <button type="button" aria-label={pending ? "Stop assistant" : "Continue with assistant"} onClick={requestHelp} disabled={!pending && index === stages.length - 1} className="h-9 rounded-full border border-border px-3 text-sm font-medium hover:bg-muted disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">{pending ? "Stop" : "Assist"}</button>
+              <StepperNext className="rounded-full">Continue</StepperNext>
+            </div>
           </div>
+          <p role="status" className="min-h-10 text-sm text-muted-foreground">
+            {pending ? "Preparing the next step. You can still edit." : last?.result === "blocked" ? last.message : last?.source === "agent" ? "Assistant moved you to the next step." : "Assist follows the same rules as you."}
+          </p>
         </Stepper>
-      </section>
-
-      <section className="grid gap-2">
-        <button type="button" onClick={requestHelp} disabled={!pending && index === stages.length - 1} className="w-fit rounded-full border border-border px-4 py-2 text-sm font-medium disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
-          {pending ? "Stop assistant" : "Continue with assistant"}
-        </button>
-        <p role="status" className="min-h-10 text-sm text-muted-foreground">
-          {pending ? "Preparing the next step. You can still edit or navigate." : last?.result === "blocked" ? last.message : last?.source === "agent" ? "Assistant moved you to the next step." : "The assistant follows the same rules as you."}
-        </p>
       </section>
 
       <section className="grid gap-2 border-t pt-5">

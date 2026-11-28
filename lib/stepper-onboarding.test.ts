@@ -16,5 +16,10 @@ describe("agent-ready onboarding policy", () => {
       { ref: "Onboarding progress", action: "setValue", args: ["review"] },
     ]);
     expect(exampleSteps("review", "Studio", "PEN", true)).toEqual([]);
+    // A blank field can be a deliberate human edit, not an invitation to overwrite.
+    expect(exampleSteps("business", "", "", true, { name: true, currency: true })).toEqual([
+      { ref: "Onboarding progress", action: "setValue", args: ["preferences"] },
+      { ref: "Onboarding progress", action: "setValue", args: ["review"] },
+    ]);
   });
 });
