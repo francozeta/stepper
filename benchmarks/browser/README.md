@@ -17,3 +17,5 @@ cp benchmarks/browser/* "$tmp/"
 ```
 
 Next comparators: Dice UI Base at pinned commit 391f1ef1a015e34666b25aa00c07de4a80feeea1; its registry requires direction and icon generation dependencies, so include the real installed source in a separate fixture rather than stubbing its behavior. Also test installed consumer code in a real product, current Stepperize release, actual WebKit and physical mobile, async network abort, and independent developers. No comparative results until the workflow has run. References: https://ark-ui.com/docs/components/steps, https://www.stepperize.com/docs/v8/api/react/primitives, https://www.stepperize.com/docs/v8/guides/navigation.
+
+First successful exploratory browser run: [captured Vercel Sandbox measurements](results/2026-11-27-vercel.json). Direct dependency versions are recorded; the disposable VM's full lock was not retained. This run used Playwright 1.65.1 rather than the CI pin, and is separate from the failed GitHub Actions run.

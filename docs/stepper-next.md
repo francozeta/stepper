@@ -170,3 +170,16 @@ An isolated [browser harness](../benchmarks/browser/README.md) adds actual Ark U
 ## CI cost and browser runner correction
 
 [Browser comparison run 1](https://github.com/francozeta/stepper/actions/runs/46100877816) installed dependencies but failed during browser installation: the pinned Playwright does not support Ubuntu 26.04 on x64. No comparative results were generated. Pin the isolated runner to Ubuntu 24.04; run this heavyweight workflow only on explicit workflow dispatch, cancel superseded runs on the same ref, and retain artifacts for seven days. Keep Verify and the short internal benchmark automatic. The new manual workflow requires its definition on the default branch for normal dispatch; the current draft is not merged. No rerun initiated. Stepper is public, so standard hosted runners are not a private-repository minutes saving; the opt-in policy reduces redundant work and artifact retention. Private repository pipelines are outside this change.
+
+## First competitive Chromium run — 2026-11-27
+
+[Captured measurements](../benchmarks/browser/results/2026-11-27-vercel.json) from revision `5cd44a9` in one temporary Vercel VM (1 vCPU, 2 GB RAM, Ubuntu 26.04.1, Node 24.22.3, Chromium 159.0.8154.6). Upgraded Playwright to 1.65.1 and installed its OS libraries only in the sandbox. All four integrations passed five checks in each profile (40/40); no page errors. ArrowRight moved focus to Preferences without selection only in our tested adapter; the other tested defaults left focus on Business. This is not a claim about all keyboard configurations.
+
+| Integration | Full gzip bytes | Incremental vs native | Desktop median ms / 80 updates | Mobile emulation 4x median ms / 80 updates |
+| --- | ---: | ---: | ---: | ---: |
+| Native | 61,325 | 0 | 7.0 | 31.4 |
+| Stepper | 78,528 | 17,203 | 26.7 | 130.3 |
+| Ark UI | 69,311 | 7,986 | 52.6 | 173.4 |
+| Stepperize | 66,695 | 5,370 | 27.6 | 90.0 |
+
+Stepper is larger than both libraries; desktop medians are similar to Stepperize, mobile CPU emulation is slower than Stepperize. All integrations preserved the controlled owner change, including native and Ark with app-owned revision guards. Do not claim unique reliability or a significant desktop win from a single run. Native has fewer features. Compare incremental bundle composition with and without Base UI and cn, isolate context updates, benchmark equivalent features and randomized library order, and repeat on actual devices before release. The resolved transitive lock was not preserved from the disposable VM; direct versions and measured samples were captured. CI's original browser run is still failed; this is separate evidence. VM stopped after 123.976 seconds; no additional sandbox or runtime dependency changes.
