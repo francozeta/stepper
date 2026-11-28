@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/stepper";
 
 export const metadata: Metadata = {
-  title: "Identity study 007",
+  title: "Identity study 008",
   description: "A composable React stepper for onboarding, checkout and multi-step forms.",
   robots: { index: false, follow: false },
 };
@@ -21,7 +21,7 @@ const neutral = {
   "--primary-foreground": "#fff", "--muted": "#f4f4f4",
   "--muted-foreground": "#626262", "--border": "#d4d4d4",
   "--ring": "#555", "--input": "#d4d4d4",
-  "--destructive": "#b91c1c", colorScheme: "light",
+  "--destructive": "#b91c1c", "--destructive-foreground": "#fff", colorScheme: "light",
 } as CSSProperties;
 const serif = "[font-family:Georgia,'Times_New_Roman',serif] font-normal tracking-[-.055em]";
 const rule = "border-[#bd171c]/35";
@@ -189,12 +189,92 @@ function AnatomyNote({ part, children }: { part: string; children: string }) {
   return <span aria-hidden="true" data-anatomy-note={part}>{children}</span>;
 }
 
-function Mark({ className = "" }: {className?: string}) {
+const markPath = "M5 34h13V23h13V12h12v24H30v7H5z";
+
+function Mark({ className = "", construction = false }: {className?: string; construction?: boolean}) {
   return <svg viewBox="0 0 48 48" fill="none" aria-hidden="true" className={className}>
-    <path d="M5 34h13V23h13V12h12v24H30v7H5z" fill="currentColor"/>
-    <path d="M5 43V34h13V23h13V12h12M1 34h46M18 5v42M31 5v42" stroke="currentColor" strokeWidth=".65" opacity=".45"/>
+    <path d={markPath} fill="currentColor"/>
+    {construction && <path d="M5 43V34h13V23h13V12h12M1 34h46M18 5v42M31 5v42" stroke="currentColor" strokeWidth=".65" opacity=".45"/>}
     <path d="M11 39h7m6-11h7m6-11h6" stroke={paper} strokeWidth="1.2"/>
   </svg>;
+}
+
+const markStyles = `
+  .identity-mark [data-mark-fill] {
+    clip-path: inset(0 0 0 0);
+    transition: clip-path 260ms cubic-bezier(.2,.8,.2,1);
+  }
+  .identity-mark:has([data-slot="stepper-trigger"][aria-current="step"][data-mark-stage="account"]) [data-mark-fill] { clip-path: inset(0 62.5% 0 0); }
+  .identity-mark:has([data-slot="stepper-trigger"][aria-current="step"][data-mark-stage="details"]) [data-mark-fill] { clip-path: inset(0 35.42% 0 0); }
+  .identity-mark:has([data-slot="stepper-trigger"][aria-current="step"][data-mark-stage="confirm"]) [data-mark-fill] { clip-path: inset(0 0 0 0); }
+  .identity-mark:not(:has(#identity-mark-grid:checked)) [data-mark-grid] { visibility: hidden; }
+  @media (prefers-reduced-motion: reduce) {
+    .identity-mark [data-mark-fill] { transition: none; }
+  }
+`;
+
+function MarkStudy() {
+  return (
+    <div className="identity-mark min-w-0">
+      <style>{markStyles}</style>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h3 className="text-xl font-medium tracking-tight">A mark in motion.</h3>
+        <label className="flex min-h-11 cursor-pointer items-center gap-2 text-sm text-[#555]">
+          <input type="checkbox" id="identity-mark-grid" defaultChecked className="size-4 accent-[#bd171c]"/>
+          Construction
+        </label>
+      </div>
+      <div style={neutral} className="mt-3 rounded-xl border border-border bg-background p-4 text-foreground sm:p-6">
+        <Stepper steps={stages} defaultValue="confirm" className="gap-6">
+          <div className="grid min-w-0 place-items-center overflow-hidden rounded-lg bg-[#f2efeb] py-5">
+            <svg viewBox="0 0 180 132" className="h-[156px] w-full max-w-[260px] text-[#bd171c]" aria-hidden="true">
+              <g data-mark-grid="" stroke="currentColor" strokeWidth=".6" opacity=".35" fill="none">
+                {[42,68,94,118].map(x=><path key={x} d={"M"+x+" 12V112"}/>)}
+                {[30,52,74,92].map(y=><path key={y} d={"M26 "+y+"H136"}/>)}
+                <path d="M26 105h110m-110-4v8m110-8v8" strokeDasharray="2 2"/>
+              </g>
+              <g transform="translate(32 6) scale(2)">
+                <path d={markPath} fill="currentColor" opacity=".10"/>
+                <path data-mark-fill="" d={markPath} fill="currentColor"/>
+                <path d={markPath} stroke="currentColor" strokeWidth=".45" strokeLinejoin="round"/>
+                <path d="M11 39h7m6-11h7m6-11h6" stroke={paper} strokeWidth="1.2"/>
+              </g>
+              <g data-mark-grid="" fill="currentColor" fontSize="8" fontFamily="monospace">
+                <text x="42" y="121">01</text><text x="68" y="121">02</text><text x="94" y="121">03</text>
+              </g>
+            </svg>
+          </div>
+          <StepperList aria-label="Logo progress" className="min-w-0 [&>li]:min-w-0">
+            {stages.map(({value},index)=><StepperItem key={value} value={value} defaultTrigger={false}>
+              <StepperTrigger data-mark-stage={value}><StepperIndicator/><StepperLabel>{["Start","Build","Complete"][index]}</StepperLabel></StepperTrigger>
+            </StepperItem>)}
+          </StepperList>
+        </Stepper>
+      </div>
+      <p className="mt-3 text-sm leading-relaxed text-[#555]">Move between steps to reveal the mark. The transition can reverse at any point.</p>
+    </div>
+  );
+}
+
+function MarkSizes() {
+  return <div className="min-w-0">
+    <h3 className="flex min-h-11 items-center text-xl font-medium tracking-tight">At every scale.</h3>
+    <div className="mt-3 grid min-h-[300px] grid-rows-[1fr_auto] overflow-hidden rounded-xl border border-[#242424]/15 bg-white">
+      <div className="grid grid-cols-2">
+        <div className="grid place-items-center bg-[#bd171c] text-white">
+          <svg viewBox="0 0 48 48" aria-hidden="true" className="size-20 sm:size-24"><path d={markPath} fill="currentColor"/></svg>
+        </div>
+        <div className="grid place-items-center bg-[#f2efeb] text-[#bd171c]"><Mark className="size-20 sm:size-24"/></div>
+      </div>
+      <div className="grid grid-cols-3 border-t border-[#242424]/15">
+        {[16,24,40].map(size=><div key={size} className="grid min-h-[104px] grid-rows-[48px_auto] place-items-center border-r border-[#242424]/10 px-2 py-3 last:border-r-0">
+          <svg viewBox="0 0 48 48" aria-hidden="true" style={{width:size,height:size}} className="text-[#242424]"><path d={markPath} fill="currentColor"/>{size!==16&&<path d="M11 39h7m6-11h7m6-11h6" stroke="white" strokeWidth="1.2"/>}</svg>
+          <span className="font-mono text-xs text-[#555]">{size}px</span>
+        </div>)}
+      </div>
+    </div>
+    <p className="mt-3 text-sm leading-relaxed text-[#555]">A simplified silhouette for small surfaces. The proposed mark is not yet the official logo.</p>
+  </div>;
 }
 
 function Demo() {
@@ -332,15 +412,15 @@ function StateStudy() {
   return (
     <div className="identity-states min-w-0">
       <h3 className="text-xl font-medium tracking-tight">State</h3>
-      <p className="mt-2 max-w-[44ch] text-sm leading-relaxed text-[#555]">Select a step. Its state updates with the flow; errors and disabled steps are set by your application.</p>
-      <div style={neutral} className="mt-5 flex min-h-[220px] items-center rounded-xl border border-border bg-background px-2 py-6 text-foreground sm:px-5">
+      <p className="mt-2 max-w-[44ch] text-sm leading-relaxed text-[#555]">Try the steps. Completion, errors and availability belong to your application.</p>
+      <div style={neutral} className="mt-5 flex min-h-[232px] items-center rounded-xl border border-border bg-background px-2 py-6 text-foreground sm:px-5">
         <Stepper steps={stateSteps} defaultValue="details" className="w-full min-w-0 gap-5">
-          <StepperList aria-label="Explore step states" className="min-w-0 [&>li]:min-w-0">
+          <StepperList aria-label="Explore step states" className="min-w-0 [&>li]:min-w-[3.6rem] sm:[&>li]:min-w-[4rem]">
             {stateSteps.map(({value},index)=>(
               <StepperItem key={value} value={value} completed={value==="account"} error={value==="payment"} defaultTrigger={false} className="min-w-0">
                 <StepperTrigger className="min-w-0 gap-2.5">
                   <StepperIndicator/>
-                  <StepperLabel className="text-[11px] sm:text-xs">
+                  <StepperLabel className="text-[10px] leading-4 sm:text-xs">
                     {stateNames.map(state=><span key={state} data-state-label={state} className="capitalize">{state}</span>)}
                   </StepperLabel>
                   <span className="sr-only">, {["Account","Details","Review","Payment","Finish"][index]}</span>
@@ -364,8 +444,8 @@ function VariationStudy() {
   return (
     <div className="identity-variants min-w-0">
       <h3 className="text-xl font-medium tracking-tight">Appearance</h3>
-      <p className="mt-2 max-w-[44ch] text-sm leading-relaxed text-[#555]">Change the style, not the behavior. Your current step stays the same when you switch appearances.</p>
-      <div style={neutral} className="mt-5 rounded-xl border border-border bg-background px-3 py-4 text-foreground sm:px-5">
+      <p className="mt-2 max-w-[44ch] text-sm leading-relaxed text-[#555]">Switch the appearance at any step. Navigation and progress stay intact.</p>
+      <div style={neutral} className="mt-5 flex min-h-[232px] flex-col justify-center rounded-xl border border-border bg-background px-3 py-4 text-foreground sm:px-5">
         <fieldset className="mx-auto flex w-fit max-w-full items-center gap-0.5 rounded-full border border-border bg-muted/50 p-1">
           <legend className="sr-only">Stepper appearance</legend>
           {([{id:"minimal",label:"Minimal"},{id:"outline",label:"Outline"},{id:"editorial",label:"Editorial"}] as const).map(({id,label})=>(
@@ -464,6 +544,13 @@ export default function IdentityStudy() {
           {Icon:FlaskConical,title:"Research",href:"/drafts/interactions"},
           {Icon:Layers,title:"Handoff",href:"/drafts/handoff"},
         ]).map(({Icon,title,href})=><Link key={href} href={href} className="inline-flex items-center gap-2 text-sm font-medium hover:text-[#bd171c]"><Icon aria-hidden="true" className="size-4 shrink-0 text-[#bd171c]"/>{title}<ArrowUpRight aria-hidden="true" className="size-3.5 shrink-0"/></Link>)}
+      </section>
+      <section id="identity" className={`border-b py-10 lg:py-14 ${rule}`}>
+        <h2 className={`${serif} text-5xl text-[#bd171c] sm:text-6xl`}>Progress, in its form.</h2>
+        <div className="mt-7 grid min-w-0 gap-8 lg:grid-cols-2 lg:gap-10">
+          <MarkStudy/>
+          <MarkSizes/>
+        </div>
       </section>
       <footer className="flex flex-wrap items-end justify-between gap-5 py-8">
         <p className={`${serif} text-3xl italic text-[#bd171c] sm:text-4xl`}>Expressive by identity.<br/>Neutral by design.</p>
