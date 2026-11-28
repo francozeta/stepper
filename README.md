@@ -7,13 +7,20 @@ source into your app, so you own the code and can customize it directly.
 
 ## Install
 
+Start in a TypeScript React project with shadcn/ui and Tailwind CSS v4.
 Use Node.js 22 or newer for the `cn` dependency.
 
 ```bash
 pnpm dlx shadcn@latest add @stepper/stepper
 ```
 
-The CLI installs the source at:
+If the namespace cannot be resolved, use the direct registry URL:
+
+```bash
+npx shadcn@latest add https://francozeta-stepper.vercel.app/r/stepper.json
+```
+
+The CLI uses your `components.json` UI alias. The default source path is:
 
 ```txt
 components/ui/stepper.tsx
@@ -25,20 +32,44 @@ Install the styled demo block with:
 pnpm dlx shadcn@latest add @stepper/stepper-demo
 ```
 
-## Usage
+## Your first flow
 
 ```tsx
+"use client";
+
+import { useState } from "react";
 import {
-  Stepper,
-  StepperContent,
-  StepperDescription,
-  StepperIndicator,
-  StepperItem,
-  StepperLabel,
-  StepperList,
-  StepperTrigger,
+  Stepper, StepperContent, StepperItem, StepperList,
+  StepperNext, StepperPrevious, type StepperStepsValue,
 } from "@/components/ui/stepper";
+
+const steps = [{ value: "details" }, { value: "review" }] as const;
+type Step = StepperStepsValue<typeof steps>;
+
+export function SetupStepper() {
+  const [step, setStep] = useState<Step>("details");
+  return (
+    <Stepper steps={steps} value={step} onValueChange={setStep}>
+      <StepperList>
+        <StepperItem value="details">Details</StepperItem>
+        <StepperItem value="review">Review</StepperItem>
+      </StepperList>
+      <StepperContent value="details">Enter your details.</StepperContent>
+      <StepperContent value="review">Review your details.</StepperContent>
+      <div className="flex justify-between">
+        <StepperPrevious />
+        <StepperNext />
+      </div>
+    </Stepper>
+  );
+}
 ```
+
+Render `SetupStepper` in your page. The app owns form validation and final
+submission; this example demonstrates navigation only. The registry copies
+one Stepper file and installs or reuses Base UI and `cn`.
+
+[Installation and usage](https://francozeta-stepper.vercel.app/docs/installation) · [API](https://francozeta-stepper.vercel.app/docs/api)
 
 ## Philosophy
 

@@ -53,6 +53,18 @@ describe("MDX docs content", () => {
     expect(sidebar).toContain("DocsSearchTrigger");
   });
 
+  it("documents a complete first flow and the silent controlled fallback", async () => {
+    const install = await readText("content/docs/installation.mdx");
+    const docsData = await readText("lib/docs.ts");
+    expect(install).toContain("Node.js 22");
+    expect(install).toContain("Tailwind CSS v4");
+    expect(install).toContain("components.json");
+    expect(install).toContain("without calling onValueChange");
+    expect(docsData).toContain('export function SetupStepper()');
+    expect(docsData).toContain("without emitting onValueChange");
+    expect(docsData).not.toContain("including controlled fallbacks");
+  });
+
   it("documents Stepper ownership, controlled fallback, and composition boundaries", async () => {
     const index = await readText("content/docs/index.mdx");
     const stepper = await readText("content/docs/stepper.mdx");

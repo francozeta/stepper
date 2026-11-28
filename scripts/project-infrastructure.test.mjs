@@ -133,6 +133,10 @@ describe("project infrastructure", () => {
     expect(registrySource).toContain("function Stepper(");
     expect(registrySource).toContain("function StepperItem<");
     expect(registrySource).toContain("export type {");
+    // Base-style registry transforms strip JSX asChild attributes. Keep
+    // the internal compatibility transport outside that transform.
+    expect(registrySource.match(/legacyAsChild=\{asChild\}/g)).toHaveLength(3);
+    expect(registrySource).not.toContain("asChild={asChild}");
     expect(registrySource).not.toContain("./stepper/");
   });
 

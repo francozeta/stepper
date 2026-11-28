@@ -579,10 +579,11 @@ function StepperItem<TValue extends StepperValue = StepperValue>({
 function StepperElement({
   defaultTagName,
   render,
-  asChild,
+  legacyAsChild: asChild,
   children,
   ...props
-}: React.HTMLAttributes<HTMLElement> & StepperCompositionProps & {
+}: React.HTMLAttributes<HTMLElement> & Omit<StepperCompositionProps, "asChild"> & {
+  legacyAsChild?: boolean;
   defaultTagName: "button" | "div";
   type?: React.ComponentPropsWithoutRef<"button">["type"];
   disabled?: boolean;
@@ -639,7 +640,7 @@ function StepperTrigger({
     <StepperElement
       defaultTagName="button"
       render={render}
-      asChild={asChild}
+      legacyAsChild={asChild}
       id={triggerId}
       type={nativeButton ? "button" : undefined}
       aria-current={isActive ? "step" : undefined}
@@ -845,7 +846,7 @@ function StepperContent<TValue extends StepperValue = StepperValue>({
     <StepperElement
       defaultTagName="div"
       render={render}
-      asChild={asChild}
+      legacyAsChild={asChild}
       id={getStepId(id, "content", value)}
       role="region"
       aria-labelledby={getStepId(id, "trigger", value)}
@@ -937,7 +938,7 @@ function StepperNavigationButton({
     <StepperElement
       defaultTagName="button"
       render={render}
-      asChild={asChild}
+      legacyAsChild={asChild}
       type={nativeButton ? "button" : undefined}
       disabled={nativeButton ? isDisabled : undefined}
       aria-disabled={isDisabled ? true : undefined}

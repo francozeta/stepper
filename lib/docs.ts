@@ -16,10 +16,12 @@ const releaseItems = [
   "The registry output is generated from components/ui/stepper.tsx.",
   "GitHub Actions verifies the registry, docs, tests, and production build.",
   "The public install command copies @stepper/stepper from the official shadcn registry namespace.",
-  "The component is copied into the user's app instead of installed as a runtime dependency.",
+  "The Stepper source is copied into the app. Its Base UI and cn runtime dependencies are installed or reused.",
 ];
 
-const gettingStartedSnippet = `import {
+const gettingStartedSnippet = `"use client";
+
+import {
   Stepper,
   StepperContent,
   StepperItem,
@@ -32,11 +34,11 @@ export function CheckoutStepper() {
   return (
     <Stepper defaultValue="account">
       <StepperList>
-        <StepperItem value="account" completed>
+        <StepperItem value="account">
           Account
         </StepperItem>
         <StepperItem value="profile">Profile</StepperItem>
-        <StepperItem value="payment" disabled>
+        <StepperItem value="payment">
           Payment
         </StepperItem>
       </StepperList>
@@ -53,19 +55,34 @@ export function CheckoutStepper() {
   );
 }`;
 
-const controlledSnippet = `const [step, setStep] = React.useState("details");
+const controlledSnippet = `"use client";
 
-<Stepper value={step} onValueChange={setStep}>
-  <StepperList>
-    <StepperItem value="details">Details</StepperItem>
-    <StepperItem value="review">Review</StepperItem>
-    <StepperItem value="confirm">Confirm</StepperItem>
-  </StepperList>
+import { useState } from "react";
+import {
+  Stepper, StepperContent, StepperItem, StepperList,
+  StepperNext, StepperPrevious, type StepperStepsValue,
+} from "@/components/ui/stepper";
 
-  <StepperContent value="details">Collect details.</StepperContent>
-  <StepperContent value="review">Review the request.</StepperContent>
-  <StepperContent value="confirm">Confirm the flow.</StepperContent>
-</Stepper>;`;
+const steps = [{ value: "details" }, { value: "review" }] as const;
+type Step = StepperStepsValue<typeof steps>;
+
+export function SetupStepper() {
+  const [step, setStep] = useState<Step>("details");
+  return (
+    <Stepper steps={steps} value={step} onValueChange={setStep}>
+      <StepperList>
+        <StepperItem value="details">Details</StepperItem>
+        <StepperItem value="review">Review</StepperItem>
+      </StepperList>
+      <StepperContent value="details">Enter your details.</StepperContent>
+      <StepperContent value="review">Review your details.</StepperContent>
+      <div className="flex justify-between">
+        <StepperPrevious />
+        <StepperNext />
+      </div>
+    </Stepper>
+  );
+}`;
 
 const usageSnippet = `import {
   Stepper,
@@ -208,12 +225,12 @@ const controlledBehaviorNotes = [
   {
     label: "Missing value",
     value: "First enabled step",
-    help: "When value points to a step that does not exist, Stepper renders the first enabled step and calls onValueChange with that fallback.",
+    help: "When value points to a step that does not exist, Stepper renders the first enabled step without emitting onValueChange. The controlled owner can explicitly reconcile its value.",
   },
   {
     label: "Disabled value",
     value: "Skipped",
-    help: "When the selected step becomes disabled, Stepper moves to the first enabled step so controls and content stay coherent.",
+    help: "When the selected step becomes disabled, Stepper displays the first enabled step; if all are disabled, there is no active step. The controlled owner keeps its value.",
   },
   {
     label: "Real flows",
@@ -1235,7 +1252,7 @@ const rootProps = [
   {
     name: "onValueChange",
     type: "(value: string) => void",
-    description: "Called when the selected step changes, including controlled fallbacks to the first enabled step.",
+    description: "Called for valid navigation requests. Rendering a fallback does not emit onValueChange.",
   },
   {
     name: "orientation",
