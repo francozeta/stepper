@@ -6,7 +6,7 @@ import { registryInstallSnippet } from "@/lib/docs";
 import Link from "next/link";
 import {
   Stepper, StepperContent, StepperItem, StepperList,
-  StepperNext, StepperPrevious,
+  StepperNext, StepperPrevious, StepperTrigger, StepperIndicator, StepperLabel, StepperSeparator,
 } from "@/components/ui/stepper";
 
 export const metadata: Metadata = {
@@ -27,13 +27,49 @@ const serif = "[font-family:Georgia,'Times_New_Roman',serif] font-normal trackin
 const rule = "border-[#bd171c]/35";
 const field = "h-10 w-full min-w-0 rounded-md border border-border bg-background px-3 text-base text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring ";
 const stages = [{value:"account"}, {value:"details"}, {value:"confirm"}] as const;
-const parts = [
-  ["Indicator", "The visible state of each step."],
-  ["Trigger", "The actual interactive hit area."],
-  ["Fill", "The completed portion of the connector."],
-  ["Track", "The full connector path."],
-  ["Content", "The panel associated with a step."],
+const anatomyParts = [
+  { id: "root", name: "Stepper", detail: "Shares the current step and navigation state.", slot: "stepper" },
+  { id: "list", name: "StepperList", detail: "Groups the steps in their navigation order.", slot: "stepper-list" },
+  { id: "item", name: "StepperItem", detail: "Represents one stage and its state.", slot: "stepper-item" },
+  { id: "trigger", name: "StepperTrigger", detail: "Selects a step; supports keyboard navigation.", slot: "stepper-trigger" },
+  { id: "indicator", name: "StepperIndicator", detail: "Shows a number, completion mark or error.", slot: "stepper-indicator" },
+  { id: "label", name: "StepperLabel", detail: "Names the stage for the person using it.", slot: "stepper-label" },
+  { id: "separator", name: "StepperSeparator", detail: "Track and fill connect stages and express progress.", slot: "stepper-separator" },
+  { id: "content", name: "StepperContent", detail: "Displays the panel for the active stage.", slot: "stepper-content" },
+  { id: "navigation", name: "StepperPrevious / Next", detail: "Moves to the previous or next enabled stage.", slot: "stepper-next" },
 ] as const;
+
+const anatomyCode = `<Stepper defaultValue="details">
+  <StepperList>
+    {steps.map(({ value, label }, index) => (
+      <StepperItem key={value} value={value}
+        defaultTrigger={false} separator={false}>
+        <StepperTrigger>
+          <StepperIndicator />
+          <StepperLabel>{label}</StepperLabel>
+        </StepperTrigger>
+        {index < steps.length - 1 && <StepperSeparator />}
+      </StepperItem>
+    ))}
+  </StepperList>
+  <StepperContent value="account">Account information</StepperContent>
+  <StepperContent value="details">Preferences and details</StepperContent>
+  <StepperContent value="confirm">Review your information</StepperContent>
+  <StepperPrevious>Back</StepperPrevious>
+  <StepperNext>Continue</StepperNext>
+</Stepper>`;
+
+const inspectorStyles = `
+  .identity-inspector:not(:has(#inspect-code:checked)) [data-inspector-code],
+  .identity-inspector:has(#inspect-code:checked) [data-inspector-live],
+  .identity-inspector:not(:has(#inspect-anatomy:checked)) [data-inspector-parts] { display: none; }
+  .identity-inspector:has(#inspect-anatomy:checked) [data-inspector-live] { background-image: radial-gradient(#bd171c20 .65px, transparent .65px); background-size: 12px 12px; }
+  ${anatomyParts.filter(p=>p.id!=="navigation").map(p=>`.identity-inspector:has(#inspect-anatomy:checked):has(#part-${p.id}:checked) [data-inspector-component] [data-slot="${p.slot}"]:not([hidden]):not(:focus-visible) { outline: 1px solid #bd171c; outline-offset: -1px; }`).join("\n")}
+  .identity-inspector:has(#inspect-anatomy:checked):has(#part-navigation:checked) [data-inspector-component] :is([data-slot="stepper-previous"],[data-slot="stepper-next"]):not(:focus-visible) { outline: 1px solid #bd171c; outline-offset: 3px; }
+  .identity-inspector:has(#inspect-anatomy:checked):has(#part-separator:checked) [data-inspector-component] [data-slot="stepper-separator"] { outline: 2px solid #bd171c; outline-offset: 2px; }
+  .identity-inspector:has(#inspect-anatomy:checked):has(#part-indicator:checked) [data-inspector-component] [data-slot="stepper-indicator"],
+  .identity-inspector:has(#inspect-anatomy:checked):has(#part-label:checked) [data-inspector-component] [data-slot="stepper-label"] { outline-offset: 3px; }
+`;
 
 function Mark({ className = "" }: {className?: string}) {
   return <svg viewBox="0 0 48 48" fill="none" aria-hidden="true" className={className}>
@@ -76,30 +112,59 @@ function Demo() {
 }
 
 function Anatomy() {
-  return <div className="relative">
-    <input id="show-anatomy" type="checkbox" defaultChecked className="peer sr-only"/>
-    <label htmlFor="show-anatomy" className="mb-5 inline-flex h-9 cursor-pointer items-center gap-2 rounded-full border border-[#bd171c]/50 px-3 text-sm text-[#bd171c] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-checked:bg-[#bd171c] peer-checked:text-white"><Layers aria-hidden="true" className="size-4 shrink-0"/> Show anatomy</label>
-    <div style={neutral} className="relative rounded-xl border border-border bg-background px-3 pt-16 pb-14 text-foreground sm:px-6">
-      <Stepper steps={stages} defaultValue="details" className="gap-4">
-        <StepperList>
-          <StepperItem value="account">Account</StepperItem>
-          <StepperItem value="details">Details</StepperItem>
-          <StepperItem value="confirm">Confirm</StepperItem>
-        </StepperList>
-        <div className="min-h-16 rounded-md border border-border p-3 text-xs text-muted-foreground">
-          <StepperContent value="account" className="border-0 bg-transparent p-0 shadow-none">Account information</StepperContent>
-          <StepperContent value="details" className="border-0 bg-transparent p-0 shadow-none">Preferences and details</StepperContent>
-          <StepperContent value="confirm" className="border-0 bg-transparent p-0 shadow-none">Review your information</StepperContent>
+  return <div className="identity-inspector mt-7">
+    <style>{inspectorStyles}</style>
+    <fieldset className="mb-5 flex flex-wrap items-center gap-1 rounded-full border border-[#242424]/15 bg-white/40 p-1 w-fit">
+      <legend className="sr-only">Component view</legend>
+      {([{id:"preview", label:"Preview"}, {id:"anatomy", label:"Anatomy"}, {id:"code", label:"Code"}]).map(({id,label})=><label key={id} className="relative cursor-pointer">
+        <input type="radio" name="inspector-view" id={"inspect-"+id} defaultChecked={id==="anatomy"} className="peer sr-only"/>
+        <span className="flex h-9 items-center justify-center rounded-full px-4 text-sm font-medium text-[#555] peer-checked:bg-[#242424] peer-checked:text-white peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#bd171c]">{label}</span>
+      </label>)}
+    </fieldset>
+    <div className="grid gap-5 lg:grid-cols-[1.2fr_1fr] lg:items-start">
+      <div className="min-w-0">
+        <div data-inspector-live="" style={neutral} className="flex min-h-[340px] items-center justify-center rounded-xl border border-border bg-background p-4 text-foreground sm:p-10">
+          <div data-inspector-component="" className="w-full max-w-lg rounded-lg bg-background p-2 sm:p-4">
+            <Stepper steps={stages} defaultValue="details" className="gap-5">
+              <StepperList aria-label="Anatomy example">
+                {stages.map(({value},index)=><StepperItem key={value} value={value} defaultTrigger={false} separator={false}>
+                  <StepperTrigger>
+                    <StepperIndicator/>
+                    <StepperLabel>{["Account","Details","Confirm"][index]}</StepperLabel>
+                  </StepperTrigger>
+                  {index<stages.length-1 && <StepperSeparator/>}
+                </StepperItem>)}
+              </StepperList>
+              <div className="min-h-[76px]">
+                {([{value:"account",text:"Account information"},{value:"details",text:"Preferences and details"},{value:"confirm",text:"Review your information"}] as const).map(({value,text})=><StepperContent key={value} value={value} className="min-h-[76px] rounded-lg border border-border bg-muted/25 p-4 shadow-none"><p className="text-sm font-medium">{text}</p></StepperContent>)}
+              </div>
+              <div className="flex justify-between gap-3">
+                <StepperPrevious className="rounded-full">Back</StepperPrevious>
+                <StepperNext className="rounded-full">Continue</StepperNext>
+              </div>
+            </Stepper>
+          </div>
         </div>
-      </Stepper>
-    </div>
-    <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-14 bottom-0 hidden text-[#bd171c] peer-checked:block">
-      <div className="absolute inset-x-3 top-1 bottom-2 border border-dashed border-[#bd171c]/40"/>
-      <div className="absolute top-5 left-[8%] border border-[#bd171c] bg-[#f2efeb] px-1.5 py-0.5 font-mono text-[9px]">INDICATOR<span className="absolute top-full left-1/2 h-6 border-l border-dashed border-[#bd171c]"/></div>
-      <div className="absolute top-5 left-[42%] border border-[#bd171c] bg-[#f2efeb] px-1.5 py-0.5 font-mono text-[9px]">TRIGGER<span className="absolute top-full left-1/2 h-6 border-l border-dashed border-[#bd171c]"/></div>
-      <div className="absolute top-[112px] left-[23%] bg-[#f2efeb] px-1 font-mono text-[9px]">FILL</div>
-      <div className="absolute top-[112px] right-[23%] bg-[#f2efeb] px-1 font-mono text-[9px]">TRACK</div>
-      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 border border-[#bd171c] bg-[#f2efeb] px-2 py-0.5 font-mono text-[9px]">CONTENT</div>
+        <div data-inspector-code="" style={neutral} className="relative rounded-xl border border-border bg-background text-foreground">
+          <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-2.5">
+            <span className="flex items-center gap-2 text-sm"><Code2 aria-hidden="true" className="size-4"/> JSX</span>
+            <CopyButton value={anatomyCode} label="Copy JSX" iconOnly className="size-9"/>
+          </div>
+          <pre tabIndex={0} className="max-h-[520px] overflow-auto p-4 text-xs leading-6 focus-visible:outline-2 focus-visible:outline-[#bd171c] sm:text-sm"><code>{anatomyCode}</code></pre>
+        </div>
+      </div>
+      <fieldset data-inspector-parts="" className="min-w-0 border-t border-[#bd171c]/35">
+        <legend className="sr-only">Inspect a component part</legend>
+        {anatomyParts.map(({id,name,detail},i)=><label key={id} className="relative block cursor-pointer border-b border-[#bd171c]/20">
+          <input id={"part-"+id} type="radio" name="inspector-part" defaultChecked={id==="trigger"} className="peer sr-only"/>
+          <span className="grid grid-cols-[2ch_minmax(0,1fr)_1rem] items-center gap-x-3 px-3 py-3 text-sm peer-checked:bg-[#bd171c]/[.055] peer-checked:text-[#bd171c] peer-focus-visible:outline-2 peer-focus-visible:outline-[#bd171c]">
+            <span aria-hidden="true" className="font-mono text-xs tabular-nums text-[#bd171c]">{String(i+1).padStart(2,"0")}</span>
+            <span className="break-words font-mono text-[13px] font-medium sm:text-sm">{name}</span>
+            <ArrowRight aria-hidden="true" className="size-4"/>
+          </span>
+          <span className="hidden px-3 pt-0 pb-4 pl-[calc(2ch+1.5rem)] text-sm leading-relaxed text-[#555] peer-checked:block peer-checked:bg-[#bd171c]/[.055]">{detail}</span>
+        </label>)}
+      </fieldset>
     </div>
   </div>;
 }
@@ -137,13 +202,15 @@ export default function IdentityStudy() {
           <Demo/>
         </div>
       </section>
-      <section className={`grid gap-8 border-b py-10 lg:grid-cols-2 lg:gap-12 ${rule}`}>
-        <div className="min-w-0"><Anatomy/></div>
-        <div className="lg:border-l lg:border-[#bd171c]/35 lg:pl-12">
-          <h2 className={`${serif} mt-2 text-6xl text-[#bd171c]`}>Anatomy.</h2>
-          <p className="mt-4 max-w-md text-sm leading-relaxed">Compose each part independently. Change the appearance without changing how your flow works.</p>
-          <dl className="mt-5 grid gap-2.5 text-sm">{parts.map(([name,desc],i)=><div key={name} className="grid grid-cols-[2ch_9ch_1fr] gap-3"><span aria-hidden="true" className="font-mono text-xs text-[#bd171c]">{String(i+1).padStart(2,"0")}</span><dt className="font-medium text-[#bd171c]">{name}</dt><dd>{desc}</dd></div>)}</dl>
+      <section id="anatomy" className={`border-b py-10 lg:py-14 ${rule}`}>
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h2 className={`${serif} text-5xl text-[#bd171c] sm:text-6xl`}>Anatomy.</h2>
+            <p className="mt-4 max-w-[52ch] text-base leading-relaxed">Explore how the parts fit together. Select a component to reveal its role in the live example.</p>
+          </div>
+          <Link href="/docs/api" className="inline-flex items-center gap-2 text-sm font-medium hover:text-[#bd171c]">API reference <ArrowUpRight aria-hidden="true" className="size-4"/></Link>
         </div>
+        <Anatomy/>
       </section>
       <section className={`border-b py-10 lg:py-14 ${rule}`}>
         <h2 className={`${serif} text-5xl text-[#bd171c] sm:text-6xl`}>Your flow. Your rules.</h2>
