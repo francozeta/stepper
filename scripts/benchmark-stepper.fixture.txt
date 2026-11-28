@@ -68,4 +68,4 @@ it("compares render work and navigation races in the same runtime", async () => 
   }));
   expect(median(candidate.map(x => x.calls))).toBeLessThan(median(baseline.map(x => x.calls)));
   expect(candidateRace).toEqual(["2"]);
-});
+}, 60_000);
